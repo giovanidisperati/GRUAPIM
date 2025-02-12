@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 01 - Revisão de Análise e Programação Orientada a Objetos</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="fa fa-home mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>08 - Exercício II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>09 - Docker</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>10 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>11 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>12 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>13 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>14 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>15 - Microsserviços VI</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+            <h3><strong>Apresentação da Disciplina: APIs e Microsserviços</strong></h3>
+            <p>Bem-vindos à disciplina de <strong>APIs e Microsserviços</strong>! Nesta matéria, vamos explorar a
+                construção de <strong>sistemas distribuídos</strong> utilizando APIs e arquiteturas baseadas em
+                microsserviços. O objetivo ao longo do semestre é fornecer uma compreensão sólida sobre como projetar, desenvolver e
+                implantar aplicações modernas escaláveis, seguras e eficientes.</p>
+            <p>Ao longo do curso, discutiremos a transição de arquiteturas monolíticas para microsserviços, abordando
+                suas vantagens e desafios. Aprenderemos sobre <strong>padrões arquiteturais, autenticação e autorização,
+                    boas práticas de desenvolvimento, testes, conteinerização e escalabilidade</strong>, de forma a apresentar
+                cenários reais do mercado de tecnologia.</p>
+            <p>Ao término do curso é esperado que vocês estejam aptos a compreender os desafios que envolvem o desenvolvimento de aplicações robustas e escaláveis, 
+                e que sejam capazes de enfrentá-los por meio da adoção de práticas estebelecidas na literatura de desenvolvimento de software. A disciplina será <strong>prática e orientada a
+                    projetos</strong>, proporcionando experiências aplicadas ao desenvolvimento de APIs e microsserviços.</p>
+            <hr>
+            <h3><strong>Conteúdo Programático da Disciplina</strong></h3>
+            <ol>
+                <li>
+                    <p><strong>Construção de APIs REST e uso de verbos HTTP</strong> </p>
+                    <ul>
+                        <li>Arquitetura e fundamentos das APIs REST </li>
+                        <li>Padrões e boas práticas de desenvolvimento</li>
+                        <li>Estratégias de autenticação e autorização </li>
+                        <li>Testes unitários, funcionais e de integração </li>
+                        <li>Refatoração e reúso de código </li>
+                    </ul>
+                </li>
+                <br/>
+                <li>
+                    <p><strong>Construção de aplicações baseadas em microsserviços</strong> </p>
+                    <ul>
+                        <li>Arquiteturas para construção de microsserviços</li>
+                        <li>Boas práticas de codificação</li>
+                        <li>Desenvolvimento de Projeto baseado em microsserviços</li>
+                    </ul>
+                </li>
+                <br/>
+                <li>
+                    <p><strong>Conteinerização de microsserviços</strong> </p>
+                    <ul>
+                        <li>Uso de contêineres para empacotamento e execução</li>
+                        <li>Benefícios e desafios da conteinerização</li>
+                    </ul>
+                </li>
+                <br/>
+                <li>
+                    <p><strong>Deploy de microsserviços</strong> </p>
+                    <ul>
+                        <li>Estratégias de implantação</li>
+                        <li>Automação de deploy</li>
+                    </ul>
+                </li>
+                <br/>
+                <li>
+                    <p><strong>Conceitos de orquestração e coreografia de coleções de microsserviços</strong> </p>
+                    <ul>
+                        <li>Gerenciamento e coordenação de microsserviços</li>
+                    </ul>
+                </li>
+                <br/>
+                <li>
+                    <p><strong>Introdução ao CI/CD, Load Balance, Bancos de Dados Distribuídos e Serviços de
+                            Cache</strong> </p>
+                    <ul>
+                        <li>Automação de integração e entrega contínua </li>
+                        <li>Balanceamento de carga e otimização de desempenho </li>
+                        <li>Gerenciamento de dados em ambientes distribuídos</li>
+                    </ul>
+                </li>
+                <br/>
+                <li>
+                    <p><strong>Segurança em aplicações baseadas em microsserviços</strong> </p>
+                    <ul>
+                        <li>Estratégias de proteção contra vulnerabilidades </li>
+                        <li>Boas práticas de segurança</li>
+                    </ul>
+                </li>
+                <br/>
+                <li>
+                    <p><strong>Tópicos de escalabilidade nas aplicações de microsserviços</strong> </p>
+                    <ul>
+                        <li>Estratégias para lidar com alta demanda e crescimento </li>
+                        <li>Arquiteturas resilientes e eficientes</li>
+                    </ul>
+                </li>
+            </ol>
+            <hr>
+            <p>Essa disciplina será desenvolvida utilizando <strong>Java e Spring Boot</strong> como principais
+                tecnologias, permitindo que vocês experimentem na prática a construção e o gerenciamento de
+                microsserviços.</p>
+            <p>Preparem-se para um curso dinâmico e repleto de desafios práticos que vão aproximar vocês das
+                <strong>demandas reais do mercado de software</strong>! 🚀</p>
+        </div>
+
+    </div>
+
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- <script src="js/main.js"></script> -->
+
+</body>
+
+</html>

@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 01 - Revisão de Análise e Programação Orientada a Objetos</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li class="active">
+                    <a href="Aula01.html"><span class="fa fa-home mr-0"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>08 - Exercício II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>09 - Docker</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>10 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>11 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>12 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>13 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>14 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>15 - Microsserviços VI</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+
+            <h1><strong>Aula 01 - Revisão de Análise e Programação Orientada a Objetos</strong></h1>
+            <hr>
+            <h2><strong>Revisão de APO1</strong></h2>
+            <p><strong>Objetivo:</strong> Relembrar fundamentos de Java, OOP, coleções, tratamento de erros e UML
+                básico.
+            </p>
+            <h3><strong>Sintaxe Java e Estruturas de Controle</strong></h3>
+            <p><strong>Conteúdo:</strong> </p>
+            <ul>
+                <li>Tipos primitivos, operadores (lógicos, relacionais, ternários). </li>
+                <li>Estruturas de decisão (<code>if-else</code>, <code>switch</code>), repetição (<code>for</code>,
+                    <code>while</code>, <code>do-while</code>).
+                </li>
+                <li>Boas práticas: legibilidade e eficiência.</li>
+            </ul>
+            <h3>1. Sintaxe Básica do Java</h3>
+            <h4>1.1 Tipos Primitivos e Variáveis</h4>
+            <p>No Java, os tipos primitivos representam valores simples, não objetos, e são otimizados para performance.
+                Entre
+                eles temos:</p>
+            <ul>
+                <li><strong>byte</strong> (8 bits, -128 a 127)</li>
+                <li><strong>short</strong> (16 bits, -32768 a 32767)</li>
+                <li><strong>int</strong> (32 bits, -2.147.483.648 a 2.147.483.647)</li>
+                <li><strong>long</strong> (64 bits)</li>
+                <li><strong>float</strong> (32 bits, ponto flutuante)</li>
+                <li><strong>double</strong> (64 bits, ponto flutuante, maior precisão)</li>
+                <li><strong>char</strong> (16 bits, representa um caractere Unicode)</li>
+                <li><strong>boolean</strong> (pode ser <code>true</code> ou <code>false</code>)</li>
+            </ul>
+            <p>Ao declarar uma variável, fazemos:</p>
+            <pre><code class="language-java">int idade = 25;
+double salario = 2500.75;
+boolean ativo = true;
+</code></pre>
+            <h3>1.2 Operadores</h3>
+            <ul>
+                <li><strong>Aritméticos</strong>: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>,
+                    <code>%</code>
+                </li>
+                <li><strong>Lógicos</strong>: <code>&amp;&amp;</code> (E), <code>||</code> (OU), <code>!</code> (NÃO)
+                </li>
+                <li><strong>Relacionais</strong>: <code>==</code>, <code>!=</code>, <code>&gt;</code>,
+                    <code>&gt;=</code>,
+                    <code>&lt;</code>, <code>&lt;=</code>
+                </li>
+                <li><strong>Unários</strong>: <code>++</code> (incremento), <code>--</code> (decremento)</li>
+                <li><strong>Ternário</strong>: <code>condicao ? valorSeVerdadeiro : valorSeFalso</code></li>
+            </ul>
+            <p>Exemplo de operador ternário:</p>
+            <pre><code class="language-java">int x = (5 &gt; 3) ? 10 : 0; // x será 10
+</code></pre>
+            <h3>1.3 Estruturas de Controle</h3>
+            <ul>
+                <li><strong>if/else</strong>:
+                    <pre><code class="language-java">if (idade &gt;= 18) {
+    System.out.println(&quot;Maior de idade&quot;);
+} else {
+    System.out.println(&quot;Menor de idade&quot;);
+}
+</code></pre>
+                </li>
+                <li><strong>switch</strong>:
+                    <pre><code class="language-java">switch (diaDaSemana) {
+    case 1: System.out.println(&quot;Segunda&quot;); break;
+    case 2: System.out.println(&quot;Terça&quot;); break;
+    // ...
+    default: System.out.println(&quot;Dia inválido&quot;); break;
+}
+</code></pre>
+                </li>
+                <li><strong>for</strong> (tradicional):
+                    <pre><code class="language-java">for (int i = 0; i &lt; 10; i++) {
+    System.out.println(i);
+}
+</code></pre>
+                </li>
+                <li><strong>while</strong> / <strong>do-while</strong>:
+                    <pre><code class="language-java">int i = 0;
+while (i &lt; 10) {
+    System.out.println(i);
+    i++;
+}
+</code></pre>
+                </li>
+            </ul>
+            <hr>
+            <h3><strong>2. OOP Básico (Classes, Objetos, Encapsulamento)</strong></h3>
+            <p><strong>Conteúdo:</strong> </p>
+            <ul>
+                <li>Classes vs. objetos: definição e instanciação. </li>
+                <li>Modificadores de acesso (<code>private</code>, <code>public</code>, <code>protected</code>). </li>
+                <li>Encapsulamento: uso de getters/setters.</li>
+            </ul>
+            <h3>2.1 Classes e Objetos</h3>
+            <ul>
+                <li><strong>Classe</strong>: Molde que define atributos (dados) e métodos (comportamentos).</li>
+                <li><strong>Objeto</strong>: Instância de uma classe em tempo de execução.</li>
+            </ul>
+            <p>Exemplo:</p>
+            <pre><code class="language-java">public class Produto {
+    // Atributos (propriedades)
+    private String nome;
+    private double preco;
+
+    // Construtor
+    public Produto(String nome, double preco) {
+        this.nome = nome;
+        this.preco = preco;
+    }
+
+    // Métodos de acesso (getters e setters)
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public double getPreco() { return preco; }
+    public void setPreco(double preco) { this.preco = preco; }
+
+    // Método de negócio
+    public double calcularDesconto(double percentual) {
+        return preco - (preco * percentual);
+    }
+}
+</code></pre>
+            <h3>2.2 Encapsulamento</h3>
+            <p>O encapsulamento é o princípio de proteger os dados internos de um objeto, expondo somente o necessário
+                por
+                meio
+                de métodos públicos. Isso aumenta a segurança e a clareza do código. Em Java, utilizamos
+                <strong>modificadores
+                    de acesso</strong>:
+            </p>
+            <ul>
+                <li><code>public</code>: acessível de qualquer lugar.</li>
+                <li><code>private</code>: acessível apenas dentro da própria classe.</li>
+                <li><code>protected</code>: acessível na classe, no mesmo pacote ou em subclasses.</li>
+                <li>(default – sem palavra-chave): acessível no mesmo pacote.</li>
+            </ul>
+            <h3>2.3 Construtores</h3>
+            <p>São métodos especiais que inicializam um objeto no momento em que é criado. Possuem o mesmo nome da
+                classe e
+                não
+                retornam valor.</p>
+            <p>No exemplo acima, o construtor recebe como parâmetros <code>String nome</code> e
+                <code>double preco</code> e
+                inicializa as variáveis de instância (atributos) com os valores desses parâmetros. A palavra de
+                <code>this</code> distingue variáveis de instância de parâmetros locais.
+            </p>
+            <h3>2.4 Herança</h3>
+            <p>Permite criar classes especializadas a partir de classes existentes. Usamos a palavra-chave
+                <code>extends</code>
+                em Java.
+            </p>
+            <pre><code class="language-java">public class Carro extends Veiculo {
+    // Carro herda atributos e métodos de Veiculo
+}
+</code></pre>
+            <ul>
+                <li>Promove o <strong>reuso de código</strong>.</li>
+                <li>É importante verificar se a relação “é-um” (IS-A) realmente faz sentido no modelo, caso contrário
+                    não se
+                    deve usar herança.</li>
+            </ul>
+            <p>Entretanto, a <strong>composição</strong> (ter objetos como membros) é geralmente preferida em vez da
+                <strong>herança</strong> (estender classes) devido a:
+            </p>
+            <h4><strong>2.4.1. Flexibilidade e Baixo Acoplamento</strong></h4>
+            <ul>
+                <li><strong>Herança</strong> cria uma relação rígida &quot;é-um&quot; entre classes, tornando o código
+                    frágil a
+                    mudanças na superclasse.</li>
+                <li><strong>Composição</strong> estabelece uma relação &quot;tem-um&quot;, permitindo substituir
+                    componentes
+                    sem
+                    afetar a classe principal.</li>
+            </ul>
+            <h5>Exemplo com Herança (Problema):</h5>
+            <pre><code class="language-java">class Veiculo {
+    void ligarMotor() { /* ... */ }
+}
+
+class Carro extends Veiculo { 
+    // Herda tudo de Veiculo, mesmo que não precise.
+}
+
+// E se surgir um CarroElétrico que não usa motor a combustão?
+class CarroEletrico extends Veiculo {
+    // Sobrescrever ligarMotor()? O motor é elétrico!
+}
+</code></pre>
+            <h5>Exemplo com Composição (Solução):</h5>
+            <pre><code class="language-java">interface Motor {
+    void ligar();
+}
+
+class MotorCombustão implements Motor {
+    public void ligar() { /* ... */ }
+}
+
+class MotorElétrico implements Motor {
+    public void ligar() { /* ... */ }
+}
+
+class Carro {
+    private Motor motor;
+
+    public Carro(Motor motor) {
+        this.motor = motor; // Composição: Carro &quot;tem um&quot; Motor
+    }
+
+    void ligar() {
+        motor.ligar(); // Comportamento definido pelo motor escolhido
+    }
+}
+
+// Uso:
+Carro carroGasolina = new Carro(new MotorCombustão());
+Carro carroEletrico = new Carro(new MotorEletrico()); // Flexibilidade!
+</code></pre>
+            <h4><strong>2.4.2 Evita Hierarquias Complexas</strong></h4>
+            <p>Herança múltipla não é permitida em Java, e hierarquias profundas tornam o código difícil de manter.</p>
+            <h5>Exemplo Ruim (Herança):</h5>
+            <pre><code class="language-java">abstract class Personagem {
+    abstract void mover();
+}
+
+class HeroiVoador extends Personagem {
+    void mover() { /* Voar */ }
+}
+
+class HeroiNadador extends Personagem {
+    void mover() { /* Nadar */ }
+}
+
+// E se um herói precisar voar E nadar? Teríamos que criar:
+class HeroiVoadorNadador extends Personagem {}
+/* Duplicação de código! */
+</code></pre>
+            <h5>Solução com Composição</h5>
+            <p>Encapsule habilidades como componentes independentes:</p>
+            <pre><code class="language-java">interface HabilidadeMovimento {
+    void mover();
+}
+
+class Voar implements HabilidadeMovimento {
+    public void mover() { System.out.println(&quot;Voando!&quot;); }
+}
+
+class Nadar implements HabilidadeMovimento {
+    public void mover() { System.out.println(&quot;Nadando!&quot;); }
+}
+
+class Personagem {
+    private HabilidadeMovimento habilidade;
+
+    public Personagem(HabilidadeMovimento habilidade) {
+        this.habilidade = habilidade; 
+        // Composição: Personagem &quot;tem uma&quot; habilidade
+    }
+
+    void mover() {
+        habilidade.mover();
+    }
+
+    // Permite mudar a habilidade em tempo de execução!
+    void setHabilidade(HabilidadeMovimento novaHabilidade) {
+        this.habilidade = novaHabilidade;
+    }
+}
+
+// Uso dinâmico:
+Personagem heroi = new Personagem(new Voar());
+heroi.mover(); // Voando!
+
+heroi.setHabilidade(new Nadar());
+heroi.mover(); // Nadando!`
+</code></pre>
+            <h4><strong>2.4.3. Reutilização de Código sem Acoplamento</strong></h4>
+            <p>Na composição, você reutiliza comportamentos sem herdar métodos desnecessários.</p>
+            <h5>Exemplo com Herança</h5>
+            <pre><code class="language-java">class ListaPersonalizada extends ArrayList&lt;String&gt; {
+    // Herda todos os métodos de ArrayList, mesmo os indesejados.
+}
+</code></pre>
+            <h5>Exemplo com Composição</h5>
+            <pre><code class="language-java">class ListaPersonalizada {
+    private List&lt;String&gt; lista = new ArrayList&lt;&gt;();
+
+    // Expõe apenas os métodos necessários:
+    public void addElemento(String elemento) {
+        lista.add(elemento);
+    }
+
+    public int tamanho() {
+        return lista.size();
+    }
+}
+</code></pre>
+            <p>O código exemplo acima é redundante, pois é meramente um wrapper para a classe ArrayList, mas demonstra o
+                ponto
+                principal.</p>
+            <h4><strong>2.4.4. Princípio SOLID: Aberto/Fechado e Inversão de Dependência</strong></h4>
+            <p>A composição permite estender comportamentos sem modificar a classe original, seguindo o princípio
+                <strong>&quot;Prefira interfaces a implementações&quot;</strong>.
+            </p>
+            <h5>Exemplo com Interfaces:</h5>
+            <pre><code class="language-java">interface Notificador {
+    void enviar(String mensagem);
+}
+
+class EmailNotificador implements Notificador {
+    public void enviar(String mensagem) { /* ... */ }
+}
+
+class SMSNotificador implements Notificador {
+    public void enviar(String mensagem) { /* ... */ }
+}
+
+class Sistema {
+    private Notificador notificador;
+
+    public Sistema(Notificador notificador) { 
+        // Injeção de dependência
+        this.notificador = notificador;
+    }
+
+    void alertar() {
+        notificador.enviar(&quot;Alerta!&quot;); 
+        // Troque o notificador sem alterar Sistema
+    }
+}
+</code></pre>
+            <h4><strong>2.4.5 Quando Usar Herança?</strong></h4>
+            <p>A herança é útil quando:</p>
+            <ul>
+                <li>Existe uma relação clara <strong>&quot;é-um&quot;</strong> (ex: <code>Gato extends Animal</code>).
+                </li>
+                <li>Você precisa de <strong>polimorfismo</strong> verdadeiro.</li>
+                <li>A superclasse é estável e não mudará frequentemente.</li>
+            </ul>
+            <p>A composição oferece:</p>
+            <ul>
+                <li><strong>Menos acoplamento</strong>: Mudanças em componentes não afetam a classe principal.</li>
+                <li><strong>Maior flexibilidade</strong>: Comportamentos podem ser trocados em tempo de execução.</li>
+                <li><strong>Melhor teste</strong>: Componentes podem ser mockados facilmente.</li>
+            </ul>
+            <p>Use herança para modelar relações hierárquicas genuínas e imutáveis. Para tudo mais, prefira composição!
+                🛠️
+            </p>
+            <h3>2.5. Polimorfismo</h3>
+            <p>Significa “muitas formas”. Em OOP, há dois principais tipos:</p>
+            <ul>
+                <li><strong>Sobrecarga (Overload)</strong>: mesmo nome de método, mas parâmetros diferentes.
+                    <pre><code class="language-java">public int soma(int a, int b) { return a + b; }
+public double soma(double a, double b) { return a + b; }
+</code></pre>
+                </li>
+                <li><strong>Sobreposição (Override)</strong>: redefinir um método herdado de uma superclasse.
+                    <pre><code class="language-java">@Override
+public void acelerar() {
+    System.out.println(&quot;O carro está acelerando&quot;);
+}
+</code></pre>
+                </li>
+            </ul>
+            <h3>2.6. Interfaces e Classes Abstratas</h3>
+            <ul>
+                <li><strong>Interfaces</strong>: definem <strong>contratos</strong> de métodos (sem implementação),
+                    obrigando as
+                    classes que as implementam a fornecer a lógica.
+                    <pre><code class="language-java">public interface Conectavel {
+    void connect();
+    void disconnect();
+}
+</code></pre>
+                </li>
+                <li><strong>Classes Abstratas</strong>: não podem ser instanciadas diretamente e podem conter métodos
+                    abstratos
+                    (sem corpo) ou concretos (com implementação).
+                    <pre><code class="language-java">public abstract class Funcionario {
+    public abstract void calculaSalario();
+    public void baterPonto() {
+        System.out.println(&quot;Ponto registrado&quot;);
+    }
+}
+</code></pre>
+                </li>
+            </ul>
+            <h3>2.7 Exemplos Práticos</h3>
+            <h4>Classe ContaBancaria</h4>
+            <p>Modelando uma conta bancária com encapsulamento e validação de saldo.</p>
+            <pre><code class="language-java">public class ContaBancaria {
+    private String titular;
+    private double saldo;
+
+    public ContaBancaria(String titular, double saldoInicial) {
+        this.titular = titular;
+        this.saldo = saldoInicial;
+    }
+
+    public String getTitular() { return titular; }
+
+    public double getSaldo() { return saldo; }
+
+    public void depositar(double valor) {
+        if (valor &gt; 0) {
+            saldo += valor;
+        } else {
+            System.out.println(&quot;Valor inválido para depósito.&quot;);
+        }
+    }
+
+    public boolean sacar(double valor) {
+        if (valor &gt; 0 &amp;&amp; saldo &gt;= valor) {
+            saldo -= valor;
+            return true;
+        }
+        System.out.println(&quot;Saldo insuficiente ou valor inválido.&quot;);
+        return false;
+    }
+}
+</code></pre>
+            <h4>Uso da ContaBancaria</h4>
+            <pre><code class="language-java">public class BancoTeste {
+    public static void main(String[] args) {
+        ContaBancaria conta = new ContaBancaria(&quot;Ana Silva&quot;, 1000.0);
+        conta.depositar(500);
+        conta.sacar(300);
+        System.out.printf(&quot;Saldo final: R$%.2f%n&quot;, conta.getSaldo());
+    }
+}
+</code></pre>
+            <h4>Uso de Herança: ContaPoupanca</h4>
+            <p>Criando uma conta poupança que herda de <code>ContaBancaria</code>.</p>
+            <pre><code class="language-java">public class ContaPoupanca extends ContaBancaria {
+    private double taxaJuros;
+
+    public ContaPoupanca(String titular, double saldoInicial, double taxaJuros) {
+        super(titular, saldoInicial);
+        this.taxaJuros = taxaJuros;
+    }
+
+    public void aplicarJuros() {
+        depositar(getSaldo() * taxaJuros);
+    }
+}
+</code></pre>
+            <h4>Uso de Composição: Cliente e ContaBancaria</h4>
+            <p>Evitando herança desnecessária com um relacionamento &quot;tem-um&quot;.</p>
+            <pre><code class="language-java">public class Cliente {
+    private String nome;
+    private ContaBancaria conta;
+
+    public Cliente(String nome, ContaBancaria conta) {
+        this.nome = nome;
+        this.conta = conta;
+    }
+
+    public void exibirSaldo() {
+        System.out.printf(&quot;Cliente: %s - Saldo: R$%.2f%n&quot;, nome, conta.getSaldo());
+    }
+}
+</code></pre>
+            <h4>Polimorfismo: Interface Notificacao</h4>
+            <pre><code class="language-java">interface Notificacao {
+    void enviar(String mensagem);
+}
+
+class EmailNotificacao implements Notificacao {
+    public void enviar(String mensagem) {
+        System.out.println(&quot;Email enviado: &quot; + mensagem);
+    }
+}
+
+class SMSNotificacao implements Notificacao {
+    public void enviar(String mensagem) {
+        System.out.println(&quot;SMS enviado: &quot; + mensagem);
+    }
+}
+</code></pre>
+            <h4>Uso da Interface Notificacao</h4>
+            <pre><code class="language-java">public class SistemaNotificacao {
+    public static void main(String[] args) {
+        Notificacao notificacao = new EmailNotificacao();
+        notificacao.enviar(&quot;Seu saldo foi atualizado.&quot;);
+
+        notificacao = new SMSNotificacao();
+        notificacao.enviar(&quot;Pagamento recebido.&quot;);
+    }
+}
+</code></pre>
+            <h3><strong>2.8. Boas Práticas</strong></h3>
+            <ul>
+                <li><strong>DRY (Don&#39;t Repeat Yourself)</strong>: Evitar código duplicado.</li>
+            </ul>
+            <p>Exemplo de violação desse princípio</p>
+            <pre><code class="language-java">// Código duplicado para calcular imposto em dois lugares diferentes  
+double calcularImpostoPedido(Pedido pedido) {  
+    return pedido.getTotal() * 0.10;  
+}  
+
+void gerarNotaFiscal(Pedido pedido) {  
+    double imposto = pedido.getTotal() * 0.10; // Cálculo repetido  
+    // ...  
+}  
+</code></pre>
+            <p>Solução (extrair para um único método)</p>
+            <pre><code class="language-java">double calcularImposto(double valor) {  
+    return valor * 0.10;  
+}  
+
+// Reutilização em múltiplos lugares:  
+void gerarNotaFiscal(Pedido pedido) {  
+    double imposto = calcularImposto(pedido.getTotal());  
+    // ...  
+}  
+
+double totalComImposto(Pedido pedido) {  
+    return pedido.getTotal() + calcularImposto(pedido.getTotal());  
+}  
+</code></pre>
+            <ul>
+                <li><strong>Validação em Métodos</strong>: Garantir lógica consistente.</li>
+            </ul>
+            <p>Exemplo de violação</p>
+            <pre><code class="language-java">void sacar(double valor) {  
+    saldo -= valor; 
+    // Problema: valor pode ser negativo ou maior que o saldo  
+}  
+</code></pre>
+            <p>Solução</p>
+            <pre><code class="language-java">void sacar(double valor) {  
+    if (valor &lt;= 0) {  
+        throw new IllegalArgumentException(&quot;Valor deve ser positivo.&quot;);  
+    }  
+    if (valor &gt; saldo) {  
+        throw new SaldoInsuficienteException(&quot;Saldo indisponível.&quot;);  
+    }  
+    saldo -= valor;  
+}  
+</code></pre>
+            <p>Para garantir que este princípio está sendo seguido, tenha em mente</p>
+            <ul>
+                <li>
+                    <p>Validação de Parâmetros: Verifique null, intervalos numéricos, ou formatos (ex: e-mail).</p>
+                </li>
+                <li>
+                    <p>Uso de Exceções Significativas: Lançe exceções específicas (IllegalArgumentException,
+                        InvalidStateException).</p>
+                </li>
+                <li>
+                    <p>Uso de Mensagens Claras: Descreva o erro de forma que ajude na depuração (ex: &quot;Valor não
+                        pode
+                        ser
+                        negativo&quot;).</p>
+                </li>
+            </ul>
+            <hr>
+            <h2>3. Coleções, Generics, Reflexão e Exceções</h2>
+            <h3>3.1 Arrays e Coleções</h3>
+            <h4>Arrays</h4>
+            <p>Os arrays em Java são estruturas de dados de tamanho fixo, utilizados para armazenar elementos do mesmo
+                tipo.
+                Eles são declarados da seguinte forma:</p>
+            <pre><code class="language-java">int[] numeros = new int[5]; // Array de inteiros com 5 posições
+String[] nomes = {&quot;João&quot;, &quot;Maria&quot;, &quot;Pedro&quot;}; // Array inicializado diretamente
+</code></pre>
+            <p>Os arrays têm a vantagem de serem eficientes em termos de memória e acessíveis via índices, mas sua
+                desvantagem é
+                o tamanho fixo, que não pode ser alterado após a criação.</p>
+            <h4>Collections Framework</h4>
+            <p>O framework de coleções do Java (“Java Collections Framework” - JCF) fornece estruturas de dados prontas,
+                dinâmicas e mais flexíveis do que arrays tradicionais. Algumas das principais interfaces e classes
+                incluem:
+            </p>
+            <h4>List</h4>
+            <p>A interface <code>List</code> representa uma coleção ordenada de elementos, permitindo duplicatas. As
+                principais
+                implementações são:</p>
+            <ul>
+                <li><code>ArrayList</code> - Implementação baseada em array dinâmico. Rápido para acesso direto, mas
+                    mais
+                    lento
+                    para inserções e remoções no meio da lista.</li>
+                <li><code>LinkedList</code> - Baseado em uma lista duplamente encadeada. Rápido para inserções e
+                    remoções,
+                    mas
+                    mais lento para acessos aleatórios.</li>
+                <li><code>Vector</code> - Similar ao <code>ArrayList</code>, mas sincronizado para acesso concorrente.
+                    Geralmente substituído pelo <code>ArrayList</code> devido às melhorias no gerenciamento de
+                    concorrência
+                    do
+                    Java.</li>
+            </ul>
+            <p>Exemplo:</p>
+            <pre><code class="language-java">List&lt;String&gt; nomes = new ArrayList&lt;&gt;();
+nomes.add(&quot;Ana&quot;);
+nomes.add(&quot;Carlos&quot;);
+nomes.add(&quot;Beatriz&quot;);
+
+System.out.println(nomes.get(1)); // Exibe &quot;Carlos&quot;
+</code></pre>
+            <h4>Set</h4>
+            <p>A interface <code>Set</code> representa uma coleção de elementos únicos (sem duplicatas). As principais
+                implementações são:</p>
+            <ul>
+                <li><code>HashSet</code> - Baseado em tabela hash, oferece alta performance para buscas, mas não garante
+                    ordenação.</li>
+                <li><code>LinkedHashSet</code> - Mantém a ordem de inserção dos elementos.</li>
+                <li><code>TreeSet</code> - Baseado em uma <code>Red-Black Tree</code>, garante ordenação natural dos
+                    elementos.
+                </li>
+            </ul>
+            <p>Exemplo:</p>
+            <pre><code class="language-java">Set&lt;Integer&gt; numeros = new HashSet&lt;&gt;();
+numeros.add(5);
+numeros.add(10);
+numeros.add(5); // Ignorado pois já existe
+
+System.out.println(numeros); // Exibe [5, 10]
+</code></pre>
+            <h4>Map</h4>
+            <p>A interface <code>Map</code> armazena pares (chave, valor). As principais implementações são:</p>
+            <ul>
+                <li><code>HashMap</code> - Baseado em tabela hash, não garante ordem de inserção.</li>
+                <li><code>LinkedHashMap</code> - Mantém a ordem de inserção dos pares.</li>
+                <li><code>TreeMap</code> - Ordena os pares com base na chave.</li>
+            </ul>
+            <p>Exemplo:</p>
+            <pre><code class="language-java">Map&lt;String, Integer&gt; idades = new HashMap&lt;&gt;();
+idades.put(&quot;Ana&quot;, 25);
+idades.put(&quot;Carlos&quot;, 30);
+
+System.out.println(idades.get(&quot;Ana&quot;)); // Exibe 25
+</code></pre>
+            <h4>Queue e Deque</h4>
+            <ul>
+                <li><code>Queue</code> - Representa uma fila (FIFO - First In, First Out). Implementações incluem
+                    <code>LinkedList</code> e <code>PriorityQueue</code>.
+                </li>
+                <li><code>Deque</code> - Representa uma fila de dois extremos (pode adicionar e remover elementos no
+                    início
+                    e no
+                    fim). Implementações incluem <code>ArrayDeque</code> e <code>LinkedList</code>.</li>
+            </ul>
+            <p>Exemplo:</p>
+            <pre><code class="language-java">Queue&lt;String&gt; fila = new LinkedList&lt;&gt;();
+fila.add(&quot;Ana&quot;);
+fila.add(&quot;Carlos&quot;);
+System.out.println(fila.poll()); // Remove e retorna &quot;Ana&quot;
+</code></pre>
+            <h4>Comparativo das Principais Classes de Coleção</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estrutura</th>
+                        <th>Permite Duplicatas?</th>
+                        <th>Mantém Ordem?</th>
+                        <th>Melhor Uso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>ArrayList</code></td>
+                        <td>Sim</td>
+                        <td>Sim</td>
+                        <td>Lista dinâmica com acesso rápido por índice</td>
+                    </tr>
+                    <tr>
+                        <td><code>LinkedList</code></td>
+                        <td>Sim</td>
+                        <td>Sim</td>
+                        <td>Inserções e remoções frequentes</td>
+                    </tr>
+                    <tr>
+                        <td><code>HashSet</code></td>
+                        <td>Não</td>
+                        <td>Não</td>
+                        <td>Conjunto de elementos únicos sem ordem</td>
+                    </tr>
+                    <tr>
+                        <td><code>TreeSet</code></td>
+                        <td>Não</td>
+                        <td>Sim (ordenado)</td>
+                        <td>Conjunto de elementos ordenados</td>
+                    </tr>
+                    <tr>
+                        <td><code>HashMap</code></td>
+                        <td>Não (chaves)</td>
+                        <td>Não</td>
+                        <td>Estrutura rápida para pares chave-valor</td>
+                    </tr>
+                    <tr>
+                        <td><code>TreeMap</code></td>
+                        <td>Não (chaves)</td>
+                        <td>Sim (ordenado)</td>
+                        <td>Mapeamento chave-valor ordenado</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>O Java Collections Framework fornece estruturas robustas e eficientes para manipular dados de maneira
+                flexível,
+                sendo uma alternativa muito superior aos arrays quando é necessário lidar com coleções dinâmicas.</p>
+            <h3>3.2 Generics</h3>
+            <p>Os <strong>Generics</strong> permitem definir <strong>tipos parametrizados</strong>, aumentando a
+                segurança
+                de
+                tipos em tempo de compilação e evitando erros de conversão.</p>
+            <h4>Conceito de Generics</h4>
+            <p>Generics permitem que classes, interfaces e métodos sejam parametrizados por tipos, tornando-os mais
+                reutilizáveis e seguros. Antes da introdução dos Generics no Java 5, coleções e outras classes
+                utilizavam
+                objetos genéricos (<code>Object</code>), exigindo conversões explícitas e permitindo a inserção de
+                elementos
+                de
+                tipos incompatíveis.</p>
+            <p>Com Generics, podemos definir um tipo parametrizado, garantindo que somente elementos do tipo
+                especificado
+                sejam
+                armazenados.</p>
+            <h4>Exemplo com List</h4>
+            <pre><code class="language-java">List&lt;String&gt; nomes = new ArrayList&lt;&gt;();
+nomes.add(&quot;Ana&quot;);
+// nomes.add(10); // Erro de compilação
+</code></pre>
+            <h3>Benefícios dos Generics</h3>
+            <ul>
+                <li><strong>Segurança de tipos</strong>: evita erros de tempo de execução ao garantir que apenas
+                    elementos
+                    do
+                    tipo correto sejam adicionados.</li>
+                <li><strong>Reutilização de código</strong>: classes e métodos podem ser escritos para trabalhar com
+                    diferentes
+                    tipos sem precisar de conversões.</li>
+                <li><strong>Legibilidade e manutenção</strong>: código mais claro e menos propenso a erros.</li>
+            </ul>
+            <p>Os Generics são amplamente utilizados no Java, especialmente no framework de coleções, proporcionando
+                flexibilidade e segurança de tipos nas implementações.</p>
+            <h3>3.3 Reflexão</h3>
+            <p>A <strong>Reflexão</strong> é um mecanismo do Java que permite inspecionar e manipular classes, métodos e
+                atributos em tempo de execução. Ela é amplamente utilizada em frameworks para injeção de dependências,
+                serialização de objetos e mapeamento de entidades.</p>
+            <h4>Como Funciona a Reflexão</h4>
+            <p>A reflexão permite obter informações de uma classe e modificar seu comportamento dinamicamente. Isso é
+                feito
+                com
+                a API <code>java.lang.reflect</code>.</p>
+            <h4>Exemplo de Inspeção de Classe</h4>
+            <pre><code class="language-java">import java.lang.reflect.Method;
+
+class Exemplo {
+    public void metodoPublico() {
+        System.out.println(&quot;Método Público&quot;);
+    }
+}
+
+public class ReflexaoExemplo {
+    public static void main(String[] args) throws ClassNotFoundException {
+        Class&lt;?&gt; classe = Class.forName(&quot;Exemplo&quot;);
+        Method[] metodos = classe.getDeclaredMethods();
+        
+        for (Method metodo : metodos) {
+            System.out.println(&quot;Método encontrado: &quot; + metodo.getName());
+        }
+    }
+}
+</code></pre>
+            <p>Neste exemplo, usamos a reflexão para listar os métodos declarados da classe <code>Exemplo</code>.</p>
+            <h4>Modificação de Atributos Privados</h4>
+            <p>A reflexão também pode ser usada para acessar e modificar atributos privados:</p>
+            <pre><code class="language-java">import java.lang.reflect.Field;
+
+class Pessoa {
+    private String nome = &quot;João&quot;;
+}
+
+public class ReflexaoAtributo {
+    public static void main(String[] args) throws Exception {
+        Pessoa p = new Pessoa();
+        Class&lt;?&gt; classe = p.getClass();
+        Field campo = classe.getDeclaredField(&quot;nome&quot;);
+        campo.setAccessible(true);
+        campo.set(p, &quot;Maria&quot;);
+        System.out.println(&quot;Novo nome: &quot; + campo.get(p));
+    }
+}
+</code></pre>
+            <h3>Aplicabilidade da Reflexão</h3>
+            <p>A reflexão é utilizada em diversas situações no desenvolvimento de software, incluindo:</p>
+            <ul>
+                <li><strong>Frameworks de injeção de dependências</strong> (Spring, CDI) - para criar instâncias de
+                    classes
+                    dinamicamente.</li>
+                <li><strong>ORMs (Hibernate, JPA)</strong> - para mapear entidades a tabelas do banco de dados.</li>
+                <li><strong>Serialização e desserialização</strong> - conversão de objetos em formatos como JSON e XML.
+                </li>
+                <li><strong>Criação de testes automatizados</strong> - para acessar métodos privados e validar
+                    comportamentos
+                    sem modificar diretamente o código-fonte.</li>
+            </ul>
+            <p>Embora poderosa, a reflexão deve ser usada com cautela, pois pode impactar a performance da aplicação e
+                quebrar o
+                encapsulamento dos objetos.</p>
+            <h3>3.4 Tratamento de Exceções</h3>
+            <p>O <strong>tratamento de exceções</strong> em Java é essencial para lidar com erros que ocorrem durante a
+                execução
+                do programa. As exceções podem ser tratadas utilizando os blocos <code>try</code>, <code>catch</code> e
+                <code>finally</code>.
+            </p>
+            <h4>Exemplo de Tratamento de Exceção</h4>
+            <pre><code class="language-java">try {
+    int resultado = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println(&quot;Erro de divisão por zero&quot;);
+} finally {
+    System.out.println(&quot;Este bloco sempre será executado&quot;);
+}
+</code></pre>
+            <h3>Tipos de Exceções</h3>
+            <p>As exceções em Java são divididas em dois tipos principais:</p>
+            <h4>Exceções Checadas (Checked Exceptions)</h4>
+            <ul>
+                <li>São aquelas que obrigam o programador a tratá-las em tempo de compilação.</li>
+                <li>Exemplo: <code>IOException</code>, <code>SQLException</code>.</li>
+                <li>Devem ser tratadas explicitamente usando <code>try-catch</code> ou propagadas com
+                    <code>throws</code>.
+                </li>
+            </ul>
+            <pre><code class="language-java">import java.io.*;
+
+public class ExemploChecked {
+    public static void main(String[] args) {
+        try {
+            FileReader file = new FileReader(&quot;arquivo.txt&quot;);
+        } catch (FileNotFoundException e) {
+            System.out.println(&quot;Arquivo não encontrado&quot;);
+        }
+    }
+}
+</code></pre>
+            <h4>Exceções Não Checadas (Unchecked Exceptions)</h4>
+            <ul>
+                <li>São aquelas que ocorrem em tempo de execução e não precisam ser obrigatoriamente tratadas.</li>
+                <li>Exemplo: <code>NullPointerException</code>, <code>ArrayIndexOutOfBoundsException</code>.</li>
+            </ul>
+            <pre><code class="language-java">public class ExemploUnchecked {
+    public static void main(String[] args) {
+        String texto = null;
+        System.out.println(texto.length()); // Lança NullPointerException
+    }
+}
+</code></pre>
+            <h3>Criando Exceções Personalizadas</h3>
+            <p>É possível definir exceções personalizadas criando classes que herdam de <code>Exception</code> (checada)
+                ou
+                <code>RuntimeException</code> (não checada):
+            </p>
+            <pre><code class="language-java">class MinhaExcecao extends Exception {
+    public MinhaExcecao(String mensagem) {
+        super(mensagem);
+    }
+}
+
+public class TesteExcecaoPersonalizada {
+    public static void main(String[] args) {
+        try {
+            throw new MinhaExcecao(&quot;Erro personalizado&quot;);
+        } catch (MinhaExcecao e) {
+            System.out.println(&quot;Capturado: &quot; + e.getMessage());
+        }
+    }
+}
+</code></pre>
+            <h3>Considerações sobre Tratamento de Exceções</h3>
+            <ul>
+                <li>Evite capturar exceções genéricas como <code>Exception</code>, pois isso pode ocultar erros
+                    específicos.
+                </li>
+                <li>O tratamento adequado de exceções melhora a robustez do código e evita falhas inesperadas durante a
+                    execução
+                    do programa.</li>
+            </ul>
+            <hr>
+            <h2>4. Introdução à UML (Unified Modeling Language)</h2>
+            <p>A UML é um <strong>conjunto de diagramas</strong> para modelar sistemas orientados a objetos. Ajuda a
+                visualizar,
+                especificar e documentar a arquitetura de um software.</p>
+            <h3>4.1 Diagrama de Caso de Uso</h3>
+            <ul>
+                <li>Mostra <strong>atores</strong> (usuários ou sistemas externos) e <strong>casos de uso</strong>
+                    (funcionalidades ou objetivos).</li>
+                <li>Relações: <strong>include</strong> (um caso de uso inclui outro), <strong>extend</strong> (um caso
+                    de
+                    uso
+                    estende outro).</li>
+            </ul>
+            <h3>4.2 Diagrama de Classes</h3>
+            <ul>
+                <li>Mostra <strong>classes</strong>, seus <strong>atributos</strong> e <strong>métodos</strong>, além de
+                    relacionamentos:<ul>
+                        <li><strong>Associação</strong>: relação simples (um objeto “conhece” o outro).</li>
+                        <li><strong>Agregação</strong>: relação “tem-um” mas com vida independente.</li>
+                        <li><strong>Composição</strong>: relação “parte-todo” com ciclo de vida dependente (ex.: carro e
+                            motor).
+                        </li>
+                        <li><strong>Generalização</strong> (herança): seta com linha contínua e triângulo apontando para
+                            a
+                            superclasse.</li>
+                    </ul>
+                </li>
+            </ul>
+            <hr>
+            <h2>5. Exercícios de Fixação de Conteúdo</h2>
+            <p>Os exercícios de fixação de conteúdo estão disponibilizados por meio da plataforma Moodle. Entregue-os
+                dentro
+                do
+                prazo estabelecido e, em caso de dúvidas, não hesite entrar em contato!</p>
+            <p><strong>Bons estudos!</strong></p>
+
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span><p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo, Câmpus Guarulhos. APIs e Microsserviços - Prof. Giovani.</p></span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- <script src="js/main.js"></script> -->
+
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+body {
+    font-family: sans-serif;
+    color: #3b3b3d;
+    font-size: large;
+}
+
+table,
+th,
+td {
+    border: 1px solid;
+}
+
+code {
+    font-family: "Roboto Mono";
+    font-weight: bold;
+    padding: 1px 1px 1px 1px;
+    width: auto;
+    height: auto;
+}
+
+.footer {
+    background-color: #212121;
+}
