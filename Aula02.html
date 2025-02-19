@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 02 - Continuação da Revisão de Análise e Programação Orientada a Objetos</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="fa fa-home mr-0"></span>01 - Revisão</a>
+                </li>
+                <li class="active">
+                    <a href="Aula02.html"><span class="fa fa-user mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>08 - Exercício II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>09 - Docker</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>10 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>11 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>12 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>13 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>14 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="fa fa-user mr-0"></span>15 - Microsserviços VI</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+
+            <h1><strong>Aula 02 - Continuação de revisão de conteúdo</strong></h1>
+            <hr>
+            <h2><strong>Revisão de APOO1</strong></h2>
+            <p><strong>Objetivo:</strong> Reforçar fundamentos de Java e OOP. </p>
+            <h3><strong>Sintaxe Java e Estruturas de Controle</strong></h3>
+            <p><strong>Conteúdo:</strong> </p>
+            <ul>
+                <li>Encapsulamento</li>
+                <li>Herança</li>
+                <li>Polimorfismo</li>
+                <li>Interfaces </li>
+                <li>Classes Abstratas</li>
+            </ul>
+            <h3>1. <strong>Conceitos Fundamentais de Programação Orientada a Objetos em Java</strong></h3>
+            <p>Para essa revisão utilizaremos três exemplos disponibilizados no Moodle (Exemplos de código-fonte:
+                Herança, Polimorfismo e Interface) que demonstram conceitos essenciais da <strong>Programação Orientada
+                    a Objetos (POO)</strong>, um paradigma amplamente utilizado no desenvolvimento de software moderno.
+            </p>
+            <p>Cada um dos conceitos abordados nos exemplos será detalhado abaixo, com explicações e exemplos extraídos
+                dos códigos fornecidos. Os códigos foram retirados do livro Java - Como Programar, 10ª edição, de Paul
+                Deitel e Harvey Deitel.</p>
+            <hr>
+            <h2><strong>1. Classes e Objetos</strong></h2>
+            <h3><strong>O que são classes?</strong></h3>
+            <p>Uma <strong>classe</strong> é um modelo para criar objetos. Ela define <strong>atributos (dados)</strong>
+                e <strong>métodos (comportamentos)</strong> que os objetos daquela classe terão.</p>
+            <h3><strong>O que são objetos?</strong></h3>
+            <p>Um <strong>objeto</strong> é uma instância de uma classe. Ele possui um estado (definido pelos atributos
+                da classe) e um comportamento (definido pelos métodos da classe).</p>
+            <h3><strong>Exemplo de Classe e Objeto</strong></h3>
+            <p>No exemplo do sistema de folha de pagamento, temos a classe <code>Employee</code>:</p>
+            <pre><code class="language-java">public abstract class Employee {
+   private final String firstName;
+   private final String lastName;
+   private final String socialSecurityNumber;
+}
+</code></pre>
+            <p>E no arquivo <code>PayrollSystemTest.java</code>, criamos objetos dessa classe:</p>
+            <pre><code class="language-java">SalariedEmployee salariedEmployee = 
+   new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
+</code></pre>
+            <p>Aqui, <code>salariedEmployee</code> é um <strong>objeto</strong> da classe <code>SalariedEmployee</code>.
+            </p>
+            <hr>
+            <h2><strong>2. Encapsulamento</strong></h2>
+            <p>O <strong>encapsulamento</strong> é um princípio que protege os dados de um objeto, permitindo que sejam
+                acessados apenas por meio de métodos específicos (getters e setters).</p>
+            <h3><strong>Exemplo de Encapsulamento</strong></h3>
+            <p>No código abaixo, os atributos são privados (<code>private</code>), e só podem ser acessados por métodos
+                públicos (<code>public</code>).</p>
+            <pre><code class="language-java">private double weeklySalary;
+
+public double getWeeklySalary() {
+   return weeklySalary;
+}
+
+public void setWeeklySalary(double weeklySalary) {
+   if (weeklySalary &lt; 0.0)
+      throw new IllegalArgumentException(&quot;Weekly salary must be &gt;= 0.0&quot;);
+   this.weeklySalary = weeklySalary;
+}
+</code></pre>
+            <p>Isso garante que <strong>nenhum outro código pode modificar <code>weeklySalary</code>
+                    diretamente</strong>, prevenindo valores inválidos.</p>
+            <hr>
+            <h2><strong>3. Herança</strong></h2>
+            <p>A <strong>herança</strong> permite que uma classe herde atributos e métodos de outra classe. Isso promove
+                a <strong>reutilização de código</strong> e evita redundância. Vejamos o exemplo do sistema de folha de
+                pagamento, disponibilizado abaixo. Leia com atenção as classes abaixo e execute o código em sua máquina.
+            </p>
+            <h4><code>CommissionEmployee</code></h4>
+            <pre><code class="language-java">// Classe que representa um funcionário que recebe comissões.
+
+public class CommissionEmployee
+{
+   private final String firstName;                              
+   private final String lastName;                               
+   private final String socialSecurityNumber;                   
+   private double grossSales; // Vendas brutas semanais      
+   private double commissionRate; // Porcentagem de comissão
+
+   // Construtor com cinco argumentos
+   public CommissionEmployee(String firstName, String lastName, 
+      String socialSecurityNumber, double grossSales, 
+      double commissionRate)
+   {
+      if (grossSales &lt; 0.0) 
+         throw new IllegalArgumentException(&quot;Gross sales must be &gt;= 0.0&quot;);
+
+      if (commissionRate &lt;= 0.0 || commissionRate &gt;= 1.0)
+         throw new IllegalArgumentException(&quot;Commission rate must be &gt; 0.0 and &lt; 1.0&quot;);
+
+      this.firstName = firstName;                                    
+      this.lastName = lastName;                                    
+      this.socialSecurityNumber = socialSecurityNumber;         
+      this.grossSales = grossSales;
+      this.commissionRate = commissionRate;
+   }
+
+   public String getFirstName() { return firstName; }
+   public String getLastName() { return lastName; }
+   public String getSocialSecurityNumber() { return socialSecurityNumber; } 
+
+   public void setGrossSales(double grossSales)
+   {
+      if (grossSales &lt; 0.0) 
+         throw new IllegalArgumentException(&quot;Gross sales must be &gt;= 0.0&quot;);
+
+      this.grossSales = grossSales;
+   }
+
+   public double getGrossSales() { return grossSales; } 
+
+   public void setCommissionRate(double commissionRate)
+   {
+      if (commissionRate &lt;= 0.0 || commissionRate &gt;= 1.0)
+         throw new IllegalArgumentException(&quot;Commission rate must be &gt; 0.0 and &lt; 1.0&quot;);
+
+      this.commissionRate = commissionRate;
+   }
+
+   public double getCommissionRate() { return commissionRate; }
+
+   public double earnings() { return getCommissionRate() * getGrossSales(); }
+
+   @Override 
+   public String toString()
+   {
+      return String.format(&quot;commission employee: %s %s%n&quot; +
+         &quot;social security number: %s%n&quot; +
+         &quot;gross sales: %.2f%ncommission rate: %.2f&quot;, 
+         getFirstName(), getLastName(), 
+         getSocialSecurityNumber(), getGrossSales(), 
+         getCommissionRate());
+   } 
+}
+</code></pre>
+            <h4><code>BasePlusCommissionEmployee</code></h4>
+            <pre><code class="language-java">// Classe que herda CommissionEmployee e adiciona um salário base.
+
+public class BasePlusCommissionEmployee extends CommissionEmployee
+{
+   private double baseSalary;
+
+   public BasePlusCommissionEmployee(String firstName, String lastName, 
+      String socialSecurityNumber, double grossSales, 
+      double commissionRate, double baseSalary)
+   {
+      super(firstName, lastName, socialSecurityNumber, grossSales, commissionRate);
+
+      if (baseSalary &lt; 0.0)                   
+         throw new IllegalArgumentException(&quot;Base salary must be &gt;= 0.0&quot;);  
+
+      this.baseSalary = baseSalary;
+   }
+
+   public void setBaseSalary(double baseSalary)
+   {
+      if (baseSalary &lt; 0.0)                   
+         throw new IllegalArgumentException(&quot;Base salary must be &gt;= 0.0&quot;);  
+
+      this.baseSalary = baseSalary;                
+   } 
+
+   public double getBaseSalary() { return baseSalary; }
+
+   @Override 
+   public double earnings() { return getBaseSalary() + super.earnings(); }
+
+   @Override
+   public String toString()
+   {
+      return String.format(&quot;base-salaried %s%nbase salary: %.2f&quot;, 
+         super.toString(), getBaseSalary());   
+   } 
+}
+</code></pre>
+            <h4><code>BasePlusCommissionEmployeeTest</code></h4>
+            <pre><code class="language-java">// Programa principal para testar BasePlusCommissionEmployee.
+
+public class BasePlusCommissionEmployeeTest
+{
+   public static void main(String[] args) 
+   {
+      BasePlusCommissionEmployee employee = 
+         new BasePlusCommissionEmployee(&quot;Bob&quot;, &quot;Lewis&quot;, &quot;333-33-3333&quot;, 5000, .04, 300);
+
+      System.out.println(&quot;Employee information obtained by get methods:&quot;);
+      System.out.println(employee.toString());
+
+      employee.setBaseSalary(1000); 
+
+      System.out.println(&quot;\nUpdated employee information:&quot;);
+      System.out.println(employee.toString());
+   }
+}
+</code></pre>
+            <hr>
+            <h3>Explicação do código com Herança</h3>
+            <p>Perceba que o código possui duas classes principais <code>CommissionEmployee</code> e
+                <code>BasePlusCommissionEmployee</code>. A classe <code>BasePlusCommissionEmployee</code> herda as
+                funcionalidades de <code>CommissionEmployee</code> e as sobrecreve, implementando a regra de negócio
+                adequada para a subclasse. Ou seja, <code>BasePlusCommissionEmployee</code> é um
+                <code>CommissionEmployee</code> com regras específicas.
+            </p>
+            <hr>
+            <h2><strong>4. Polimorfismo e Classe Abstrata</strong></h2>
+            <p>O <strong>polimorfismo</strong> permite que diferentes classes usem o mesmo método de formas diferentes.
+            </p>
+            <p>Ainda sobre os conceitos de Herança, na extensão do exemplo do sistema de folha de pagamento,
+                <code>SalariedEmployee</code>, <code>HourlyEmployee</code> e <code>CommissionEmployee</code> herdam de
+                <code>Employee</code>:
+            </p>
+            <pre><code class="language-java">public class SalariedEmployee extends Employee {
+}
+</code></pre>
+            <p>Isso significa que <code>SalariedEmployee</code> automaticamente <strong>herda</strong> os atributos
+                <code>firstName</code>, <code>lastName</code> e <code>socialSecurityNumber</code>, definidos em
+                <code>Employee</code>.
+            </p>
+            <p>O método <code>toString()</code> na superclasse <code>Employee</code> também pode ser reutilizado pelas
+                subclasses:</p>
+            <pre><code class="language-java">@Override
+public String toString() {
+   return String.format(&quot;%s %s%nsocial security number: %s&quot;, 
+      getFirstName(), getLastName(), getSocialSecurityNumber());
+}
+</code></pre>
+            <p>Como resultado, qualquer classe que <strong>herde</strong> <code>Employee</code> terá esse método sem
+                precisar reescrevê-lo.</p>
+            <p>Assim, no exemplo <code>PayrollSystemTest.java</code>, um array de <code>Employee[]</code> contém
+                diferentes tipos de funcionários, mas todos podem ser tratados genericamente.</p>
+            <pre><code class="language-java">Employee[] employees = new Employee[4];
+employees[0] = salariedEmployee;
+employees[1] = hourlyEmployee;
+employees[2] = commissionEmployee;
+employees[3] = basePlusCommissionEmployee;
+</code></pre>
+            <p>Depois, podemos percorrer esse array e chamar <code>earnings()</code> sem precisar saber o tipo exato de
+                funcionário:</p>
+            <pre><code class="language-java">for (Employee currentEmployee : employees) {
+   System.out.printf(&quot;earned $%,.2f%n%n&quot;, currentEmployee.earnings());
+}
+</code></pre>
+            <p>Isso é possível porque todas as classes herdam de <code>Employee</code> e <strong>sobrescrevem</strong> o
+                método <code>earnings()</code>. Isso é chamado de <em><strong>Polimorfismo de tempo de
+                        execução</strong></em> ou <em><strong>Polimorfismo Dinâmico</strong></em>, uma vez que a chamada
+                para um mesmo método produz resultados distintos dependendo do objeto que é chamado. </p>
+            <p>O <strong>polimorfismo de tempo de execução</strong> ocorre quando uma <strong>superclasse</strong>
+                define um método, e uma <strong>subclasse</strong> fornece sua própria implementação desse método.
+                Quando um objeto de uma subclasse é referenciado por uma variável da superclasse, a versão do método
+                executada será aquela definida na <strong>subclasse</strong> e <strong>não</strong> na superclasse.</p>
+            <p>Isso é possível graças à <strong>sobrescrita de métodos (method overriding)</strong>, que permite
+                redefinir um método herdado.</p>
+            <p>No exemplo da folha de pagamento, a classe abstrata <code>Employee</code> define um método abstrato
+                <code>earnings()</code>:
+            </p>
+            <pre><code class="language-java">public abstract class Employee {
+   public abstract double earnings();
+}
+</code></pre>
+            <p>Todas as classes que herdam <code>Employee</code> são <strong>obrigadas</strong> a fornecer uma
+                implementação para <code>earnings()</code>, pois <code>Employee</code> é abstrata.</p>
+            <h3><strong>Sobrescrita em Subclasses</strong></h3>
+            <p>Cada tipo de funcionário tem uma maneira diferente de calcular os ganhos:</p>
+            <h4><strong>Funcionário Assalariado (<code>SalariedEmployee</code>)</strong></h4>
+            <pre><code class="language-java">@Override
+public double earnings() {
+   return getWeeklySalary();
+}
+</code></pre>
+            <p>Aqui, o salário é fixo por semana.</p>
+            <h4><strong>Funcionário Horista (<code>HourlyEmployee</code>)</strong></h4>
+            <pre><code class="language-java">@Override
+public double earnings() {
+   if (getHours() &lt;= 40) 
+      return getWage() * getHours();
+   else
+      return 40 * getWage() + (getHours() - 40) * getWage() * 1.5;
+}
+</code></pre>
+            <p>Aqui, o cálculo depende do número de horas trabalhadas, com pagamento extra para horas acima de 40.</p>
+            <h4><strong>Funcionário Comissionado (<code>CommissionEmployee</code>)</strong></h4>
+            <pre><code class="language-java">@Override
+public double earnings() {
+   return getCommissionRate() * getGrossSales();
+}
+</code></pre>
+            <p>Aqui, o pagamento depende das vendas realizadas.</p>
+            <hr>
+            <h2><strong>Como o Polimorfismo Funciona no Código</strong></h2>
+            <p>O polimorfismo acontece quando os objetos são manipulados através de uma variável de <strong>tipo da
+                    superclasse (<code>Employee</code>)</strong>, mas a versão do método executada <strong>é aquela
+                    definida na subclasse real do objeto</strong>.</p>
+            <p>Veja o trecho de código no arquivo <code>PayrollSystemTest.java</code>:</p>
+            <pre><code class="language-java">Employee[] employees = new Employee[4];
+
+employees[0] = new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
+employees[1] = new HourlyEmployee(&quot;Karen&quot;, &quot;Price&quot;, &quot;222-22-2222&quot;, 16.75, 40);
+employees[2] = new CommissionEmployee(&quot;Sue&quot;, &quot;Jones&quot;, &quot;333-33-3333&quot;, 10000, .06);
+employees[3] = new BasePlusCommissionEmployee(&quot;Bob&quot;, &quot;Lewis&quot;, &quot;444-44-4444&quot;, 5000, .04, 300);
+</code></pre>
+            <p>Aqui, criamos um <strong>array de <code>Employee</code></strong>, mas ele contém diferentes tipos de
+                funcionários.</p>
+            <p>Depois, processamos cada funcionário de forma genérica:</p>
+            <pre><code class="language-java">for (Employee currentEmployee : employees) {
+   System.out.printf(&quot;earned $%,.2f%n%n&quot;, currentEmployee.earnings());
+}
+</code></pre>
+            <p>Mesmo que <code>currentEmployee</code> seja do tipo <code>Employee</code>, o método
+                <code>earnings()</code> chamado <strong>é o da subclasse real do objeto</strong>.
+            </p>
+            <p>Isso ocorre porque <strong>Java usa ligação dinâmica (dynamic binding)</strong>, ou seja, só decide qual
+                versão do método executar <strong>durante a execução do programa</strong>.</p>
+            <p>Esse uso de polimorfismo torna o código mais <strong>flexível, extensível e modular</strong>, permitindo
+                adicionar novos tipos de <code>Employee</code> sem modificar o código que processa os pagamentos.</p>
+            <h2><strong>Classe Abstrata no Contexto do Exemplo do Sistema de Folha de Pagamento</strong></h2>
+            <p>No exemplo do <strong>sistema de folha de pagamento</strong>, a <strong>classe abstrata</strong>
+                utilizada é, como mencionado, <code>Employee</code>. Ela serve como uma <strong>superclasse
+                    genérica</strong> para diferentes tipos de funcionários:</p>
+            <ul>
+                <li><code>SalariedEmployee</code> (funcionário assalariado)</li>
+                <li><code>HourlyEmployee</code> (funcionário horista)</li>
+                <li><code>CommissionEmployee</code> (funcionário comissionado)</li>
+                <li><code>BasePlusCommissionEmployee</code> (funcionário com salário base + comissão)</li>
+            </ul>
+            <p>O uso de uma <strong>classe abstrata</strong> permite definir um <strong>modelo comum</strong> para todas
+                essas classes, <strong>evitando duplicação de código e garantindo uma estrutura uniforme</strong>.</p>
+            <hr>
+            <h2><strong>O que é uma Classe Abstrata?</strong></h2>
+            <p>Uma <strong>classe abstrata</strong> em Java é uma classe que <strong>não pode ser instanciada
+                    diretamente</strong> e que pode conter <strong>métodos abstratos</strong> (métodos sem
+                implementação, que devem ser implementados por suas subclasses).</p>
+            <p>Ela é usada quando <strong>há um comportamento comum entre várias classes</strong>, mas a implementação
+                exata desse comportamento <strong>depende de cada subclasse</strong>.</p>
+            <h3><strong>Definição da Classe Abstrata <code>Employee</code></strong></h3>
+            <p>No código do exemplo, a classe <code>Employee</code> é definida assim:</p>
+            <pre><code class="language-java">// Classe abstrata Employee
+public abstract class Employee {
+   private final String firstName;
+   private final String lastName;
+   private final String socialSecurityNumber;
+
+   // Construtor da classe abstrata
+   public Employee(String firstName, String lastName, String socialSecurityNumber) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+      this.socialSecurityNumber = socialSecurityNumber;
+   }
+
+   // Métodos concretos (com implementação)
+   public String getFirstName() { return firstName; }
+   public String getLastName() { return lastName; }
+   public String getSocialSecurityNumber() { return socialSecurityNumber; }
+
+   // Método abstrato - deve ser implementado pelas subclasses
+   public abstract double earnings();
+
+   @Override
+   public String toString() {
+      return String.format(&quot;%s %s%nsocial security number: %s&quot;, 
+         getFirstName(), getLastName(), getSocialSecurityNumber());
+   }
+}
+</code></pre>
+            <hr>
+            <h2><strong>Por que <code>Employee</code> é Abstrata?</strong></h2>
+            <p>A classe <code>Employee</code> <strong>não representa um funcionário específico</strong>, mas sim um
+                modelo genérico para funcionários. Cada tipo de funcionário calcula seus ganhos
+                (<code>earnings()</code>) de uma maneira diferente. </p>
+            <p>Por isso, o método <code>earnings()</code> <strong>é abstrato</strong>:</p>
+            <pre><code class="language-java">public abstract double earnings();
+</code></pre>
+            <p>Isso significa que <strong>todas as subclasses de <code>Employee</code> DEVEM implementar esse
+                    método</strong>, pois cada tipo de funcionário tem uma forma diferente de calcular seu pagamento.
+            </p>
+            <h3><strong>Benefícios do Uso de uma Classe Abstrata</strong></h3>
+            <p>O uso de <code>Employee</code> como <strong>classe abstrata</strong> traz várias vantagens:</p>
+            <h4>✅ <strong>1. Garante uma Estrutura Comum</strong></h4>
+            <p>Todas as subclasses <strong>devem implementar <code>earnings()</code></strong>, garantindo que cada tipo
+                de funcionário tenha um método para calcular seus ganhos.</p>
+            <h4>✅ <strong>2. Facilita o Polimorfismo</strong></h4>
+            <p>Podemos tratar diferentes tipos de funcionários <strong>de forma genérica</strong>, como no exemplo:</p>
+            <pre><code class="language-java">Employee[] employees = new Employee[4];
+employees[0] = new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
+employees[1] = new HourlyEmployee(&quot;Karen&quot;, &quot;Price&quot;, &quot;222-22-2222&quot;, 16.75, 40);
+employees[2] = new CommissionEmployee(&quot;Sue&quot;, &quot;Jones&quot;, &quot;333-33-3333&quot;, 10000, .06);
+employees[3] = new BasePlusCommissionEmployee(&quot;Bob&quot;, &quot;Lewis&quot;, &quot;444-44-4444&quot;, 5000, .04, 300);
+</code></pre>
+            <p>Aqui, todos os objetos são tratados como <code>Employee</code>, mas cada um executa
+                <code>earnings()</code> de acordo com sua classe específica (explicação detalhada fornecida acima).
+            </p>
+            <h4>✅ <strong>3. Evita Duplicação de Código</strong></h4>
+            <p>O código <strong>comum</strong> a todos os funcionários (como <code>firstName</code>,
+                <code>lastName</code> e <code>socialSecurityNumber</code>) fica <strong>centralizado</strong> na classe
+                <code>Employee</code>, evitando repetição em cada subclasse.
+            </p>
+            <h3><strong>Ou seja...</strong></h3>
+            <p>🔹 <strong><code>Employee</code> foi definida como uma classe abstrata</strong> porque <strong>não faz
+                    sentido instanciar diretamente um &quot;funcionário genérico&quot;</strong>.<br>🔹 <strong>O método
+                    <code>earnings()</code> foi definido como abstrato</strong> para forçar cada subclasse a implementar
+                seu próprio cálculo de pagamento.<br>🔹 <strong>Isso torna o código mais organizado, modular e
+                    extensível</strong>, permitindo adicionar novos tipos de funcionários no futuro sem modificar o
+                código existente. </p>
+            <hr>
+            <h2><strong>5. Interfaces</strong></h2>
+            <p>Uma <strong>interface</strong> em Java é uma estrutura que define um <strong>contrato</strong> para
+                classes. Esse contrato estabelece um conjunto de métodos que <strong>as classes que implementam essa
+                    interface devem fornecer</strong>. </p>
+            <p>Diferente das <strong>classes abstratas</strong>, uma interface <strong>não pode conter atributos de
+                    instância</strong> (exceto constantes <code>static final</code>) e <strong>não pode conter
+                    implementações de métodos</strong> (até Java 8, que introduziu métodos <code>default</code>). As
+                interfaces são frequentemente usadas para garantir que diferentes classes compartilhem um comportamento
+                comum, <strong>independentemente da hierarquia de herança</strong>.</p>
+            <h3><strong>Interface <code>Payable</code> no Código de Exemplo</strong></h3>
+            <p>No sistema de folha de pagamento, foi definida a seguinte interface:</p>
+            <pre><code class="language-java">// Interface Payable
+public interface Payable {
+   double getPaymentAmount(); // Método abstrato sem implementação
+}
+</code></pre>
+            <p>Essa interface estabelece que <strong>qualquer classe que a implemente DEVE fornecer um método
+                    <code>getPaymentAmount()</code></strong>.</p>
+            <p>A ideia central é permitir que <strong>diferentes tipos de entidades</strong> (como
+                <strong>empregados</strong> e <strong>faturas</strong>) possam ser processadas de forma uniforme, já que
+                todas elas fornecem um valor a ser pago.
+            </p>
+            <hr>
+            <h2><strong>Implementações da Interface <code>Payable</code></strong></h2>
+            <p>A interface <code>Payable</code> é implementada por <strong>duas categorias diferentes de
+                    classes</strong>:</p>
+            <ol>
+                <li><strong>A classe <code>Invoice</code></strong>, que representa <strong>faturas de
+                        fornecedores</strong>.</li>
+                <li><strong>A classe <code>Employee</code> e suas subclasses</strong>, que representam
+                    <strong>diferentes tipos de funcionários</strong>.
+                </li>
+            </ol>
+            <h3><strong>1️⃣ Classe <code>Invoice</code> Implementando <code>Payable</code></strong></h3>
+            <p>A classe <code>Invoice</code> representa uma <strong>fatura de um fornecedor</strong>. Como uma fatura
+                não é um funcionário, ela <strong>não poderia herdar de <code>Employee</code></strong>, mas pode
+                <strong>implementar <code>Payable</code></strong> para ser processada de maneira uniforme com
+                funcionários.
+            </p>
+            <h4><code>Invoice</code></h4>
+            <pre><code class="language-java">// Classe Invoice que implementa Payable
+public class Invoice implements Payable {
+   private final String partNumber;
+   private final String partDescription;
+   private int quantity;
+   private double pricePerItem;
+
+   public Invoice(String partNumber, String partDescription, int quantity, double pricePerItem) {
+      if (quantity &lt; 0) 
+         throw new IllegalArgumentException(&quot;Quantity must be &gt;= 0&quot;);
+
+      if (pricePerItem &lt; 0.0) 
+         throw new IllegalArgumentException(&quot;Price per item must be &gt;= 0&quot;);
+
+      this.partNumber = partNumber;
+      this.partDescription = partDescription;
+      this.quantity = quantity;
+      this.pricePerItem = pricePerItem;
+   }
+
+   // Implementação do método getPaymentAmount() da interface Payable
+   @Override
+   public double getPaymentAmount() {
+      return getQuantity() * getPricePerItem(); // O valor total da fatura
+   }
+
+   @Override
+   public String toString() {
+      return String.format(&quot;invoice: %npart number: %s (%s) %nquantity: %d %nprice per item: $%,.2f&quot;,
+         getPartNumber(), getPartDescription(), getQuantity(), getPricePerItem());
+   }
+}
+</code></pre>
+            <h3><strong>📌 O que acontece aqui?</strong></h3>
+            <ul>
+                <li>A classe <code>Invoice</code> <strong>implementa <code>Payable</code></strong>, o que a obriga a
+                    fornecer uma implementação para <code>getPaymentAmount()</code>.</li>
+                <li><code>getPaymentAmount()</code> calcula o <strong>valor total da fatura</strong>
+                    (<code>quantidade * preço por item</code>).</li>
+                <li>Isso permite que uma <strong>fatura seja tratada de forma semelhante a um empregado</strong> dentro
+                    do sistema de folha de pagamento.</li>
+            </ul>
+            <hr>
+            <h3><strong>2️⃣ Classe <code>Employee</code> e Subclasses Implementando <code>Payable</code></strong></h3>
+            <p>Como <code>Employee</code> representa diferentes tipos de funcionários, e <strong>cada funcionário tem um
+                    valor a ser pago</strong>, <code>Employee</code> também implementa <code>Payable</code>:</p>
+            <pre><code class="language-java">// Classe abstrata Employee que implementa Payable
+public abstract class Employee implements Payable {
+   private final String firstName;
+   private final String lastName;
+   private final String socialSecurityNumber;
+
+   public Employee(String firstName, String lastName, String socialSecurityNumber) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+      this.socialSecurityNumber = socialSecurityNumber;
+   }
+
+   @Override
+   public String toString() {
+      return String.format(&quot;%s %s%nsocial security number: %s&quot;, 
+         getFirstName(), getLastName(), getSocialSecurityNumber());
+   }
+}
+</code></pre>
+            <h4><strong>Subclasses de <code>Employee</code> Sobrescrevendo <code>getPaymentAmount()</code></strong></h4>
+            <p>Cada subclasse de <code>Employee</code> implementa <code>getPaymentAmount()</code> de acordo com sua
+                forma específica de cálculo de pagamento.</p>
+            <h4><strong>Funcionário Assalariado (<code>SalariedEmployee</code>)</strong></h4>
+            <pre><code class="language-java">public class SalariedEmployee extends Employee {
+   private double weeklySalary;
+
+   public SalariedEmployee(String firstName, String lastName, String socialSecurityNumber, double weeklySalary) {
+      super(firstName, lastName, socialSecurityNumber);
+      if (weeklySalary &lt; 0.0)
+         throw new IllegalArgumentException(&quot;Weekly salary must be &gt;= 0.0&quot;);
+      this.weeklySalary = weeklySalary;
+   }
+
+   @Override
+   public double getPaymentAmount() {
+      return getWeeklySalary();
+   }
+}
+</code></pre>
+            <h4><strong>Funcionário Horista (<code>HourlyEmployee</code>)</strong></h4>
+            <pre><code class="language-java">public class HourlyEmployee extends Employee {
+   private double wage;
+   private double hours;
+
+   public HourlyEmployee(String firstName, String lastName, String socialSecurityNumber, double wage, double hours) {
+      super(firstName, lastName, socialSecurityNumber);
+      this.wage = wage;
+      this.hours = hours;
+   }
+
+   @Override
+   public double getPaymentAmount() {
+      if (hours &lt;= 40)
+         return wage * hours;
+      else
+         return 40 * wage + (hours - 40) * wage * 1.5;
+   }
+}
+</code></pre>
+            <hr>
+            <h3><strong>O Poder do Polimorfismo com Interfaces</strong></h3>
+            <p>Agora que <strong><code>Invoice</code> e <code>Employee</code> implementam <code>Payable</code></strong>,
+                podemos armazenar <strong>tanto funcionários quanto faturas no mesmo array e processá-los de maneira
+                    uniforme</strong>.</p>
+            <h4><strong>Trecho de código do <code>PayrollSystemTest.java</code></strong></h4>
+            <pre><code class="language-java">// Criando um array de Payable para armazenar diferentes tipos de objetos
+Payable[] payableObjects = new Payable[4];
+
+payableObjects[0] = new Invoice(&quot;01234&quot;, &quot;seat&quot;, 2, 375.00);
+payableObjects[1] = new Invoice(&quot;56789&quot;, &quot;tire&quot;, 4, 79.95);
+payableObjects[2] = new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
+payableObjects[3] = new SalariedEmployee(&quot;Lisa&quot;, &quot;Barnes&quot;, &quot;888-88-8888&quot;, 1200.00);
+
+System.out.println(&quot;Invoices and Employees processed polymorphically:&quot;);
+
+for (Payable currentPayable : payableObjects) {
+   System.out.printf(&quot;%n%s %n%s: $%,.2f%n&quot;, 
+      currentPayable.toString(), 
+      &quot;payment due&quot;, currentPayable.getPaymentAmount());
+}
+</code></pre>
+            <h3><strong>📌E aqui, o que acontece?</strong></h3>
+            <ul>
+                <li>Criamos um <strong>array de <code>Payable</code></strong> contendo <strong>faturas
+                        (<code>Invoice</code>) e funcionários (<code>SalariedEmployee</code>)</strong>.</li>
+                <li>Usamos <strong>polimorfismo</strong> para tratar <strong>todos os objetos como
+                        <code>Payable</code></strong>, independentemente de serem faturas ou funcionários.</li>
+                <li>Chamamos <code>getPaymentAmount()</code> sem nos preocuparmos com o tipo exato do objeto, pois
+                    sabemos que <strong>todos os objetos no array implementam <code>Payable</code></strong>.</li>
+            </ul>
+            <p>Ou seja, a interface <code>Payable</code> foi usada para <strong>padronizar o cálculo de valores a serem
+                    pagos</strong> a diferentes entidades (<code>Invoice</code> e <code>Employee</code>). Isso nos
+                fornece diversas vantagens:</p>
+            <ul>
+                <li>Permite <strong>tratar faturas e funcionários de forma uniforme</strong>, simplificando o código.
+                </li>
+                <li>Facilita a <strong>expansão do sistema</strong>, pois novos tipos de <code>Payable</code> podem ser
+                    adicionados sem alterar o código existente. </li>
+                <li><strong>Reduz o acoplamento</strong>, pois <code>Invoice</code> e <code>Employee</code> <strong>não
+                        precisam estar na mesma hierarquia de classes</strong> para serem processados de maneira
+                    semelhante.</li>
+            </ul>
+            <p>Esse é um <strong>ótimo exemplo de polimorfismo e boas práticas de POO</strong>, demonstrando como
+                interfaces tornam um sistema <strong>mais flexível, extensível e reutilizável</strong>! 🚀</p>
+            <hr>
+            <h2>Conclusão</h2>
+            <p>Esses conceitos basilares nos permitem criar aplicações que seguem os bons padrões da programação
+                orientada a objetos, permitindo extensibilidade e reúso de código-fonte.</p>
+            <p>📌 Lembrem-se: o mais importante é buscarmos alta coesão e baixo acoplamento. Para isso, devemos nos
+                valer das possibilidades que são proporcionadas pelo paradigma da POO.</p>
+
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- <script src="js/main.js"></script> -->
+
+</body>
+
+</html>
