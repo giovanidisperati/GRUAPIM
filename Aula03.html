@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/prism.css">
+
+  <title>APIs e Microsserviços - Aula 01 - Revisão de Análise e Programação Orientada a Objetos</title>
+</head>
+
+<body>
+  <div class="wrapper d-flex align-items-stretch">
+    <nav id="sidebar">
+      <h1><a href="#" class="logo text-center">GRUAPIM</a></h1>
+      <ul class="list-unstyled components mb-5">
+        <li>
+            <a href="Aula01.html"><span class="fa fa-home mr-0"></span>01 - Revisão</a>
+        </li>
+        <li>
+            <a href="Aula02.html"><span class="fa fa-user mr-0"></span>02 - Revisão II</a>
+        </li>
+        <li class="active">
+            <a href="Aula03.html"><span class="fa fa-user mr-0"></span>03 - REST I</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>04 - REST II</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>05 - REST III</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>06 - REST IV</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>07 - Exercício I</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>08 - Exercício II</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>09 - Docker</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>10 - Microsserviços I</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>11 - Microsserviços II</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>12 - Microsserviços III</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>13 - Microsserviços IV</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>14 - Microsserviços V</a>
+        </li>
+        <li>
+            <a href="#"><span class="fa fa-user mr-0"></span>15 - Microsserviços VI</a>
+        </li>
+    </ul>
+    </nav>
+
+    <div id="content" class="p-4 p-md-5 pt-5">
+
+      <h1><strong>Aula 03 - Introdução às APIS REST e ao Spring Boot</strong></h1>
+      <p>Nesta aula apresentaremos uma introdução aos conceitos basilares para construção de uma API REST para gerenciar
+        uma lista de contatos utilizando <strong>Spring Boot</strong>. A ideia é demonstrar, passo a passo, como criar
+        um projeto <strong>Spring Boot</strong> e expor métodos que permitem a criação, consulta, atualização e exclusão
+        de contatos (operações conhecidas como CRUD). Antes disso, entretanto, é preciso definir alguns conceitos.</p>
+      <h2><strong>1. O que é uma API?</strong></h2>
+      <p>Uma <strong>API (Application Programming Interface)</strong> é um conjunto de regras e definições que permitem
+        que diferentes sistemas de software se comuniquem entre si. Elas atuam como intermediárias que possibilitam que
+        um sistema solicite e envie dados para outro, de maneira estruturada e padronizada. </p>
+      <p>Dentre os diversos estilos de arquitetura para APIs, uma das mais populares e amplamente utilizadas hoje em dia
+        é a <strong>API REST</strong> (Representational State Transfer). Esse padrão se baseia nos princípios da web,
+        utilizando o protocolo HTTP para a comunicação entre sistemas distribuídos. </p>
+      <hr>
+      <h2><strong>1.1 O que é uma API REST?</strong></h2>
+      <p>O termo <strong>REST (Representational State Transfer)</strong> foi criado por <strong>Roy Fielding</strong> em
+        sua tese de doutorado em 2000. Ele descreveu um conjunto de princípios arquiteturais que utilizam os padrões já
+        estabelecidos na web para criar sistemas escaláveis e eficientes. </p>
+      <p>Uma API REST segue esses princípios, permitindo que os dados sejam manipulados através de <strong>recursos
+          (resources)</strong>, representados por <strong>URLs (Uniform Resource Locators)</strong> e acessados usando
+        os métodos HTTP padrão:</p>
+      <ul>
+        <li><strong>GET</strong> → Obtém um recurso (ex.: buscar lista de usuários). </li>
+        <li><strong>POST</strong> → Cria um novo recurso (ex.: cadastrar um novo usuário). </li>
+        <li><strong>PUT</strong> → Atualiza um recurso existente (ex.: editar os dados de um usuário). </li>
+        <li><strong>PATCH</strong> → Atualiza parcialmente um recurso (ex.: modificar apenas um campo específico de um
+          usuário).</li>
+        <li><strong>DELETE</strong> → Remove um recurso (ex.: excluir um usuário).</li>
+      </ul>
+      <p>Esses métodos garantem que a API siga uma <strong>estrutura previsível e intuitiva</strong> para
+        desenvolvedores que a utilizam. Isso acontece pois o uso adequado dos métodos HTTP em APIs REST garante
+        <strong>padronização</strong>, <strong>previsibilidade</strong> e <strong>intuitividade</strong> para os
+        desenvolvedores que consomem a API. Ou seja, ao interagir com qualquer API REST bem projetada, um desenvolvedor
+        já pode inferir <strong>como fazer requisições</strong> apenas conhecendo os métodos e os recursos expostos.
+      </p>
+      <p>Se uma API segue corretamente os padrões REST, um desenvolvedor não precisa consultar a documentação sempre que
+        for fazer uma chamada, pois os métodos HTTP seguem uma <strong>convenção universal</strong>. </p>
+      <h3><strong>1.2 Exemplo de Convenção em APIs REST</strong></h3>
+      <p>Vamos imaginar uma API para gerenciar <strong>usuários</strong> (<code>users</code>). Seguindo a convenção
+        REST, os endpoints e métodos HTTP devem funcionar assim:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Ação Desejada</th>
+            <th>Método HTTP</th>
+            <th>Caminho (URI)</th>
+            <th>Corpo da Requisição</th>
+            <th>Resposta Esperada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Obter todos os usuários</td>
+            <td><strong>GET</strong></td>
+            <td><code>/users</code></td>
+            <td>❌ (sem corpo)</td>
+            <td>Lista de usuários (JSON)</td>
+          </tr>
+          <tr>
+            <td>Obter um usuário pelo ID</td>
+            <td><strong>GET</strong></td>
+            <td><code>/users/{id}</code></td>
+            <td>❌ (sem corpo)</td>
+            <td>JSON do usuário</td>
+          </tr>
+          <tr>
+            <td>Criar um novo usuário</td>
+            <td><strong>POST</strong></td>
+            <td><code>/users</code></td>
+            <td>✅ JSON com os dados do usuário</td>
+            <td>JSON do usuário criado com ID gerado</td>
+          </tr>
+          <tr>
+            <td>Atualizar <strong>todo</strong> um usuário existente</td>
+            <td><strong>PUT</strong></td>
+            <td><code>/users/{id}</code></td>
+            <td>✅ JSON com todos os campos do usuário</td>
+            <td>JSON do usuário atualizado</td>
+          </tr>
+          <tr>
+            <td>Atualizar <strong>parcialmente</strong> um usuário</td>
+            <td><strong>PATCH</strong></td>
+            <td><code>/users/{id}</code></td>
+            <td>✅ JSON com apenas os campos alterados</td>
+            <td>JSON do usuário atualizado</td>
+          </tr>
+          <tr>
+            <td>Excluir um usuário</td>
+            <td><strong>DELETE</strong></td>
+            <td><code>/users/{id}</code></td>
+            <td>❌ (sem corpo)</td>
+            <td>Resposta vazia (status HTTP 204)</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3><strong>Por que isso faz sentido?</strong></h3>
+      <p>Se um desenvolvedor encontrar uma API com o recurso <code>products</code> (produtos), ele já pode inferir como
+        a API funciona sem ler a documentação, pois seguirá o mesmo padrão:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Ação Desejada</th>
+            <th>Método HTTP</th>
+            <th>Caminho (URI)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Obter todos os produtos</td>
+            <td><strong>GET</strong></td>
+            <td><code>/products</code></td>
+          </tr>
+          <tr>
+            <td>Obter um produto pelo ID</td>
+            <td><strong>GET</strong></td>
+            <td><code>/products/{id}</code></td>
+          </tr>
+          <tr>
+            <td>Criar um novo produto</td>
+            <td><strong>POST</strong></td>
+            <td><code>/products</code></td>
+          </tr>
+          <tr>
+            <td>Atualizar um produto</td>
+            <td><strong>PUT</strong></td>
+            <td><code>/products/{id}</code></td>
+          </tr>
+          <tr>
+            <td>Atualizar um campo do produto</td>
+            <td><strong>PATCH</strong></td>
+            <td><code>/products/{id}</code></td>
+          </tr>
+          <tr>
+            <td>Excluir um produto</td>
+            <td><strong>DELETE</strong></td>
+            <td><code>/products/{id}</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Isso garante que, se um desenvolvedor aprender a consumir uma API REST, ele poderá consumir qualquer outra API
+        REST bem estruturada <strong>sem precisar reaprender</strong> cada API do zero. Na seção 2.5 é apresentado o
+        código fonte da implementação de um Controller de uma aplicação Spring Boot que segue a convenção descrita
+        acima.</p>
+      <p>Ainda em relação à convenção, é importante o uso adequado dos verbos PUT e PATCH.</p>
+      <h3><strong>1.3 Diferença entre PUT e PATCH</strong></h3>
+      <p>Tanto o <strong>PUT</strong> quanto o <strong>PATCH</strong> são usados para atualizar recursos, mas com
+        diferenças importantes:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Método</th>
+            <th>Propósito</th>
+            <th>Tipo de Atualização</th>
+            <th>Exemplo de Uso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>PUT</strong></td>
+            <td>Atualiza um recurso inteiro</td>
+            <td>Substitui completamente os dados</td>
+            <td>Atualizar todas as informações de um usuário</td>
+          </tr>
+          <tr>
+            <td><strong>PATCH</strong></td>
+            <td>Atualiza parcialmente um recurso</td>
+            <td>Modifica apenas os campos enviados na requisição</td>
+            <td>Atualizar apenas o e-mail de um usuário</td>
+          </tr>
+        </tbody>
+      </table>
+      <h4><strong>Exemplo de Requisição PUT</strong></h4>
+      <p>Se temos um usuário cadastrado assim: </p>
+      <pre><code class="language-json">{
+  &quot;id&quot;: 1,
+  &quot;nome&quot;: &quot;João Silva&quot;,
+  &quot;email&quot;: &quot;joao@email.com&quot;,
+  &quot;telefone&quot;: &quot;9999-9999&quot;
+}
+</code></pre>
+      <p>E enviamos um <strong>PUT</strong> com este corpo:</p>
+      <pre><code class="language-json">{
+  &quot;id&quot;: 1,
+  &quot;nome&quot;: &quot;Maria Silva&quot;,
+  &quot;email&quot;: &quot;maria@email.com&quot;,
+  &quot;telefone&quot;: &quot;8888-8888&quot;
+}
+</code></pre>
+      <p>O registro original será completamente substituído, mesmo que não tenha havido mudanças no ID.</p>
+      <h4><strong>Exemplo de Requisição PATCH</strong></h4>
+      <p>Se enviarmos um <strong>PATCH</strong> apenas com:</p>
+      <pre><code class="language-json">{
+  &quot;email&quot;: &quot;email_atualizado@email.com&quot;
+}
+</code></pre>
+      <p>Apenas o campo <code>email</code> será alterado, e os outros campos permanecerão inalterados.</p>
+      <hr>
+      <h2><strong>1.4 Utilização de APIs REST</strong></h2>
+      <p>Em relação à aplicabilidade, as APIs REST são amplamente utilizadas em diversos cenários do desenvolvimento de
+        software, incluindo:</p>
+      <ol>
+        <li>
+          <p><strong>Aplicações Web e Mobile</strong>: </p>
+          <ul>
+            <li>APIs REST são a base para <strong>aplicativos móveis</strong> e <strong>front-ends modernos</strong>,
+              permitindo que o cliente (navegador ou aplicativo) se comunique com servidores back-end. </li>
+            <li>Exemplo: O aplicativo de um banco acessa os dados do usuário através de uma API REST.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Integração entre Sistemas</strong>: </p>
+          <ul>
+            <li>Diferentes sistemas podem se comunicar via APIs REST, eliminando a necessidade de compartilhamento de
+              banco de dados. </li>
+            <li>Exemplo: Um ERP de uma empresa pode se integrar ao sistema de contabilidade por meio de uma API.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Serviços em Nuvem e IoT</strong>: </p>
+          <ul>
+            <li>Dispositivos IoT (Internet das Coisas) frequentemente usam APIs REST para enviar dados para servidores.
+            </li>
+            <li>Exemplo: Um smartwatch pode enviar informações de batimentos cardíacos para uma API REST na nuvem.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Plataformas de Terceiros</strong>: </p>
+          <ul>
+            <li>Muitas empresas oferecem APIs REST para que terceiros utilizem seus serviços de forma programática.
+            </li>
+            <li>Exemplo: O Google Maps fornece APIs REST para que desenvolvedores integrem mapas em seus aplicativos.
+            </li>
+          </ul>
+        </li>
+      </ol>
+      <hr>
+      <h2><strong>1.5 Vantagens das APIs REST</strong></h2>
+      <ol>
+        <li>
+          <p><strong>Simplicidade e Facilidade de Uso</strong> </p>
+          <ul>
+            <li>As APIs REST utilizam o protocolo HTTP, que é amplamente conhecido e usado na web. </li>
+            <li>O uso de JSON como formato de dados facilita a leitura e escrita, tornando a comunicação leve e
+              eficiente.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Escalabilidade</strong> </p>
+          <ul>
+            <li>Por serem <strong>stateless</strong> (não armazenam estado entre requisições), as APIs REST facilitam a
+              escalabilidade horizontal, permitindo múltiplos servidores processando requisições simultaneamente.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Flexibilidade e Independência</strong> </p>
+          <ul>
+            <li>REST permite que clientes em diferentes tecnologias (React, Angular, iOS, Android) consumam a mesma API
+              sem alterações no servidor.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Padronização e Interoperabilidade</strong> </p>
+          <ul>
+            <li>Como segue padrões bem definidos, uma API REST pode ser usada por qualquer cliente que compreenda HTTP.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Cacheável</strong> </p>
+          <ul>
+            <li>APIs REST permitem o uso eficiente de cache, reduzindo a carga no servidor e melhorando a performance.
+            </li>
+          </ul>
+        </li>
+      </ol>
+      <p>É importante notar, entretanto, que não basta fazer as chamadas dos métodos HTTP para que se tenha uma API
+        REST. </p>
+      <h2><strong>1.6 Modelo de Maturidade de Richardson</strong></h2>
+      <p>Nesse sentido, o <strong>Modelo de Maturidade de Richardson (RMM - Richardson Maturity Model)</strong> foi
+        criado pelo cientista da computação <strong>Leonard Richardson</strong> e apresentado em 2008 durante uma
+        palestra na QCon, uma conferência sobre desenvolvimento de software. Esse modelo propõe uma forma de
+        <strong>avaliar o nível de conformidade</strong> de uma API com os princípios REST, ajudando a medir quão bem
+        uma API segue a filosofia RESTful descrita por <strong>Roy Fielding</strong> em sua tese de doutorado em 2000.
+      </p>
+      <p>A motivação principal desse modelo é a observação de que <strong>nem todas as APIs chamadas de &quot;REST&quot;
+          realmente seguem os princípios REST</strong>. Muitas APIs usam apenas HTTP como meio de transporte, mas
+        continuam operando como sistemas antigos, sem aproveitar os benefícios reais do REST. O modelo de Richardson
+        classifica APIs em <strong>quatro níveis de maturidade</strong>, destacando aspectos como a organização de
+        recursos, o uso correto dos métodos HTTP e a adoção de hipermídia (HATEOAS).</p>
+      <hr>
+      <h2><strong>Os Quatro Níveis do Modelo de Richardson</strong></h2>
+      <p>O modelo define <strong>quatro níveis de maturidade</strong>, numerados de 0 a 3, onde cada nível indica uma
+        progressão rumo a uma API verdadeiramente RESTful.</p>
+      <h3><strong>Nível 0 - &quot;O Ponto de Entrada Único&quot; (The Swamp of POX - Plain Old XML)</strong></h3>
+      <p>Neste nível, a API <strong>não utiliza os conceitos REST</strong>. Em vez disso, ela usa HTTP apenas como
+        <strong>meio de transporte</strong> para mensagens genéricas, muitas vezes enviando e recebendo dados em
+        formatos como XML ou JSON, sem aproveitar a estrutura do protocolo HTTP.
+      </p>
+      <h4><strong>Exemplo Histórico: APIs Baseadas em RPC ou SOAP</strong></h4>
+      <ul>
+        <li>Antes da adoção de REST, muitas APIs eram construídas utilizando <strong>SOAP (Simple Object Access
+            Protocol)</strong>, que encapsula mensagens XML dentro de requisições HTTP.</li>
+        <li>As APIs SOAP normalmente usavam apenas <strong>um único endpoint</strong>, como <code>/service</code>, e
+          todas as operações eram diferenciadas pelo <strong>conteúdo do corpo da requisição</strong>.</li>
+        <li>Como consequência, <strong>HTTP era tratado apenas como um canal de transporte</strong>, sem o uso adequado
+          de métodos como GET, POST, PUT e DELETE. Ainda há usos para SOAP, que serão discutidos posteriormente, mas de
+          forma geral sua utilização é atualmente restrita à casos específicos.</li>
+        <li><strong>Exemplo real:</strong> Serviços SOAP do governo dos EUA nos anos 2000 (exemplo: <strong>APIs SOAP do
+            IRS</strong> para comunicação entre sistemas fiscais).</li>
+      </ul>
+      <hr>
+      <h3><strong>Nível 1 - &quot;Recursos&quot; (Resources)</strong></h3>
+      <p>No <strong>Nível 1</strong>, a API começa a <strong>organizar seus dados em recursos individuais</strong> e
+        cada recurso recebe uma <strong>URL única</strong>. No entanto, os métodos HTTP ainda não são utilizados
+        corretamente, e a API continua tratando HTTP apenas como um meio de transporte.</p>
+      <h4><strong>Exemplo Histórico: APIs Baseadas em XML-RPC</strong></h4>
+      <ul>
+        <li>No início dos anos 2000, APIs baseadas em <strong>XML-RPC (Remote Procedure Call sobre XML)</strong>
+          começaram a organizar os dados em URLs específicas, mas ainda usavam <strong>um único método HTTP (normalmente
+            POST)</strong> para todas as operações.</li>
+        <li>Um exemplo clássico foi o <strong>Movable Type API</strong> (2001), uma das primeiras APIs para blogs, que
+          permitia a publicação de posts usando XML-RPC.</li>
+        <li>Todas as requisições eram enviadas para um único endpoint <code>/api</code>, com o corpo da requisição
+          contendo instruções como:
+          <pre><code class="language-xml">&lt;methodCall&gt;
+    &lt;methodName&gt;getPost&lt;/methodName&gt;
+    &lt;params&gt;
+        &lt;param&gt;
+            &lt;value&gt;&lt;string&gt;123&lt;/string&gt;&lt;/value&gt;
+        &lt;/param&gt;
+    &lt;/params&gt;
+&lt;/methodCall&gt;
+</code></pre>
+        </li>
+      </ul>
+      <hr>
+      <h3><strong>Nível 2 - &quot;Uso Correto de Verbos HTTP&quot; (HTTP Verbs)</strong></h3>
+      <p>Aqui, a API começa a <strong>utilizar corretamente os métodos HTTP</strong> (GET, POST, PUT, DELETE, PATCH).
+        Isso significa que as operações são realizadas de maneira semântica:</p>
+      <ul>
+        <li><strong>GET</strong> → Para leitura de dados</li>
+        <li><strong>POST</strong> → Para criação de dados</li>
+        <li><strong>PUT</strong> → Para substituição completa de um recurso</li>
+        <li><strong>PATCH</strong> → Para atualização parcial de um recurso</li>
+        <li><strong>DELETE</strong> → Para remoção de um recurso</li>
+      </ul>
+      <p>A partir deste nível, a API se torna <strong>mais intuitiva e previsível</strong>, pois os clientes podem
+        deduzir como interagir com ela sem precisar consultar documentação detalhada.</p>
+      <h4><strong>Exemplo Histórico: APIs RESTful do Twitter e Facebook</strong></h4>
+      <ul>
+        <li>Em <strong>2006</strong>, o Twitter lançou uma <strong>API RESTful</strong> que adotava corretamente os
+          verbos HTTP.</li>
+        <li>Exemplo real:<ul>
+            <li>Para obter um tweet: <code>GET /tweets/12345</code></li>
+            <li>Para deletar um tweet: <code>DELETE /tweets/12345</code></li>
+            <li>Para postar um novo tweet: <code>POST /tweets</code></li>
+          </ul>
+        </li>
+        <li>Essa API foi um marco na adoção de REST, e influenciou APIs de redes sociais como Facebook e Instagram.</li>
+        <li><strong>Comparação:</strong> Enquanto a API REST do Twitter era <strong>nível 2</strong>, a API SOAP de
+          serviços bancários ainda operava no <strong>nível 0 ou 1</strong>, sem uso correto dos verbos HTTP.</li>
+      </ul>
+      <hr>
+      <h3><strong>Nível 3 - &quot;HATEOAS&quot; (Hypermedia as the Engine of Application State)</strong></h3>
+      <p>O nível mais avançado da maturidade REST adiciona um conceito chamado <strong>HATEOAS (Hypermedia as the Engine
+          of Application State)</strong>. Isso significa que a API <strong>não apenas expõe recursos, mas também fornece
+          informações sobre como interagir com esses recursos dinamicamente</strong>.</p>
+      <ul>
+        <li>Em um sistema HATEOAS, cada resposta da API contém <strong>links para ações relacionadas</strong>.</li>
+        <li>Isso permite que os clientes descubram funcionalidades <strong>sem depender de documentações
+            rígidas</strong>.</li>
+      </ul>
+      <h4><strong>Exemplo Histórico: API REST da Amazon (2011)</strong></h4>
+      <ul>
+        <li>Em <strong>2011</strong>, a Amazon implementou uma versão avançada de sua API de e-commerce usando
+          <strong>HATEOAS</strong>.
+        </li>
+        <li>Exemplo de resposta JSON:
+          <pre><code class="language-json">{
+  &quot;id&quot;: 12345,
+  &quot;nome&quot;: &quot;Produto X&quot;,
+  &quot;preco&quot;: 99.99,
+  &quot;_links&quot;: {
+    &quot;comprar&quot;: { &quot;href&quot;: &quot;/carrinho/12345&quot;, &quot;method&quot;: &quot;POST&quot; },
+    &quot;avaliacoes&quot;: { &quot;href&quot;: &quot;/produtos/12345/avaliacoes&quot;, &quot;method&quot;: &quot;GET&quot; }
+  }
+}
+</code></pre>
+        </li>
+        <li>Aqui, o cliente não precisa saber previamente que <code>/carrinho/12345</code> é o endpoint para adicionar
+          um item ao carrinho. O próprio servidor fornece essa informação.</li>
+        <li><strong>Impacto:</strong> Essa abordagem começou a ser adotada por APIs de grandes plataformas como
+          <strong>PayPal e Stripe</strong>, permitindo <strong>descoberta dinâmica de ações</strong> e reduzindo a
+          necessidade de hardcoding nos clientes.
+        </li>
+      </ul>
+      <hr>
+      <h2><strong>Ou seja...</strong></h2>
+      <p>O <strong>Modelo de Maturidade de Richardson</strong> nos ajuda a avaliar o quão RESTful uma API realmente é.
+        Ele permite entender como <strong>a evolução das APIs foi impulsionada pela necessidade de escalabilidade,
+          flexibilidade e simplicidade</strong>.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Nível</th>
+            <th>Característica</th>
+            <th>Exemplo Histórico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>0</strong></td>
+            <td>Apenas HTTP como transporte (SOAP/XML-RPC)</td>
+            <td>APIs SOAP do governo dos EUA (anos 2000)</td>
+          </tr>
+          <tr>
+            <td><strong>1</strong></td>
+            <td>Recursos identificáveis por URL, mas sem uso adequado de métodos HTTP</td>
+            <td>XML-RPC do Movable Type (2001)</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td>Uso correto dos métodos HTTP (GET, POST, PUT, DELETE, PATCH)</td>
+            <td>API REST do Twitter (2006)</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td>HATEOAS, permitindo descoberta dinâmica</td>
+            <td>API REST da Amazon (2011)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Hoje, a maioria das <strong>APIs modernas</strong> opera no <strong>nível 2</strong>, mas algumas empresas
+        estão adotando <strong>nível 3 com HATEOAS</strong>, especialmente em ambientes complexos, como
+        <strong>microserviços</strong>.
+      </p>
+      <hr>
+      <h2><strong>1.7 Comparação: REST vs SOAP vs RPC</strong></h2>
+      <h3><strong>REST vs SOAP (Simple Object Access Protocol)</strong></h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th>REST</th>
+            <th>SOAP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Protocolo</strong></td>
+            <td>HTTP</td>
+            <td>HTTP, SMTP, TCP</td>
+          </tr>
+          <tr>
+            <td><strong>Formato de Dados</strong></td>
+            <td>JSON, XML</td>
+            <td>Apenas XML</td>
+          </tr>
+          <tr>
+            <td><strong>Facilidade de Uso</strong></td>
+            <td>Simples e flexível</td>
+            <td>Estruturado e verboso</td>
+          </tr>
+          <tr>
+            <td><strong>Desempenho</strong></td>
+            <td>Alto (leve)</td>
+            <td>Baixo (mais pesado)</td>
+          </tr>
+          <tr>
+            <td><strong>Escalabilidade</strong></td>
+            <td>Fácil de escalar</td>
+            <td>Difícil de escalar</td>
+          </tr>
+          <tr>
+            <td><strong>Cache</strong></td>
+            <td>Sim</td>
+            <td>Não</td>
+          </tr>
+          <tr>
+            <td><strong>Segurança</strong></td>
+            <td>Depende da implementação (HTTPS, JWT, OAuth)</td>
+            <td>Segurança robusta integrada (WS-Security)</td>
+          </tr>
+          <tr>
+            <td><strong>Utilização</strong></td>
+            <td>Aplicações web modernas, microserviços</td>
+            <td>Sistemas bancários, integração empresarial</td>
+          </tr>
+        </tbody>
+      </table>
+      <ul>
+        <li><strong>SOAP</strong> é usado em aplicações críticas (bancos, pagamentos) e sistemas legados. </li>
+        <li><strong>REST</strong> é mais leve e flexível, sendo mais popular para aplicações web e microsserviços.</li>
+      </ul>
+      <h3><strong>REST vs RPC (Remote Procedure Call)</strong></h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th>REST</th>
+            <th>RPC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Conceito</strong></td>
+            <td>Manipulação de recursos</td>
+            <td>Chamada direta de funções remotas</td>
+          </tr>
+          <tr>
+            <td><strong>Formato de Comunicação</strong></td>
+            <td>JSON, XML</td>
+            <td>Pode ser binário (gRPC, Thrift) ou JSON</td>
+          </tr>
+          <tr>
+            <td><strong>Independência de Plataforma</strong></td>
+            <td>Alta</td>
+            <td>Média (pode exigir bibliotecas específicas)</td>
+          </tr>
+          <tr>
+            <td><strong>Simplicidade</strong></td>
+            <td>Simples, segue HTTP</td>
+            <td>Pode ser complexo</td>
+          </tr>
+          <tr>
+            <td><strong>Utilização</strong></td>
+            <td>Aplicações web, microsserviços</td>
+            <td>Comunicação de alto desempenho entre serviços</td>
+          </tr>
+        </tbody>
+      </table>
+      <ul>
+        <li><strong>RPC</strong> é usado quando a comunicação precisa ser rápida e eficiente (ex.: gRPC no Google).
+        </li>
+        <li><strong>REST</strong> é mais intuitivo e fácil de usar para integração entre sistemas independentes.</li>
+      </ul>
+      <hr>
+      <h2><strong>1.8 Boas Práticas ao Criar APIs REST 📌</strong></h2>
+      <p>Criar uma API REST eficiente, intuitiva e escalável vai além de simplesmente expor endpoints HTTP. Seguir boas
+        práticas melhora a <strong>usabilidade</strong>, <strong>manutenção</strong>, <strong>segurança</strong> e
+        <strong>desempenho</strong> da API, tornando-a mais fácil de integrar com outras aplicações. A seguir,
+        apresentamos algumas diretrizes fundamentais para a construção de APIs REST profissionais:
+      </p>
+      <h4><strong>1️. Use Substantivos nos Endpoints e Evite Verbos</strong></h4>
+      <p>Os endpoints representam <strong>recursos</strong>, portanto, devem ser <strong>nomes de substantivos no
+          plural</strong>, e não <strong>ações ou verbos</strong>.</p>
+      <p>✅ <strong>Certo</strong>:</p>
+      <pre><code class="language-http">GET /contacts        → Obtém todos os contatos  
+GET /contacts/{id}   → Obtém um contato específico  
+POST /contacts       → Cria um novo contato  
+DELETE /contacts/{id} → Remove um contato  
+</code></pre>
+      <p>❌ <strong>Errado</strong>:</p>
+      <pre><code class="language-http">GET /getContacts      → Não precisa do verbo &quot;get&quot;, pois o método HTTP já indica a ação  
+POST /createContact   → O verbo &quot;create&quot; é desnecessário, pois o método POST já sugere criação  
+DELETE /removeContact → O verbo &quot;remove&quot; também é desnecessário  
+</code></pre>
+      <p>💡 <strong>Regra geral</strong>: O método HTTP já indica a ação (GET para buscar, POST para criar, DELETE para
+        remover, etc.), então o endpoint deve apenas representar o <strong>recurso</strong>.</p>
+      <h4><strong>2️. Use os Códigos de Status HTTP Corretamente</strong></h4>
+      <p>Os <strong>códigos de status HTTP</strong> ajudam o cliente da API a entender o resultado da requisição. Usar
+        códigos corretos torna a API mais intuitiva e facilita a depuração.</p>
+      <p>✅ <strong>Principais códigos de status HTTP:</strong></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Significado</th>
+            <th>Quando Usar?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>200 OK</strong></td>
+            <td>Sucesso</td>
+            <td>Quando uma requisição GET, PUT ou DELETE for bem-sucedida</td>
+          </tr>
+          <tr>
+            <td><strong>201 Created</strong></td>
+            <td>Recurso Criado</td>
+            <td>Quando um novo recurso é criado via POST</td>
+          </tr>
+          <tr>
+            <td><strong>204 No Content</strong></td>
+            <td>Sem Conteúdo</td>
+            <td>Quando um recurso é excluído com sucesso</td>
+          </tr>
+          <tr>
+            <td><strong>400 Bad Request</strong></td>
+            <td>Requisição Inválida</td>
+            <td>Quando os dados enviados são inválidos</td>
+          </tr>
+          <tr>
+            <td><strong>401 Unauthorized</strong></td>
+            <td>Não Autenticado</td>
+            <td>Quando o usuário não está autenticado</td>
+          </tr>
+          <tr>
+            <td><strong>403 Forbidden</strong></td>
+            <td>Acesso Negado</td>
+            <td>Quando o usuário não tem permissão para acessar o recurso</td>
+          </tr>
+          <tr>
+            <td><strong>404 Not Found</strong></td>
+            <td>Recurso Não Encontrado</td>
+            <td>Quando o recurso solicitado não existe</td>
+          </tr>
+          <tr>
+            <td><strong>409 Conflict</strong></td>
+            <td>Conflito</td>
+            <td>Quando há um conflito de dados (ex.: tentativa de criar um registro duplicado)</td>
+          </tr>
+          <tr>
+            <td><strong>500 Internal Server Error</strong></td>
+            <td>Erro Interno</td>
+            <td>Quando ocorre um erro inesperado no servidor</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>💡 <strong>Exemplo Prático:</strong>
+        Se um usuário tenta buscar um contato que não existe:</p>
+      <p>❌ <strong>Errado</strong>:</p>
+      <pre><code class="language-json">{
+  &quot;message&quot;: &quot;Contato não encontrado&quot;
+}
+</code></pre>
+      <p>✅ <strong>Certo</strong> (Retorna o código 404):</p>
+      <pre><code class="language-http">HTTP/1.1 404 Not Found
+{
+  &quot;error&quot;: &quot;Contato não encontrado&quot;
+}
+</code></pre>
+      <h4><strong>3️. Evite Expor Detalhes Internos da API</strong></h4>
+      <p>Nunca retorne informações sensíveis sobre a API ou stack traces detalhadas em respostas de erro. Isso pode
+        expor vulnerabilidades para possíveis ataques.</p>
+      <p>❌ <strong>Errado</strong> (Expondo detalhes internos):</p>
+      <pre><code class="language-json">{
+  &quot;error&quot;: &quot;java.lang.NullPointerException at ContactService.java:34&quot;
+}
+</code></pre>
+      <p>✅ <strong>Certo</strong> (Mensagem amigável e segura):</p>
+      <pre><code class="language-json">{
+  &quot;error&quot;: &quot;Erro ao processar a requisição. Tente novamente mais tarde.&quot;
+}
+</code></pre>
+      <p>💡 <strong>Dica</strong>: Sempre <strong>trate exceções</strong> e retorne mensagens amigáveis para o cliente,
+        sem expor detalhes da implementação.</p>
+      <h4><strong>4️. Implemente Paginação em Grandes Listas</strong></h4>
+      <p>Quando a API retorna uma grande quantidade de dados, a <strong>paginação</strong> evita sobrecarregar o
+        servidor e melhora o desempenho.</p>
+      <p>✅ <strong>Exemplo de Paginação:</strong></p>
+      <pre><code class="language-http">GET /contacts?page=1&amp;size=10
+</code></pre>
+      <p>✅ <strong>Resposta JSON com metadados de paginação:</strong></p>
+      <pre><code class="language-json">{
+  &quot;data&quot;: [
+    { &quot;id&quot;: 1, &quot;nome&quot;: &quot;João&quot; },
+    { &quot;id&quot;: 2, &quot;nome&quot;: &quot;Maria&quot; }
+  ],
+  &quot;page&quot;: 1,
+  &quot;size&quot;: 10,
+  &quot;totalPages&quot;: 5,
+  &quot;totalItems&quot;: 50
+}
+</code></pre>
+      <p>💡 <strong>Dica</strong>: Utilize frameworks como o <strong>Spring Data Pageable</strong> para implementar
+        paginação de forma eficiente.</p>
+      <h4><strong>5️. Mantenha a API Intuitiva e Consistente</strong></h4>
+      <p>Uma API bem projetada deve ser <strong>fácil de usar</strong>, <strong>padronizada</strong> e
+        <strong>previsível</strong>, permitindo que os desenvolvedores consigam integrá-la sem precisar consultar
+        constantemente a documentação.
+      </p>
+      <p>✅ <strong>Boas práticas para manter a API intuitiva:</strong></p>
+      <ul>
+        <li><strong>Use convenções de nomenclatura consistentes</strong> em todos os endpoints.</li>
+        <li><strong>Padronize os formatos de resposta JSON</strong>, garantindo que todas as respostas sigam a mesma
+          estrutura.</li>
+        <li><strong>Retorne mensagens de erro claras</strong>, explicando o problema e como resolvê-lo.</li>
+        <li><strong>Forneça documentação</strong> da API com exemplos de uso.</li>
+      </ul>
+      <h4><strong>6️. Use Versionamento na API</strong></h4>
+      <p>Com o tempo, APIs evoluem e podem quebrar compatibilidade com versões antigas. Para evitar problemas, sempre
+        versione a API.</p>
+      <p>✅ <strong>Exemplo de versionamento:</strong></p>
+      <pre><code class="language-http">GET /v1/contacts   → Versão 1  
+GET /v2/contacts   → Versão 2  
+</code></pre>
+      <p>💡 <strong>Dica</strong>: Se a API passar por mudanças grandes, <strong>mantenha versões anteriores</strong>
+        disponíveis para evitar que clientes antigos quebrem.</p>
+      <h4><strong>7️. Documente sua API de Forma Clara</strong></h4>
+      <p>A documentação é essencial para que outros desenvolvedores entendam como usar sua API. Utilize ferramentas
+        como:</p>
+      <ul>
+        <li><strong>Swagger/OpenAPI</strong> → Gera documentação interativa automaticamente. </li>
+        <li><strong>Postman</strong> → Permite criar coleções de requisições de API documentadas. </li>
+        <li><strong>Redoc</strong> → Gera documentação HTML a partir do OpenAPI.</li>
+      </ul>
+      <p>✅ <strong>Exemplo de documentação com Swagger:</strong></p>
+      <pre><code class="language-java">import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(&quot;/contacts&quot;)
+public class ContactController {
+
+    @Operation(summary = &quot;Lista todos os contatos&quot;, description = &quot;Retorna uma lista paginada de contatos&quot;)
+    @GetMapping
+    public List&lt;Contact&gt; getAllContacts() {
+        return contactRepository.findAll();
+    }
+}
+</code></pre>
+      <p>Seguir essas boas práticas ao criar APIs REST <strong>melhora a usabilidade, segurança e desempenho</strong> da
+        aplicação. Implementar um design padronizado facilita a adoção da API por outros desenvolvedores e reduz a
+        necessidade de documentação extensiva.</p>
+      <p><strong>Checklist de Boas Práticas:</strong>
+        ✅ <strong>Nomes de endpoints no plural e sem verbos</strong><br>✅ <strong>Uso correto dos métodos HTTP e códigos
+          de status</strong><br>✅ <strong>Mensagens de erro claras e sem detalhes internos</strong><br>✅
+        <strong>Paginação para grandes listas</strong><br>✅ <strong>API intuitiva e fácil de entender</strong><br>✅
+        <strong>Versionamento para evitar quebra de compatibilidade</strong><br>✅ <strong>Documentação clara e bem
+          estruturada</strong>
+      </p>
+      <p>Aplique essas práticas para construir APIS REST mais <strong>robustas, escaláveis e fáceis de usar</strong>! 🚀
+      </p>
+      <h2><strong>1.9 Conclusão</strong></h2>
+      <p>As <strong>APIs REST</strong> se tornaram o padrão para integração de sistemas modernos devido à sua
+        simplicidade, flexibilidade e eficiência. Elas permitem que diferentes aplicações, independentemente da
+        tecnologia utilizada, possam se comunicar utilizando os princípios da web. </p>
+      <p>Vamos colocar as mãos na massa e construir uma <strong>API REST com Spring Boot</strong>, explorando como
+        criar, expor e manipular recursos de forma eficiente. Nosso objetivo é compreender os fundamentos e boas
+        práticas do desenvolvimento de APIs REST para aplicações reais.</p>
+      <hr>
+      <hr>
+      <h1><strong>2. Introdução ao Spring Boot</strong></h1>
+      <p>O <strong>Spring Boot</strong> é um framework que facilita a criação de aplicativos em Java, fornecendo uma
+        estrutura de projeto pré-configurada que agiliza o desenvolvimento. </p>
+      <p>O Spring Boot segue o princípio de <strong>Convention Over Configuration</strong> (Convenção sobre
+        Configuração), que é um princípio de desenvolvimento que reduz a necessidade de configurações explícitas,
+        fornecendo valores e comportamentos padrão sensíveis. O desenvolvedor só precisa configurar explicitamente algo
+        quando deseja modificar o comportamento padrão. </p>
+      <p>Isso significa que ele vem com configurações padrão inteligentes que permitem aos desenvolvedores começarem
+        rapidamente sem precisar definir manualmente cada detalhe da aplicação, o que elimina grande parte da
+        configuração manual tradicional do Spring, permitindo que o desenvolvedor foque mais na lógica de negócio.</p>
+      <p>Sim, a explicação está clara e bem estruturada! Ela destaca os principais pontos sobre o <strong>Spring
+          Boot</strong> e seu uso do princípio <strong>Convention Over Configuration</strong> de forma objetiva. No
+        entanto, se quiser torná-la ainda mais acessível, você pode adicionar um exemplo rápido para ilustrar a ideia.
+      </p>
+      <p>📌 <strong>Exemplo prático:</strong><br>No Spring tradicional, para configurar um banco de dados, seria
+        necessário definir manualmente um <strong>DataSource</strong>, gerenciar transações e configurar o Hibernate.
+      </p>
+      <p>Com o <strong>Spring Boot</strong>, basta adicionar as dependências necessárias e incluir algumas linhas no
+        <code>application.properties</code>:
+      </p>
+      <blockquote>
+        <pre><code class="language-properties">spring.datasource.url=jdbc:mysql://localhost:3306/meubanco
+spring.datasource.username=root
+spring.datasource.password=senha
+</code></pre>
+      </blockquote>
+      <p>Ou seja, o Spring Boot detecta automaticamente o banco de dados e configura o <strong>Hibernate</strong> sem
+        necessidade de configurações adicionais.</p>
+      <h3><strong>Criando o Projeto Spring Boot</strong></h3>
+      <p>Antes de iniciarmos a implementação da nossa API REST, precisamos criar o projeto Spring Boot. Podemos fazer
+        isso de diversas maneiras, mas utilizaremos a abordagem mais prática: o <strong>Spring Initializr</strong>.</p>
+      <h4><strong>🔹 Criando o Projeto com Spring Initializr</strong></h4>
+      <p>O <strong>Spring Initializr</strong> é uma ferramenta online que permite configurar e gerar rapidamente um
+        projeto Spring Boot com as dependências necessárias.</p>
+      <h4><strong>Passo a passo para criar o projeto:</strong></h4>
+      <ol>
+        <li>
+          <p><strong>Acesse o Spring Initializr</strong> </p>
+          <ul>
+            <li>Acesse <a href="https://start.spring.io/">https://start.spring.io/</a></li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Configure o projeto</strong> </p>
+          <ul>
+            <li><strong>Project:</strong> Maven (ou Gradle, se preferir) </li>
+            <li><strong>Language:</strong> Java </li>
+            <li><strong>Spring Boot Version:</strong> Escolha a versão mais recente estável </li>
+            <li><strong>Group:</strong> <code>br.ifsp</code> </li>
+            <li><strong>Artifact:</strong> <code>contacts-api</code> </li>
+            <li><strong>Name:</strong> <code>contacts-api</code> </li>
+            <li><strong>Description:</strong> <code>API para gerenciamento de contatos</code> </li>
+            <li><strong>Package Name:</strong> <code>br.ifsp.contacts</code> </li>
+            <li><strong>Packaging:</strong> Jar </li>
+            <li><strong>Java Version:</strong> 11 ou superior (recomendado)</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Adicione as dependências essenciais</strong> </p>
+          <ul>
+            <li><strong>Spring Web</strong> → Para criar a API REST </li>
+            <li><strong>Spring Boot DevTools</strong> → Para recarregamento automático durante o desenvolvimento </li>
+            <li><strong>Spring Data JPA</strong> → Para interação com banco de dados </li>
+            <li><strong>H2 Database</strong> → Banco de dados em memória para testes</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Gerar e baixar o projeto</strong> </p>
+          <ul>
+            <li>Clique em <strong>&quot;Generate&quot;</strong> para baixar o projeto <code>.zip</code> </li>
+            <li>Extraia o <code>.zip</code> em uma pasta de sua preferência.</li>
+          </ul>
+        </li>
+      </ol>
+      <h4><strong>🔹 Importando o Projeto na IDE</strong></h4>
+      <p>Após baixar e extrair o projeto, é hora de importá-lo para uma IDE (como IntelliJ IDEA, Eclipse ou VS Code com
+        extensão Java).</p>
+      <p><strong>Se estiver usando IntelliJ IDEA:</strong></p>
+      <ol>
+        <li>Abra o IntelliJ IDEA.</li>
+        <li>Clique em <strong>File</strong> &gt; <strong>Open</strong>.</li>
+        <li>Selecione a pasta do projeto (<code>contacts-api</code>) e clique em <strong>Open</strong>.</li>
+        <li>Aguarde o Maven ou Gradle baixar as dependências automaticamente.</li>
+      </ol>
+      <p><strong>Se estiver usando Eclipse:</strong></p>
+      <ol>
+        <li>Vá até <strong>File</strong> &gt; <strong>Import</strong>.</li>
+        <li>Escolha <strong>Existing Maven Projects</strong>.</li>
+        <li>Selecione a pasta onde extraiu o projeto.</li>
+        <li>Clique em <strong>Finish</strong> e aguarde a configuração.</li>
+      </ol>
+      <h4><strong>🔹 Rodando o Projeto pela Primeira Vez</strong></h4>
+      <p>Agora que temos o projeto configurado, podemos rodá-lo pela primeira vez.</p>
+      <ol>
+        <li><strong>Abra o terminal na pasta do projeto.</strong></li>
+        <li>Se estiver usando <strong>Maven</strong>, execute:
+          <pre><code>mvn spring-boot:run
+</code></pre>
+          Se estiver usando <strong>Gradle</strong>, execute:
+          <pre><code>./gradlew bootRun
+</code></pre>
+        </li>
+        <li>Aguarde até que a aplicação inicie. Se tudo estiver correto, você verá algo como:
+          <pre><code>Tomcat started on port(s): 8080 (http)
+</code></pre>
+        </li>
+      </ol>
+      <p>Agora sua API está rodando localmente na porta <strong>8080</strong> e pronta para receber requisições! 🎉</p>
+      <p>Caso queira testar se está funcionando, abra o navegador e acesse:</p>
+      <pre><code>http://localhost:8080
+</code></pre>
+      <p>A princípio, receberá uma resposta <code>Whitelabel Error Page</code>, pois ainda não criamos nenhuma rota. Nas
+        próximas etapas, adicionaremos os <strong>endpoints REST</strong>.</p>
+      <h2><strong>2.1 Estrutura do Projeto</strong></h2>
+      <p>Ao criar um projeto com o <strong>Spring Boot</strong>, é comum utilizar o padrão de pastas do Maven, mesmo que
+        o seu build tool seja o Maven ou Gradle. Essa estrutura fica geralmente assim:</p>
+      <pre><code>.
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── br
+│   │   │       └── ifsp
+│   │   │           └── contacts
+│   │   │               ├── ContactsApplication.java
+│   │   │               ├── controller
+│   │   │               │   └── ContactController.java
+│   │   │               ├── model
+│   │   │               │   └── Contact.java
+│   │   │               └── repository
+│   │   │                   └── ContactRepository.java
+│   │   └── resources
+│   │       └── application.properties
+│   └── test
+│       └── java
+└── pom.xml (ou build.gradle)
+</code></pre>
+      <p>A seguir, veremos cada arquivo principal e as explicações associadas.</p>
+      <hr>
+      <h2><strong>2.2 Arquivo de Inicialização: <code>ContactsApplication.java</code></strong></h2>
+      <p>Este é o ponto de entrada da aplicação Spring Boot. É nele que colocamos a anotação
+        <code>@SpringBootApplication</code>, que habilita diversas configurações automáticas:
+      </p>
+      <pre><code class="language-java">package br.ifsp.contacts;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * Classe principal da nossa aplicação Spring Boot.
+ * 
+ * A anotação @SpringBootApplication habilita as configurações
+ * automáticas do Spring (auto-configuration) e também indica 
+ * que esta é a classe que deve ser executada para iniciar 
+ * a aplicação.
+ */
+@SpringBootApplication
+public class ContactsApplication {
+
+    public static void main(String[] args) {
+        // Método main: ponto de entrada de uma aplicação Java.
+        // SpringApplication.run() inicia a aplicação Spring Boot.
+        SpringApplication.run(ContactsApplication.class, args);
+    }
+
+}
+</code></pre>
+      <p><strong>Explicação</strong>:</p>
+      <ul>
+        <li><code>@SpringBootApplication</code> é uma anotação que combina diversas funcionalidades, como:<ul>
+            <li><code>@Configuration</code>: para permitir configurações na aplicação.</li>
+            <li><code>@EnableAutoConfiguration</code>: faz com que o Spring Boot configure automaticamente componentes
+              relevantes, de acordo com o que encontra no classpath do projeto.</li>
+            <li><code>@ComponentScan</code>: faz com que o Spring procure automaticamente classes anotadas como
+              componentes dentro do mesmo pacote ou em pacotes filhos.</li>
+          </ul>
+        </li>
+      </ul>
+      <p>Quando executamos o método <code>main</code>, o <strong>Spring Boot</strong> levanta um servidor embutido (por
+        padrão, o Tomcat) e passa a escutar as requisições HTTP.</p>
+      <hr>
+      <h2><strong>2.3 Modelo de Dados: <code>Contact.java</code></strong></h2>
+      <p>Para representar cada contato, precisamos de uma classe que contenha seus atributos. Chamamos essa classe de
+        <strong>modelo</strong>, ou <strong>entidade</strong>, quando falamos de persistência de dados.
+      </p>
+      <pre><code class="language-java">package br.ifsp.contacts.model;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+/**
+ * Classe que representa o modelo de dados para um Contato.
+ * 
+ * @Entity indica que este objeto será mapeado para uma tabela
+ * no banco de dados (em cenários de persistência com JPA).
+ */
+@Entity
+public class Contact {
+
+    /**
+     * @Id indica que este campo é a chave primária (primary key) da entidade.
+     * @GeneratedValue permite que o banco de dados (ou o provedor JPA) 
+     * gere automaticamente um valor único para cada novo registro.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nome;
+    private String telefone;
+    private String email;
+
+    // Construtor vazio exigido pelo JPA
+    public Contact() {}
+
+    // Construtor para facilitar a criação de objetos
+    public Contact(String nome, String telefone, String email) {
+        this.nome = nome;
+        this.telefone = telefone;
+        this.email = email;
+    }
+
+    // Getters e Setters
+    public Long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+}
+</code></pre>
+      <p><strong>Explicação</strong>:</p>
+      <ul>
+        <li><code>@Entity</code> diz ao <strong>Spring/Data JPA</strong> (ou outro provedor de JPA) que esta classe é
+          uma entidade que será mapeada para uma tabela no banco de dados.</li>
+        <li><code>@Id</code> define o identificador único do registro.</li>
+        <li><code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code> faz com que o valor do ID seja gerado
+          automaticamente (por exemplo, auto-increment em bancos relacionais).</li>
+        <li><code>Long id</code>, <code>String nome</code>, <code>String telefone</code> e <code>String email</code> são
+          os campos que vamos manipular.</li>
+      </ul>
+      <p>Mesmo que ainda não estejamos aprofundando no uso de banco de dados real, este exemplo já está preparado para
+        persistência caso seja configurado um banco H2 ou outro SGBD.</p>
+      <hr>
+      <h2><strong>2.4 Repositório de Dados: <code>ContactRepository.java</code></strong></h2>
+      <p>O repositório é responsável por realizar as operações de acesso aos dados (criar, ler, atualizar, excluir).
+        Vamos utilizar a <strong>interface</strong> <code>JpaRepository</code> do Spring Data JPA, que já oferece as
+        implementações básicas de CRUD, bastando nós definirmos a interface corretamente.</p>
+      <pre><code class="language-java">package br.ifsp.contacts.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import br.ifsp.contacts.model.Contact;
+
+/**
+ * Esta interface extende JpaRepository, que nos fornece métodos prontos 
+ * para acessar e manipular dados no banco de dados. Basta especificar 
+ * a classe de entidade (Contact) e o tipo da chave primária (Long).
+ */
+public interface ContactRepository extends JpaRepository&lt;Contact, Long&gt; {
+    // Podemos adicionar métodos personalizados se necessário.
+}
+</code></pre>
+      <p><strong>Explicação</strong>:</p>
+      <ul>
+        <li>Ao estender <code>JpaRepository&lt;Contact, Long&gt;</code>, nós ganhamos de forma automática diversos
+          métodos como:<ul>
+            <li><code>save()</code> - para inserir ou atualizar um contato</li>
+            <li><code>findById()</code> - para buscar contato por ID</li>
+            <li><code>findAll()</code> - para buscar todos os contatos</li>
+            <li><code>deleteById()</code> - para deletar contato por ID</li>
+          </ul>
+        </li>
+        <li>O <code>ContactRepository</code> já está pronto para ser injetado em outras camadas da aplicação (como na
+          Controller).</li>
+      </ul>
+      <hr>
+      <h2><strong>2.5 Controlador (Controller): <code>ContactController.java</code></strong></h2>
+      <p>O <strong>controlador</strong> é a classe que “escuta” as requisições HTTP e define como o sistema vai
+        responder. Nele, utilizamos anotações como <code>@RestController</code> (que indica um controller REST) e
+        <code>@RequestMapping</code> (para definir o caminho base dos endpoints, também chamados de “URIs” ou “rotas”).
+      </p>
+      <pre><code class="language-java">package br.ifsp.contacts.controller;
+
+import br.ifsp.contacts.model.Contact;
+import br.ifsp.contacts.repository.ContactRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * Classe responsável por mapear as rotas/endpoints relacionados
+ * aos contatos. Cada método abaixo corresponde a uma operação
+ * em nosso sistema.
+ * 
+ * @RestController: Indica que esta classe é um controlador 
+ *                  responsável por responder requisições REST.
+ * @RequestMapping(&quot;/api/contacts&quot;): Indica o caminho base.
+ */
+@RestController
+@RequestMapping(&quot;/api/contacts&quot;)
+public class ContactController {
+
+    /**
+     * @Autowired permite que o Spring &quot;injete&quot; automaticamente
+     * uma instância de ContactRepository aqui, 
+     * sem que precisemos criar manualmente.
+     */
+    @Autowired
+    private ContactRepository contactRepository;
+
+    /**
+     * Método para obter todos os contatos.
+     * 
+     * @GetMapping indica que este método vai responder a chamadas HTTP GET.
+     * Exemplo de acesso: GET /api/contacts
+     */
+    @GetMapping
+    public List&lt;Contact&gt; getAllContacts() {
+        return contactRepository.findAll();
+    }
+
+    /**
+     * Método para obter um contato específico pelo seu ID.
+     * 
+     * @PathVariable &quot;amarra&quot; a variável {id} da URL 
+     * ao parâmetro do método.
+     * Exemplo de acesso: GET /api/contacts/1
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public Contact getContactById(@PathVariable Long id) {
+        // findById retorna um Optional, então usamos orElseThrow
+        return contactRepository.findById(id)
+                .orElseThrow(() -&gt; new RuntimeException(&quot;Contato não encontrado: &quot; + id));
+    }
+
+    /**
+     * Método para criar um novo contato.
+     * 
+     * @PostMapping indica que este método responde a chamadas HTTP POST.
+     * @RequestBody indica que o objeto Contact será preenchido 
+     * com os dados JSON enviados no corpo da requisição.
+     */
+    @PostMapping
+    public Contact createContact(@RequestBody Contact contact) {
+        return contactRepository.save(contact);
+    }
+
+    /**
+     * Método para atualizar um contato existente.
+     * 
+     * @PutMapping indica que este método responde a chamadas HTTP PUT.
+     * Exemplo de acesso: PUT /api/contacts/1
+     */
+    @PutMapping(&quot;/{id}&quot;)
+    public Contact updateContact(@PathVariable Long id, @RequestBody Contact updatedContact) {
+        // Buscar o contato existente
+        Contact existingContact = contactRepository.findById(id)
+                .orElseThrow(() -&gt; new RuntimeException(&quot;Contato não encontrado: &quot; + id));
+
+        // Atualizar os campos
+        existingContact.setNome(updatedContact.getNome());
+        existingContact.setTelefone(updatedContact.getTelefone());
+        existingContact.setEmail(updatedContact.getEmail());
+
+        // Salvar alterações
+        return contactRepository.save(existingContact);
+    }
+
+    /**
+     * Método para excluir um contato pelo ID.
+     * 
+     * @DeleteMapping indica que este método responde a chamadas HTTP DELETE.
+     * Exemplo de acesso: DELETE /api/contacts/1
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public void deleteContact(@PathVariable Long id) {
+        contactRepository.deleteById(id);
+    }
+}
+</code></pre>
+      <p><strong>Explicação</strong>:</p>
+      <ol>
+        <li>
+          <p><strong><code>@RestController</code></strong>: </p>
+          <ul>
+            <li>Indica que esta classe processa requisições REST (ou seja, retorna dados em JSON ou outro formato) e não
+              retorna diretamente páginas HTML.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong><code>@RequestMapping(&quot;/api/contacts&quot;)</code></strong>:</p>
+          <ul>
+            <li>Define que todos os métodos dentro deste controller estarão acessíveis a partir de URIs que começam com
+              <code>/api/contacts</code>. Por exemplo, se o método for anotado com <code>@GetMapping</code>, isso virará
+              <code>GET /api/contacts</code>.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Métodos HTTP</strong>:</p>
+          <ul>
+            <li><code>@GetMapping</code> → Método GET do protocolo HTTP. Para obter (ler) dados.</li>
+            <li><code>@PostMapping</code> → Método POST do protocolo HTTP. Para criar (inserir) dados.</li>
+            <li><code>@PutMapping</code> → Método PUT do protocolo HTTP. Para atualizar (modificar) dados.</li>
+            <li><code>@DeleteMapping</code> → Método DELETE do protocolo HTTP. Para excluir dados.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong><code>@PathVariable</code></strong>:</p>
+          <ul>
+            <li>Indica que o valor do parâmetro <code>id</code> virá diretamente do segmento correspondente na URL. Por
+              exemplo, ao acessar <code>GET /api/contacts/10</code>, o valor <code>10</code> será atribuído ao parâmetro
+              <code>id</code>.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p><strong><code>@RequestBody</code></strong>:</p>
+          <ul>
+            <li>Indica que o parâmetro do método (<code>Contact contact</code>) deve ser populado com o corpo da
+              requisição. Em uma chamada POST com corpo JSON, os campos <code>nome</code>, <code>telefone</code>,
+              <code>email</code> (por exemplo) serão convertidos em um objeto <code>Contact</code>.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Injeção de Dependência (<code>@Autowired</code>)</strong>:</p>
+          <ul>
+            <li>O Spring cria e gerencia o objeto <code>ContactRepository</code>. Ao colocar <code>@Autowired</code>,
+              estamos dizendo ao Spring para injetar nesse campo a instância do nosso repositório, economizando a tarefa
+              de instanciá-lo manualmente.</li>
+          </ul>
+        </li>
+      </ol>
+      <hr>
+      <h2><strong>2.6 Arquivo de Configuração: <code>application.properties</code></strong></h2>
+      <p>Caso quiséssemos usar o banco H2 em memória para testes ou configurações adicionais, poderíamos adicionar
+        alguns parâmetros no <code>application.properties</code>. Por exemplo:</p>
+      <pre><code class="language-properties">spring.datasource.url=jdbc:h2:mem:contacts_db
+spring.datasource.driverClassName=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.h2.console.enabled=true
+</code></pre>
+      <p><strong>Explicação</strong>:</p>
+      <ul>
+        <li><code>spring.datasource.url</code> e <code>spring.datasource.driverClassName</code> definem o local do banco
+          e o driver de conexão.</li>
+        <li><code>spring.jpa.hibernate.ddl-auto=update</code> faz com que a tabela seja criada/atualizada
+          automaticamente ao iniciar a aplicação, conforme as entidades definidas.</li>
+        <li><code>spring.h2.console.enabled=true</code> habilita um console web para ver e manipular dados do banco
+          (acessível em <code>/h2-console</code> quando a aplicação está rodando).</li>
+      </ul>
+      <p>Se não quisermos usar H2, ainda assim podemos manter o projeto como está, pois o Spring Boot, por padrão,
+        tentará criar um banco em memória se não for configurado outro banco real. </p>
+      <hr>
+      <h2><strong>2.7 Build e Execução</strong></h2>
+      <h3>Usando Maven</h3>
+      <p>Se estivermos utilizando Maven, teremos um arquivo <code>pom.xml</code> na raiz do projeto. Ele conterá, entre
+        outras coisas, as dependências:</p>
+      <pre><code class="language-xml">&lt;dependencies&gt;
+    &lt;!-- Dependência do Spring Web, para criar a API REST --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- Dependência do Spring Data JPA, para acesso a dados --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- Dependência para banco H2 em memória (opcional) --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+        &lt;artifactId&gt;h2&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+      <p>Para rodar, podemos simplesmente executar:</p>
+      <pre><code>mvn spring-boot:run
+</code></pre>
+      <p>ou, se gerarmos um <code>.jar</code>, podemos rodar:</p>
+      <pre><code>java -jar target/contacts-0.0.1-SNAPSHOT.jar
+</code></pre>
+      <h3>Usando Gradle</h3>
+      <p>Caso nosso projeto fosse em <strong>Gradle</strong>, teríamos um arquivo <code>build.gradle</code>. O conteúdo
+        principal para as dependências seria algo como:</p>
+      <pre><code class="language-groovy">dependencies {
+    implementation &#39;org.springframework.boot:spring-boot-starter-web&#39;
+    implementation &#39;org.springframework.boot:spring-boot-starter-data-jpa&#39;
+    runtimeOnly &#39;com.h2database:h2&#39;
+}
+</code></pre>
+      <p>Para iniciar a aplicação:</p>
+      <pre><code>./gradlew bootRun
+</code></pre>
+      <h3><strong>Maven vs. Gradle: Comparação e Diferenças</strong></h3>
+      <p>Ao desenvolver aplicações com <strong>Spring Boot</strong>, é necessário um <strong>gerenciador de dependências
+          e build</strong> para automatizar tarefas como <strong>compilação, empacotamento, testes e execução do
+          projeto</strong>. Os dois principais gerenciadores no ecossistema Java são <strong>Maven</strong> e
+        <strong>Gradle</strong>.
+      </p>
+      <h4><strong>Estrutura e Configuração</strong></h4>
+      <ul>
+        <li><strong>Maven</strong> utiliza um arquivo <strong>XML (<code>pom.xml</code>)</strong>, que define as
+          dependências e configurações do projeto de maneira declarativa. </li>
+        <li><strong>Gradle</strong> usa arquivos baseados em <strong>Groovy ou Kotlin (<code>build.gradle</code> ou
+            <code>build.gradle.kts</code>)</strong>.</li>
+      </ul>
+      <h4><strong>Desempenho e Eficiência</strong></h4>
+      <ul>
+        <li><strong>Gradle</strong> é mais rápido que Maven, pois utiliza <strong>builds incrementais</strong> e
+          <strong>cache de tarefas</strong>, evitando a recompilação de código desnecessário.
+        </li>
+        <li><strong>Maven</strong> sempre executa as tarefas do zero, tornando o build mais previsível, porém mais
+          lento.</li>
+      </ul>
+      <h4><strong>Sintaxe e Facilidade de Uso</strong></h4>
+      <ul>
+        <li><strong>Maven</strong> tem uma sintaxe rígida e baseada em XML, o que pode gerar arquivos longos e verbosos.
+        </li>
+        <li><strong>Gradle</strong> tem uma sintaxe mais concisa e expressiva, facilitando a configuração de builds
+          complexos.</li>
+      </ul>
+      <h4><strong>Popularidade e Comunidade</strong></h4>
+      <ul>
+        <li><strong>Maven</strong> tem uma comunidade maior e uma adoção mais ampla, sendo o padrão em muitos projetos
+          Java. </li>
+        <li><strong>Gradle</strong> tem ganhado espaço, especialmente em projetos modernos, e é amplamente usado no
+          desenvolvimento Android.</li>
+      </ul>
+      <h4><strong>Ou seja...</strong></h4>
+      <ul>
+        <li>Se você busca <strong>padronização e estabilidade</strong>, <strong>Maven</strong> é uma excelente escolha.
+        </li>
+        <li>Se precisa de <strong>builds mais rápidos e configuráveis</strong>, <strong>Gradle</strong> pode ser a
+          melhor opção.</li>
+      </ul>
+      <p>Ambas as ferramentas são compatíveis com <strong>Spring Boot</strong>, então a escolha depende das necessidades
+        do projeto e do conhecimento prévio da equipe. </p>
+      <p>Ao longo da disciplina utilizaremos o <strong>Maven</strong> como ferramenta padrão, dada sua maior
+        popularidade.</p>
+      <hr>
+      <h2><strong>2.8 Testando a API</strong></h2>
+      <p>Ao desenvolver uma <strong>API REST</strong>, é essencial testar suas funcionalidades para verificar se os
+        endpoints estão respondendo corretamente. Para isso, utilizamos <strong>clients de API</strong>, que permitem
+        enviar requisições HTTP e visualizar as respostas do servidor. Dentre os mais populares, temos as seguintes
+        opções.</p>
+      <h3><strong>Postman</strong> 📨</h3>
+      <p>O <strong>Postman</strong> é um dos <strong>clientes de API mais populares</strong> e oferece uma interface
+        gráfica para:<br>✅ Enviar requisições <strong>GET, POST, PUT, PATCH, DELETE</strong> com facilidade.<br>✅
+        Adicionar <strong>headers, parâmetros e autenticação</strong> às requisições.<br>✅ Salvar <strong>coleções de
+          requisições</strong> para testes automatizados.<br>✅ Simular <strong>corpos JSON e XML</strong> no envio de
+        dados. </p>
+      <p>👉 <strong>Exemplo:</strong> </p>
+      <ol>
+        <li>Abra o Postman e crie uma nova requisição. </li>
+        <li>Escolha <strong>GET</strong> e insira <code>http://localhost:8080/api/contacts</code>. </li>
+        <li>Clique em <strong>Send</strong> e visualize a resposta JSON da API.</li>
+      </ol>
+      <p>💡 O Postman também suporta <strong>testes automatizados</strong> e integração com CI/CD. </p>
+      <h3><strong>Insomnia</strong> 🌙</h3>
+      <p>O <strong>Insomnia</strong> é uma alternativa ao Postman, mais leve e focada na simplicidade. Ele permite:<br>✅
+        Criar e organizar requisições de forma intuitiva.<br>✅ Testar APIs REST, GraphQL e WebSockets.<br>✅ Gerenciar
+        variáveis de ambiente para diferentes contextos (desenvolvimento, produção). </p>
+      <p>💡 É recomendado para quem busca uma experiência mais fluida e rápida, sem tantas funcionalidades avançadas.
+      </p>
+      <h3><strong>cURL</strong> 🖥️</h3>
+      <p>O <strong>cURL</strong> é uma ferramenta de linha de comando para testar APIs diretamente no terminal. É útil
+        para desenvolvedores que preferem <strong>scripts e automação</strong>. </p>
+      <p>👉 <strong>Exemplo de requisição GET com cURL:</strong> </p>
+      <pre><code class="language-sh">curl -X GET http://localhost:8080/api/contacts
+</code></pre>
+      <p>👉 <strong>Exemplo de requisição POST com JSON:</strong> </p>
+      <pre><code class="language-sh">curl -X POST http://localhost:8080/api/contacts \
+     -H &quot;Content-Type: application/json&quot; \
+     -d &#39;{&quot;nome&quot;: &quot;Maria&quot;, &quot;telefone&quot;: &quot;9999-9999&quot;, &quot;email&quot;: &quot;maria@email.com&quot;}&#39;
+</code></pre>
+      <p>💡 cURL é embutido no Linux e macOS e pode ser usado em scripts para <strong>testes automatizados</strong>.
+      </p>
+      <h3><strong>Alternativas e Ferramentas Adicionais</strong></h3>
+      <ul>
+        <li><strong>Hoppscotch</strong> → Cliente de API online e gratuito, semelhante ao Postman. </li>
+        <li><strong>Thunder Client</strong> → Extensão do VS Code para testar APIs REST sem sair do editor. </li>
+        <li><strong>HTTPie</strong> → Alternativa ao cURL com saída mais legível.</li>
+      </ul>
+      <p>Independentemente da ferramenta, testar a API é fundamental para garantir que os endpoints funcionam conforme
+        esperado! 🚀</p>
+      <h3>Com o client em mãos, vamos ao teste da API!</h3>
+      <p>Depois que a aplicação estiver em execução (por padrão, na porta 8080), podemos testar as rotas usando alguma
+        das ferramentas descritas acima. Ao longo da disciplina utilizaremos principalmente o <strong>Postman</strong>.
+      </p>
+      <ol>
+        <li>
+          <p><strong>Criar contato (POST)</strong> </p>
+          <pre><code>POST /api/contacts
+Body (JSON):
+{
+  &quot;nome&quot;: &quot;João da Silva&quot;,
+  &quot;telefone&quot;: &quot;9999-9999&quot;,
+  &quot;email&quot;: &quot;joao@email.com&quot;
+}
+</code></pre>
+          <ul>
+            <li><strong>Resposta</strong>: Objeto JSON do contato criado, incluindo o <code>id</code> atribuído.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Obter todos os contatos (GET)</strong> </p>
+          <pre><code>GET /api/contacts
+</code></pre>
+          <ul>
+            <li><strong>Resposta</strong>: Lista de contatos em formato JSON.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Obter contato específico (GET)</strong> </p>
+          <pre><code>GET /api/contacts/1
+</code></pre>
+          <ul>
+            <li><strong>Resposta</strong>: Objeto JSON com o contato de ID 1 (caso exista).</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Atualizar contato (PUT)</strong> </p>
+          <pre><code>PUT /api/contacts/1
+Body (JSON):
+{
+  &quot;nome&quot;: &quot;Maria da Silva&quot;,
+  &quot;telefone&quot;: &quot;8888-8888&quot;,
+  &quot;email&quot;: &quot;maria@email.com&quot;
+}
+</code></pre>
+          <ul>
+            <li><strong>Resposta</strong>: Objeto JSON com o contato atualizado.</li>
+          </ul>
+        </li>
+        <li>
+          <p><strong>Excluir contato (DELETE)</strong> </p>
+          <pre><code>DELETE /api/contacts/1
+</code></pre>
+          <ul>
+            <li><strong>Resposta</strong>: Sem corpo (status HTTP 200 ou 204).</li>
+          </ul>
+        </li>
+      </ol>
+      <hr>
+      <h2><strong>2.9 Recapitulando</strong></h2>
+      <p>Neste projeto, apresentamos:</p>
+      <ol>
+        <li><strong>O que é uma API REST</strong> e como o Spring Boot facilita sua criação.</li>
+        <li><strong>Os principais verbos HTTP (GET, POST, PUT, DELETE)</strong> e como eles se relacionam com operações
+          de leitura, criação, atualização e exclusão de dados.</li>
+        <li><strong>Como estruturar um projeto Spring Boot</strong> com:<ul>
+            <li>Classe principal (<code>ContactsApplication</code>)</li>
+            <li>Entidade de modelo (<code>Contact</code>)</li>
+            <li>Repositório de dados (<code>ContactRepository</code>)</li>
+            <li>Controlador REST (<code>ContactController</code>)</li>
+            <li>Configurações no <code>application.properties</code> e dependências no <code>pom.xml</code> ou
+              <code>build.gradle</code>.
+            </li>
+          </ul>
+        </li>
+      </ol>
+      <p>Essa base serve para, gradualmente, adicionar mais funcionalidades, como:</p>
+      <ul>
+        <li>Validações nos campos de contato.</li>
+        <li>Tratamento de exceções customizadas.</li>
+        <li>Autenticação e autorização (segurança).</li>
+        <li>Integração com bancos de dados reais ou outros serviços.</li>
+      </ul>
+      <h3><strong>O que aprendemos até aqui?</strong></h3>
+      <p>✅ <strong>O que são APIs REST e seus princípios fundamentais.</strong><br>✅ <strong>Os métodos HTTP (GET, POST,
+          PUT, PATCH, DELETE) e seu uso correto.</strong><br>✅ <strong>A importância da padronização e do modelo de
+          maturidade de Richardson.</strong><br>✅ <strong>A estrutura de um projeto Spring Boot e como criar uma API
+          básica.</strong><br>✅ <strong>Como testar APIs usando ferramentas como Postman, Insomnia e cURL.</strong> </p>
+      <p>Por enquanto, nossa aplicação já exemplifica o essencial do desenvolvimento de uma <strong>API REST</strong>
+        com o <strong>Spring Boot</strong>. </p>
+      <p>Sigam este passo-a-passo e executem o código-fonte como ponto de partida para os exercícios posteriores.</p>
+      <h1><strong>3. Conclusão e Próximos Passos</strong></h1>
+      <p>Nesta aula vimos que uma <strong>API REST</strong> segue um conjunto de padrões baseados no protocolo HTTP,
+        permitindo a comunicação entre sistemas de maneira <strong>padronizada, previsível e escalável</strong>. Para
+        garantir que uma API seja realmente RESTful, entendemos a importância do <strong>modelo de maturidade de
+          Richardson</strong>, que nos ajuda a avaliar a conformidade de uma API com os princípios REST. </p>
+      <p>Além disso, iniciamos a introdução ao <strong>Spring Boot</strong>, uma tecnologia que simplifica o
+        desenvolvimento de aplicações Java, eliminando a necessidade de configurações manuais complexas e permitindo que
+        possamos rapidamente criar e expor endpoints RESTful. Aprendemos a estrutura de um projeto Spring Boot e
+        implementamos os principais componentes necessários para a construção de uma <strong>API de lista de
+          contatos</strong>.</p>
+      <p>Nas próximas aulas avançaremos na construção de <strong>APIs mais robustas e completas</strong>. Trabalharemos
+        com novos conceitos essenciais para um desenvolvimento profissional, incluindo:</p>
+      <p>🔹 <strong>Validações e Tratamento de Erros</strong>: Garantindo que nossa API retorne respostas consistentes e
+        evite entradas inválidas.<br>🔹 <strong>Persistência e Banco de Dados</strong>: Integração da API com um banco
+        de dados real para armazenar os contatos de forma permanente.<br>🔹 <strong>Autenticação e Segurança</strong>:
+        Protegendo a API com mecanismos de autenticação, como OAuth e JWT.<br>🔹 <strong>Boas Práticas e
+          Documentação</strong>: Como tornar nossa API mais compreensível e fácil de usar para outros desenvolvedores.
+      </p>
+      <p>Antes disso, entretanto, é necessário solidificar os conteúdos vistos até aqui. </p>
+      <h1><strong>4. Exercícios</strong></h1>
+      <p>Os exercícios a seguir têm como objetivo reforçar os conceitos apresentados na aula e permitir que você
+        pratique o desenvolvimento de APIs REST com <strong>Spring Boot</strong>. </p>
+      <blockquote>
+        <p>📌 <strong>Instruções:</strong> </p>
+        <ul>
+          <li>Os exercícios devem ser entregues no <strong>Moodle</strong> dentro do prazo estipulado. </li>
+          <li>Sempre <strong>comente o código</strong> explicando as principais partes da implementação. </li>
+          <li>Utilize <strong>Postman, Insomnia ou cURL</strong> para testar os endpoints criados. </li>
+          <li>O código-fonte deve ser enviado em um repositório no GitHub (ou em anexo no Moodle, se preferir).</li>
+        </ul>
+      </blockquote>
+      <hr>
+      <h3><strong>1️⃣ Exercício 1 - Criando um Novo Endpoint GET</strong></h3>
+      <p>Crie um novo endpoint <strong>GET</strong> em <code>ContactController</code> que permita buscar
+        <strong>contatos pelo nome</strong>.
+      </p>
+      <p>📌 <strong>Requisitos:</strong> </p>
+      <ul>
+        <li>O método deve receber o nome como um <strong>parâmetro de URL</strong>
+          (<code>/api/contacts/search?name=João</code>).</li>
+        <li>O método deve retornar uma lista de contatos que correspondam ao nome fornecido.</li>
+        <li>Caso nenhum contato seja encontrado, retorne uma <strong>lista vazia</strong>.</li>
+      </ul>
+      <p>📌 <strong>Dicas:</strong> </p>
+      <ul>
+        <li>Você pode precisar modificar a interface <code>ContactRepository</code> para adicionar um método de busca
+          personalizada.</li>
+      </ul>
+      <p>📝 <strong>Saída esperada (JSON)</strong>:</p>
+      <pre><code class="language-json">[
+  {
+    &quot;id&quot;: 1,
+    &quot;nome&quot;: &quot;João Silva&quot;,
+    &quot;telefone&quot;: &quot;9999-9999&quot;,
+    &quot;email&quot;: &quot;joao@email.com&quot;
+  }
+]
+</code></pre>
+      <h3><strong>2️⃣ Exercício 2 - Implementando um Método PATCH</strong></h3>
+      <p>Adicione um novo método <strong>PATCH</strong> à API, permitindo que o usuário <strong>atualize apenas um ou
+          mais campos</strong> de um contato, sem precisar enviar todos os dados. </p>
+      <p>📌 <strong>Requisitos:</strong> </p>
+      <ul>
+        <li>O método deve permitir alterar apenas os campos enviados na requisição. </li>
+        <li>Se o campo <strong>não for enviado</strong>, o valor original deve ser mantido. </li>
+        <li>Retorne o contato atualizado após a alteração. </li>
+        <li>Caso o ID fornecido não exista, retorne um <strong>erro 404</strong>.</li>
+      </ul>
+      <p>📌 <strong>Exemplo de chamada:</strong> </p>
+      <pre><code class="language-json">PATCH /api/contacts/1
+{
+  &quot;email&quot;: &quot;novoemail@email.com&quot;
+}
+</code></pre>
+      <p>📝 <strong>Saída esperada (JSON)</strong>:</p>
+      <pre><code class="language-json">{
+  &quot;id&quot;: 1,
+  &quot;nome&quot;: &quot;João Silva&quot;,
+  &quot;telefone&quot;: &quot;9999-9999&quot;,
+  &quot;email&quot;: &quot;novoemail@email.com&quot;
+}
+</code></pre>
+      <h3><strong>3️⃣ Exercício 3 - Comparando REST e SOAP</strong></h3>
+      <p>Agora que você já conhece APIs REST, faça uma <strong>pesquisa sobre APIs SOAP</strong> e responda às perguntas
+        abaixo com suas próprias palavras. </p>
+      <p>📌 <strong>Questões:</strong> </p>
+      <ol>
+        <li>Qual a principal diferença entre <strong>REST e SOAP</strong>? </li>
+        <li>Em quais <strong>cenários SOAP ainda é amplamente utilizado</strong>? </li>
+        <li>Quais são as vantagens e desvantagens de <strong>usar REST ao invés de SOAP</strong>? </li>
+        <li>O que é <strong>WS-Security</strong> e como ele se compara à segurança em APIs REST? </li>
+        <li>Explique o modelo de <strong>maturidade de Richardson</strong> e em que nível SOAP se encaixa.</li>
+      </ol>
+      <hr>
+      <h3>1️⃣ Desafio 1 - Criando um Novo Modelo de Dados**</h3>
+      <p>Atualmente, nossa API gerencia apenas <strong>contatos</strong>. Agora, queremos adicionar um novo recurso:
+        <strong>endereços</strong>.
+      </p>
+      <p>📌 <strong>Tarefas:</strong> </p>
+      <ol>
+        <li><strong>Crie uma nova entidade <code>Address</code></strong>, com os seguintes atributos: <ul>
+            <li><code>id</code> (Long, auto-increment) </li>
+            <li><code>rua</code> (String) </li>
+            <li><code>cidade</code> (String) </li>
+            <li><code>estado</code> (String) </li>
+            <li><code>cep</code> (String) </li>
+            <li><code>contactId</code> (Long) - Chave estrangeira referenciando um contato.</li>
+          </ul>
+        </li>
+        <li><strong>Crie uma relação bidirecional entre contatos e endereços.</strong></li>
+        <li><strong>Crie um repositório (<code>AddressRepository</code>)</strong> para gerenciar os endereços. </li>
+        <li><strong>Implemente um novo <code>AddressController</code></strong> para adicionar e recuperar endereços.
+        </li>
+        <li><strong>Crie uma rota GET <code>/api/contacts/{id}/addresses</code></strong> para listar todos os endereços
+          de um contato específico.</li>
+      </ol>
+      <hr>
+      <h3><strong>2️⃣ Desafio 2 - Melhorando a Validação dos Dados</strong></h3>
+      <p>Atualmente, nossa API aceita qualquer valor no cadastro de contatos. Precisamos garantir que os dados sejam
+        válidos antes de inseri-los no banco de dados. </p>
+      <p>📌 <strong>Requisitos:</strong> </p>
+      <ul>
+        <li><strong>Adicione validações</strong> à entidade <code>Contact</code>, utilizando a anotação
+          <code>@Valid</code>.
+        </li>
+        <li>Implemente regras como: <ul>
+            <li>O campo <code>nome</code> <strong>não pode estar vazio</strong>. </li>
+            <li>O campo <code>email</code> deve ter um formato válido (<code>@Email</code>). </li>
+            <li>O campo <code>telefone</code> deve ter <strong>no mínimo 8 e no máximo 15 caracteres</strong>.</li>
+          </ul>
+        </li>
+      </ul>
+      <p>📌 <strong>Exemplo de resposta para entrada inválida:</strong><br>Se tentarmos criar um contato com um telefone
+        inválido:</p>
+      <pre><code class="language-json">{
+  &quot;nome&quot;: &quot;Maria&quot;,
+  &quot;telefone&quot;: &quot;123&quot;,
+  &quot;email&quot;: &quot;maria@email.com&quot;
+}
+</code></pre>
+      <p>A API deve retornar <strong>HTTP 400</strong> e uma mensagem de erro:</p>
+      <pre><code class="language-json">{
+  &quot;erro&quot;: &quot;O telefone deve ter entre 8 e 15 caracteres&quot;
+}
+</code></pre>
+      <h3><strong>📌 Instruções Finais</strong></h3>
+      <ul>
+        <li>✅ Para os exercícios <strong>práticos (1 e 2)</strong> a entrega esperada é o código das novas rotas e
+          prints das requisições no Postman ou Insomnia. <strong>Envie um link do GitHub</strong> ou um arquivo
+          <strong>.zip</strong> com o código-fonte.
+        </li>
+        <li>✅ Para o <strong>exercício teórico (3)</strong>, envie um arquivo <strong>.pdf ou .txt</strong> com as
+          respostas.</li>
+        <li>✅ A <strong>entrega dos desafios terá um prazo estendido</strong> até o Domingo posterior à data de entrega
+          dos exercícios, também devendo ser entregue o código de implementação e os prints dos testes. </li>
+        <li>✅Teste todas as funcionalidades antes de enviar e garanta que o código está funcionando.</li>
+      </ul>
+      <h2><strong>Bons estudos e mãos à obra! 🛠🔥</strong></h2>
+    </div>
+  </div>
+
+  <footer class="footer mt-auto py-3">
+    <div class="container-fluid">
+      <span>
+        <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo, Câmpus
+          Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+      </span>
+    </div>
+  </footer>
+  </div>
+
+
+  <script src="js/prism.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/popper.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <!-- <script src="js/main.js"></script> -->
+
+</body>
+
+</html>
