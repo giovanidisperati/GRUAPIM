@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/estilo.css">
     <link rel="stylesheet" href="css/prism.css">
 
@@ -17,52 +18,58 @@
 <body>
     <div class="wrapper d-flex align-items-stretch">
         <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
             <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
             <ul class="list-unstyled components mb-5">
                 <li class="active">
-                    <a href="Aula01.html"><span class="fa fa-home mr-0"></span>01 - Revisão</a>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
                 </li>
                 <li>
-                    <a href="Aula02.html"><span class="fa fa-user mr-0"></span>02 - Revisão II</a>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
                 </li>
                 <li>
-                    <a href="Aula03.html"><span class="fa fa-user mr-0"></span>03 - REST I</a>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>04 - REST II</a>
+                    <a href="#"><span class="mr-0"></span>04 - REST II</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>05 - REST III</a>
+                    <a href="#"><span class="mr-0"></span>05 - REST III</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>06 - REST IV</a>
+                    <a href="#"><span class="mr-0"></span>06 - REST IV</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>07 - Exercício I</a>
+                    <a href="#"><span class="mr-0"></span>07 - Exercício I</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>08 - Exercício II</a>
+                    <a href="#"><span class="mr-0"></span>08 - Exercício II</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>09 - Docker</a>
+                    <a href="#"><span class="mr-0"></span>09 - Docker</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>10 - Microsserviços I</a>
+                    <a href="#"><span class="mr-0"></span>10 - Microsserviços I</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>11 - Microsserviços II</a>
+                    <a href="#"><span class="mr-0"></span>11 - Microsserviços II</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>12 - Microsserviços III</a>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços III</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>13 - Microsserviços IV</a>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços IV</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>14 - Microsserviços V</a>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços V</a>
                 </li>
                 <li>
-                    <a href="#"><span class="fa fa-user mr-0"></span>15 - Microsserviços VI</a>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VI</a>
                 </li>
             </ul>
         </nav>
@@ -993,7 +1000,10 @@ public class TesteExcecaoPersonalizada {
 
     <footer class="footer mt-auto py-3">
         <div class="container-fluid">
-            <span><p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo, Câmpus Guarulhos. APIs e Microsserviços - Prof. Giovani.</p></span>
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
         </div>
     </footer>
     </div>
@@ -1003,7 +1013,7 @@ public class TesteExcecaoPersonalizada {
     <script src="js/jquery.min.js"></script>
     <script src="js/popper.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <!-- <script src="js/main.js"></script> -->
+    <script src="js/main.js"></script>
 
 </body>
 
