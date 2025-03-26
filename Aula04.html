@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 04 - REST II: Refinando e Aprimorando a API REST com Spring Boot</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
+            <h1><a href="#" class="logo text-center">GRUAPIM</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
+                </li>
+                <li class="active">
+                    <a href="Aula04.html"><span class="mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>08 - Exercício II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>09 - Docker</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>10 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>11 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VI</a>
+                </li>
+            </ul>
+        </nav>
+
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+            <h1><strong>Aula 04 - REST II: Refinando e Aprimorando a API REST com Spring Boot</strong></h1>
+            <hr>
+            <p>Nesta aula, vamos dar continuidade ao desenvolvimento da nossa API REST criada na aula anterior. O foco
+                será na aplicação de boas práticas, tratamento de erros, paginação, ordenação, versionamento e
+                documentação automática com Swagger.</p>
+            <p>Vamos iniciar a abordar os temas por meio da implementação dos exercícios e desafios da aula anterior.
+                Tenha atenção ao replicar os códigos-fontes mostrados abaixo, pois para fins de brevidade os
+                <code>import</code> das dependências das classes foram omitidos.</p>
+            <hr>
+            <h2>1. Métodos customizados na JPA</h2>
+            <p>No exercício 1 da Aula 03, foi pedida a criação de um novo endpoint GET em <code>ContactController</code>
+                que permitisse buscar contatos pelo nome.</p>
+            <p>Para cumprirmos esse requisito podemos implementar um método <strong>searchContactsByName</strong> no
+                <code>ContactController</code>. A ideia dessa implementação é criar um endpoint GET que recebe o nome
+                como um parâmetro de URL e retorne uma lista de contatos cujos nomes correspondem parcial ou totalmente
+                ao termo pesquisado. Isso é útil para implementarmos funcionalidades de busca mais flexíveis e
+                dinâmicas. O método é demonstrado abaixo.</p>
+            <pre><code class="language-java">@GetMapping(&quot;/search&quot;)
+public List&lt;Contact&gt; searchContactsByName(@RequestParam String name) {
+    return contactRepository.findByNomeContainingIgnoreCase(name);
+}
+</code></pre>
+            <p>Perceba que o método encapsula a chamada à <strong>findByNomeContainingIgnoreCase</strong>, no
+                <code>ContactRepository</code>.</p>
+            <p>O Spring Data JPA fornece a possibilidade de criar métodos personalizados na interface de repositório
+                através de <strong>Convenções de Nomes (Naming Conventions)</strong>. Essa abordagem permite criar
+                consultas complexas apenas definindo métodos que sigam um padrão de nomenclatura específico.</p>
+            <p>Assim, para implementar o método de busca, podemos adicionar o seguinte código na interface
+                <code>ContactRepository</code>:</p>
+            <pre><code class="language-java">public interface ContactRepository extends JpaRepository&lt;Contact, Long&gt; {
+    List&lt;Contact&gt; findByNomeContainingIgnoreCase(String nome);
+}
+</code></pre>
+            <h4>🔍 <strong>1.1 Como funciona essa Convenção de Nomes?</strong></h4>
+            <p>A criação de métodos customizados se dá pela definição de nomes que indicam ao Spring Data JPA qual
+                consulta deve ser gerada. Isso é feito utilizando palavras-chave específicas que indicam o critério de
+                busca. Alguns exemplos comuns são:</p>
+            <ul>
+                <li><code>findBy</code>: Indica que o método será usado para realizar uma busca.</li>
+                <li><code>Nome</code>: O nome do atributo que será utilizado na busca. Neste caso, <code>Nome</code>
+                    refere-se ao atributo <code>nome</code> da classe <code>Contact</code>.</li>
+                <li><code>Containing</code>: Indica que a busca deve procurar ocorrências que contenham o termo
+                    especificado. É equivalente a um <code>LIKE %termo%</code> em SQL.</li>
+                <li><code>IgnoreCase</code>: Indica que a busca deve ignorar maiúsculas e minúsculas.</li>
+            </ul>
+            <p>Essa convenção é poderosa e nos permite criar consultas como:</p>
+            <ul>
+                <li><code>findByNome(String nome)</code> → Busca contatos pelo nome exato.</li>
+                <li><code>findByNomeAndEmail(String nome, String email)</code> → Busca contatos que correspondem a ambos
+                    os critérios.</li>
+                <li><code>findByNomeOrEmail(String nome, String email)</code> → Busca contatos que correspondem a pelo
+                    menos um dos critérios.</li>
+                <li><code>findByNomeStartingWith(String prefix)</code> → Busca contatos cujos nomes começam com
+                    determinado prefixo.</li>
+                <li><code>findByNomeEndingWith(String sufix)</code> → Busca contatos cujos nomes terminam com
+                    determinado sufixo.</li>
+            </ul>
+            <h3>📌 <strong>1.2 Métodos Personalizados sem Convenções de Nome</strong></h3>
+            <p>Caso queiramos implementar um método que não siga essas convenções, podemos usar anotações
+                <code>@Query</code>. Isso é útil quando precisamos de consultas mais complexas ou específicas.</p>
+            <p>Exemplo com HQL:</p>
+            <pre><code class="language-java">import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+@Query(&quot;SELECT c FROM Contact c WHERE LOWER(c.nome) LIKE LOWER(CONCAT(&#39;%&#39;, :nome, &#39;%&#39;))&quot;)
+List&lt;Contact&gt; searchByName(@Param(&quot;nome&quot;) String nome);
+</code></pre>
+            <p>Esse método produz o mesmo resultado que <code>findByNomeContainingIgnoreCase</code>, mas oferece mais
+                controle sobre a query e permite escrever SQL/HQL diretamente. Também é possível utilizar SQL nativo com
+                <code>nativeQuery = true</code>.</p>
+            <p>Exemplo com SQL nativo:</p>
+            <pre><code class="language-java">public interface ContactRepository extends JpaRepository&lt;Contact, Long&gt; {
+
+    @Query(value = &quot;SELECT * FROM Contact WHERE LOWER(nome) LIKE LOWER(CONCAT(&#39;%&#39;, :nome, &#39;%&#39;))&quot;, nativeQuery = true)
+    List&lt;Contact&gt; searchByName(@Param(&quot;nome&quot;) String nome);
+}
+</code></pre>
+            <h4>📌 1.3 Como funciona?</h4>
+            <ul>
+                <li>A anotação <code>@Query</code> define a consulta SQL nativa usando o parâmetro
+                    <code>nativeQuery = true</code>.</li>
+                <li>Neste exemplo, estamos fazendo um <code>LIKE</code> que ignora maiúsculas e minúsculas
+                    (<code>LOWER()</code>) e busca contatos que contenham o nome informado em qualquer parte do nome.
+                </li>
+                <li>É importante usar o nome exato da tabela (<code>Contact</code>) como ela existe no banco de dados.
+                </li>
+            </ul>
+            <p>Este método fornece controle total sobre a query e é útil quando precisamos usar recursos específicos do
+                banco de dados que não são suportados diretamente pelo JPA.</p>
+            <h4>📖 <strong>1.4 Quando usar cada abordagem:</strong></h4>
+            <ul>
+                <li><strong>Convenção de Nomes:</strong> Para consultas simples e padrão, como busca por atributos
+                    específicos (<code>findByNome</code>, <code>findByEmail</code>).</li>
+                <li><strong>@Query:</strong> Para consultas complexas com relacionamentos entre múltiplas entidades, ou
+                    quando precisamos de controle total sobre a query.</li>
+            </ul>
+            <h4>📌 <strong>1.5 Exemplo de Requisição:</strong></h4>
+            <pre><code>GET /api/contacts/search?name=joao
+</code></pre>
+            <p>Isso retornará todos os contatos cujo nome contenha a palavra <code>joao</code> em qualquer parte do
+                nome, ignorando maiúsculas e minúsculas.</p>
+            <hr>
+            <h2>2. Implementação do Método PATCH e Tratamento de Exceções</h2>
+            <p>Para darmos continuidade ao conteúdo e abordarmos o tratamento de exceções, relembremos o Exercício 02 da
+                Aula 03, que solicitava a criação de um novo método PATCH que permitisse atualizar parcialmente um
+                contato sem precisar enviar todos os dados - o que é útil quando o cliente deseja modificar apenas um ou
+                mais atributos específicos de um contato, mantendo os demais inalterados. Caso o ID submetido pelo
+                cliente na requisição não fosse encontrado, entretanto, era necessário lançar uma exceção e retornar o
+                status 404 - não encontrado.</p>
+            <p>Para cumprir parcialmente esse requisito, podemos podemos prosseguir com a implementação do método PATCH
+                na classe <code>ContactController</code>, por meio do método <code>updateContactPartial</code>, que
+                recebe um ID e um <code>Map&lt;String, String&gt;</code> contendo os campos a serem atualizados.</p>
+            <pre><code class="language-java">@PatchMapping(&quot;/{id}&quot;)
+public Contact updateContactPartial(@PathVariable Long id, @RequestBody Map&lt;String, String&gt; updates) {
+    Contact contact = contactRepository.findById(id)
+            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+
+    updates.forEach((key, value) -&gt; {
+        switch (key) {
+            case &quot;nome&quot;:
+                contact.setNome(value);
+                break;
+            case &quot;telefone&quot;:
+                contact.setTelefone(value);
+                break;
+            case &quot;email&quot;:
+                contact.setEmail(value);
+                break;
+        }
+    });
+
+    return contactRepository.save(contact);
+}
+</code></pre>
+            <h3>🔍 <strong>2.1 Explicação do Código:</strong></h3>
+            <ol>
+                <li>
+                    <p><strong>Recebimento do ID do Contato:</strong> </p>
+                    <ul>
+                        <li>A URL da requisição especifica o ID do contato a ser modificado
+                            (<code>/api/contacts/{id}</code>).</li>
+                        <li>Se o contato não for encontrado no banco de dados, é lançada a exceção personalizada
+                            <code>ResourceNotFoundException</code>, retornando um status HTTP 404. Faremos a
+                            implementação dessa exceção personalizada na próxima seção.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Uso do <code>Map&lt;String, String&gt;</code>:</strong> </p>
+                    <ul>
+                        <li>O corpo da requisição é recebido como um <code>Map</code>, onde: <ul>
+                                <li>A chave (<code>key</code>) é o nome do atributo a ser modificado (<code>nome</code>,
+                                    <code>telefone</code> ou <code>email</code>). </li>
+                                <li>O valor (<code>value</code>) é o novo valor que será atribuído ao atributo
+                                    correspondente.</li>
+                            </ul>
+                        </li>
+                        <li>Esse formato é útil porque permite que a requisição inclua <strong>somente os campos que
+                                precisam ser atualizados</strong>, sem exigir o envio do objeto completo.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Iteração sobre o <code>Map</code>:</strong> </p>
+                    <ul>
+                        <li>A função <code>updates.forEach()</code> percorre cada entrada (<code>key</code>,
+                            <code>value</code>) do <code>Map</code>. </li>
+                        <li>A estrutura <code>switch</code> verifica qual campo deve ser atualizado e o modifica
+                            chamando os métodos <code>setNome()</code>, <code>setTelefone()</code> ou
+                            <code>setEmail()</code> do objeto <code>Contact</code>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Persistência dos Dados:</strong> </p>
+                    <ul>
+                        <li>Após atualizar os campos necessários, o método chama
+                            <code>contactRepository.save(contact)</code> para salvar as modificações no banco de dados.
+                        </li>
+                        <li>O objeto atualizado é retornado como resposta.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h3>📌 <strong>2.2 Exemplo de Requisição:</strong></h3>
+            <p>Suponha que temos um contato com o ID <code>1</code>, e desejamos atualizar apenas o email desse contato.
+                A requisição ficaria assim:</p>
+            <pre><code>PATCH /api/contacts/1
+Content-Type: application/json
+
+{
+    &quot;email&quot;: &quot;novocontato@email.com&quot;
+}
+</code></pre>
+            <p>Também é possível enviar múltiplos campos para serem atualizados ao mesmo tempo:</p>
+            <pre><code>PATCH /api/contacts/1
+Content-Type: application/json
+
+{
+    &quot;nome&quot;: &quot;João Silva&quot;,
+    &quot;telefone&quot;: &quot;99998888&quot;
+}
+</code></pre>
+            <h2><strong>2.3 🔍 Como o método está relacionado ao tratamento de erros?</strong></h2>
+            <p>Caso o ID do contato submetido na requisição não seja encontrado, o método lança uma exceção
+                <code>ResourceNotFoundException</code>:</p>
+            <pre><code class="language-java">Contact contact = contactRepository.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+</code></pre>
+            <p>Essa exceção é capturada por outra classe que iremos criar: a <code>GlobalExceptionHandler</code>,
+                configurada para retornar uma resposta com código <strong>HTTP 404 (Not Found)</strong> quando ocorrer
+                um <code>ResourceNotFoundException</code>, garantindo que o cliente receba uma mensagem clara sobre o
+                problema ocorrido. Antes de passarmos à crição dessas duas classes, entretanto, vamos entender
+                brevemente o uso do <code>orElseThrow()</code> com <strong>Lambda Expression</strong>.</p>
+            <p>O método Faz parte da lógica que busca um contato no banco de dados pelo seu ID, como vimos anteriormente
+                quando abordamos as <strong>Naming Conventions</strong>. <code>findById()</code> é fornecido pela
+                interface <code>JpaRepository</code> (que <code>ContactRepository</code> estende) e retorna um objeto do
+                tipo <code>Optional&lt;Contact&gt;</code>.</p>
+            <pre><code class="language-java">Optional&lt;Contact&gt; findById(Long id);
+</code></pre>
+            <p>Nesse caso o uso do <code>Optional</code> é importante porque permite que o método retorne um valor
+                presente (o contato encontrado) ou ausente (<code>Optional.empty()</code>) se o ID não existir no banco
+                de dados. O Optional é uma classe introduzida no Java 8, que faz parte do pacote <code>java.util</code>.
+                Ele foi criado para lidar com o problema comum de <code>NullPointerException</code>, proporcionando uma
+                maneira elegante de representar a presença ou ausência de um valor: em vez de retornar um valor
+                potencialmente nulo, métodos podem retornar um Optional, que é um contêiner que pode ou não conter um
+                valor não-nulo. Para saber mais, consulte a <a
+                    href="https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html">Documentação Oficial do
+                    Optional (Java 8)</a>.</p>
+            <p>Para extrair o valor contido no <code>Optional</code>, utilizamos o método <code>orElseThrow()</code>,
+                que é uma forma prática e segura de lidar com possíveis ausências de valor.</p>
+            <h3><strong>2.4 📌 O que é <code>orElseThrow()</code>?</strong></h3>
+            <p>O método <code>orElseThrow()</code> é um método da classe <code>Optional&lt;T&gt;</code> que é utilizado
+                para:</p>
+            <ul>
+                <li><strong>Retornar o valor contido no <code>Optional</code></strong> se ele estiver presente.</li>
+                <li><strong>Lançar uma exceção personalizada</strong> caso o valor não esteja presente.</li>
+            </ul>
+            <p>O método <code>orElseThrow()</code> recebe um <strong>Supplier</strong> como argumento. Um
+                <code>Supplier</code> é uma interface funcional que não recebe parâmetros e retorna um objeto
+                (<code>T</code>). Ele é frequentemente implementado usando <strong>Expressões Lambda</strong>, que
+                tornam o código mais enxuto e legível.</p>
+            <p>A expressão lambda usada aqui é:</p>
+            <pre><code class="language-java">() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id)
+</code></pre>
+            <ul>
+                <li>Os parênteses <code>()</code> indicam que a função lambda <strong>não recebe parâmetros</strong>.
+                </li>
+                <li>A seta <code>-&gt;</code> indica o início da parte executável da expressão lambda. </li>
+                <li>A parte <code>new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id)</code> é o
+                    código executado quando o lambda é invocado. </li>
+                <li>Neste caso, estamos retornando uma nova instância de <code>ResourceNotFoundException</code>.</li>
+            </ul>
+            <h4><strong>2.5 📌 Por que usar uma Expressão Lambda aqui?</strong></h4>
+            <p>O método <code>orElseThrow()</code> exige um argumento que implemente a interface
+                <code>Supplier</code>.<br>Se não utilizássemos uma expressão lambda, a declaração seria mais verbosa,
+                algo como:</p>
+            <pre><code class="language-java">Contact contact = contactRepository.findById(id)
+        .orElseThrow(new Supplier&lt;ResourceNotFoundException&gt;() {
+            @Override
+            public ResourceNotFoundException get() {
+                return new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id);
+            }
+        });
+</code></pre>
+            <p>Claramente, a forma lambda é <strong>muito mais compacta e legível</strong>.</p>
+            <h3><strong>2.6 📌 Ou seja...</strong></h3>
+            <pre><code class="language-java">Contact contact = contactRepository.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+</code></pre>
+            <ul>
+                <li>Tenta buscar um <code>Contact</code> pelo <code>id</code> fornecido.</li>
+                <li>Se encontrado, retorna o objeto <code>Contact</code>.</li>
+                <li>Se não encontrado, lança uma exceção <code>ResourceNotFoundException</code> com a mensagem
+                    personalizada.</li>
+                <li>A exceção é tratada pelo <code>GlobalExceptionHandler</code> e retorna o status HTTP 404 para o
+                    cliente.</li>
+            </ul>
+            <p>Agora que entendemos essa linha de código, vamos abordar o uso de Exceptions customizadas e a
+                implementação de nosso <code>GlobalExceptionHandler</code>.</p>
+            <h3><strong>2.7 Tratamento de Erros Relacionados ao Método PATCH</strong></h3>
+            <p>O tratamento de exceções na API é feito pela classe <code>GlobalExceptionHandler</code>, que lida com
+                diferentes tipos de erros, incluindo a <code>ResourceNotFoundException</code>. O tratamento de erros é
+                uma parte essencial de uma API REST bem estruturada. Ele garante que os consumidores da API recebam
+                mensagens claras e adequadas sobre o que ocorreu, além de evitar a exposição de detalhes internos do
+                sistema.</p>
+            <p>No nosso projeto, utilizamos uma classe chamada <code>GlobalExceptionHandler</code> anotada com
+                <code>@RestControllerAdvice</code>. Essa classe intercepta exceções lançadas em qualquer parte da
+                aplicação e retorna uma resposta adequada para o cliente. Para manter a organização do código vamos
+                criar um pacote <strong>exception</strong>, a fim de manter uma estrutura clara e direta.</p>
+            <h3><strong>2.8 📌 Implementação inicial da Classe <code>GlobalExceptionHandler</code></strong></h3>
+            <pre><code class="language-java">package br.ifsp.contacts.exception;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    /**
+     * Trata exceções de recurso não encontrado
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleResourceNotFoundException(ResourceNotFoundException exception) {
+        Map&lt;String, String&gt; errorResponse = new HashMap&lt;&gt;();
+        errorResponse.put(&quot;error&quot;, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    /**
+     * Trata exceções genéricas que não foram capturadas pelos handlers anteriores.
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleGenericException(Exception exception) {
+        Map&lt;String, String&gt; errorResponse = new HashMap&lt;&gt;();
+        errorResponse.put(&quot;error&quot;, &quot;Erro interno no servidor. Entre em contato com o suporte.&quot;);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+}
+</code></pre>
+            <h3><strong>2.9 🔍 Como funciona?</strong></h3>
+            <ol>
+                <li>Os métodos são anotados com <code>@ExceptionHandler</code> para especificar quais tipos de exceção
+                    devem ser capturados. Ou seja, cada método será chamado quando ocorrer o tipo de exceção para o qual
+                    ele está anotado (<code>ResourceNotFoundException.class</code>, <code>Exception.class</code> e assim
+                    por diante).</li>
+                <li>A anotação <code>@RestControllerAdvice</code> faz com que a classe capture exceções lançadas por
+                    qualquer controlador da nossa aplicação.</li>
+                <li>Os métodos retornam um <code>ResponseEntity</code>, uma classe do Spring que permite personalizar
+                    completamente a resposta HTTP, incluindo o corpo da mensagem, o status HTTP e os cabeçalhos. Isso
+                    proporciona maior controle sobre o que é retornado ao cliente, garantindo que respostas adequadas
+                    sejam enviadas para diferentes situações, como sucessos, erros ou requisições inválidas.</li>
+                <li><code>ResourceNotFoundException</code> é uma exceção customizada que retorna um código HTTP 404.
+                    Vamos definir essa classe a seguir.</li>
+            </ol>
+            <h3><strong>2.10 📌 Classe <code>ResourceNotFoundException</code></strong></h3>
+            <pre><code class="language-java">package br.ifsp.contacts.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+</code></pre>
+            <p>Essa classe é uma exceção customizada que herda de <code>RuntimeException</code>. Ela é utilizada para
+                indicar que um recurso solicitado (por exemplo, um contato que o usuário está tentando acessar) não foi
+                encontrado no banco de dados. A garantia de que essa exceção resultará em uma resposta HTTP com código
+                <strong>404 (Not Found)</strong> ocorre porque o <strong>GlobalExceptionHandler</strong> possui um
+                método anotado com <code>@ExceptionHandler(ResourceNotFoundException.class)</code>. Essa anotação
+                instrui o Spring a interceptar qualquer exceção do tipo <code>ResourceNotFoundException</code> lançada
+                pela aplicação e tratar essa exceção de maneira centralizada, como explicado acima.</p>
+            <p>O que acontece aqui é o seguinte:</p>
+            <ol>
+                <li><strong>Interceptação da Exceção:</strong> Sempre que uma <code>ResourceNotFoundException</code> é
+                    lançada em qualquer parte da aplicação, o método <code>handleResourceNotFoundException()</code> é
+                    chamado automaticamente. </li>
+                <li><strong>Personalização da Resposta:</strong> O método cria um <code>ResponseEntity</code> com um
+                    corpo JSON contendo a mensagem de erro e define explicitamente o código de status HTTP como
+                    <code>404 (Not Found)</code>. </li>
+                <li><strong>Anotação <code>@ResponseStatus</code>:</strong> Embora o código HTTP já seja definido pelo
+                    <code>ResponseEntity</code> (<code>HttpStatus.NOT_FOUND</code>), a anotação
+                    <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code> fornece uma camada extra de garantia que o status
+                    apropriado será retornado.</li>
+            </ol>
+            <p>Portanto, a garantia se dá pelo mecanismo centralizado do Spring para captura e tratamento de exceções,
+                configurado pelo <code>@ExceptionHandler</code> no <code>GlobalExceptionHandler</code>.</p>
+            <h3><strong>2.10 🎯 Em resumo...</strong></h3>
+            <p>Quando o método <code>updateContactPartial</code> utiliza <code>contactRepository.findById()</code>, ele
+                lança a exceção <code>ResourceNotFoundException</code> se o ID não existir. Essa exceção é tratada pelo
+                método <code>handleResourceNotFoundException</code> no <code>GlobalExceptionHandler</code>, retornando
+                uma resposta com o código HTTP <strong>404 - Not Found</strong>.</p>
+            <p>O tratamento de erros bem estruturado evita que o cliente receba informações internas da aplicação e
+                padroniza as mensagens de erro. A integração do <code>GlobalExceptionHandler</code> é essencial para
+                capturar exceções lançadas pelo método PATCH e devolver respostas amigáveis.</p>
+            <p>Devemos sempre fazer tratamento de erros na nossa aplicação, especialmente em APIs REST que precisam
+                fornecer respostas claras e adequadas para os clientes que as consomem. Podemos citar os seguintes
+                motivadores para isso:</p>
+            <ul>
+                <li>
+                    <ol>
+                        <li><strong>Melhoria na Experiência do Usuário:</strong> Um tratamento adequado de erros garante
+                            que o cliente receba mensagens úteis e compreensíveis, em vez de mensagens genéricas ou
+                            códigos de status que não explicam o problema.</li>
+                    </ol>
+                </li>
+                <li>
+                    <ol start="2">
+                        <li><strong>Segurança:</strong> Se erros não forem tratados corretamente, informações sensíveis
+                            sobre a aplicação podem ser expostas acidentalmente, como detalhes do banco de dados ou da
+                            lógica de negócio.</li>
+                    </ol>
+                </li>
+                <li>
+                    <ol start="3">
+                        <li><strong>Facilidade na Depuração:</strong> Mensagens de erro claras e específicas facilitam a
+                            identificação e correção de problemas, tanto durante o desenvolvimento quanto na manutenção
+                            da aplicação.</li>
+                    </ol>
+                </li>
+                <li>
+                    <ol start="4">
+                        <li><strong>Conformidade com os Padrões REST:</strong> APIs bem projetadas devem retornar
+                            códigos HTTP apropriados (<code>404</code> para recurso não encontrado, <code>400</code>
+                            para requisição inválida, <code>500</code> para erro interno, etc.) e fornecer informações
+                            úteis sobre o problema.</li>
+                    </ol>
+                </li>
+                <li>
+                    <ol start="5">
+                        <li><strong>Evitar Que a Aplicação Quebre:</strong> Tratamento adequado de erros impede que a
+                            aplicação seja interrompida inesperadamente por uma exceção não tratada.</li>
+                    </ol>
+                </li>
+            </ul>
+            <h4><strong>2.11 🚩 O que acontece se não tratarmos erros adequadamente?</strong></h4>
+            <ul>
+                <li>A aplicação pode retornar mensagens genéricas ou códigos HTTP inadequados, dificultando a depuração.
+                </li>
+                <li>Pode expor informações sensíveis que deveriam permanecer ocultas. </li>
+                <li>Pode quebrar a aplicação se uma exceção crítica não for tratada. </li>
+                <li>Pode resultar em má experiência para os usuários e desenvolvedores que consomem a API.</li>
+            </ul>
+            <p>Embora o tratamento de erros não seja obrigatório para que a aplicação funcione, ele é essencial para
+                garantir <strong>segurança, clareza, padronização e uma melhor experiência para os usuários e
+                    desenvolvedores</strong>. Portanto, é considerado <strong>uma boa prática fundamental em qualquer
+                    aplicação</strong>. </p>
+            <p>O nosso <code>GlobalExceptionHandler</code> entretanto ainda não está pronto. Brevemente vamos voltar a
+                inserir novos tratamentos na classe. Antes disso, entretanto, vamos explorar os Desafios 1 e 2 da Aula
+                03 e os conceitos que envolvem o relacionamento e validação de Entidades.</p>
+            <hr>
+            <h2><strong>3.🔍 Criando e validando modelos de Dados</strong></h2>
+            <p>Para continuarmos a abordar os conceitos do desenvolvimento de APIS Rest com Spring Boot, relembremos os
+                Desafios 1 e 2 da Aula 03.</p>
+            <p>O Desafio 1 tinha como objetivo criar uma nova entidade <code>Address</code> relacionada
+                bidirecionalmente com <code>Contact</code>, implementar um repositório <code>AddressRepository</code> e
+                criar um controlador <code>AddressController</code> para gerenciar endereços. Também era necessário
+                criar um endpoint <code>GET /api/contacts/{id}/addresses</code> para listar todos os endereços
+                associados a um contato específico.</p>
+            <p>Já o Desafio 2 exigia a adição de validações na entidade <code>Contact</code> utilizando a anotação
+                <code>@Valid</code>. As regras incluem: nome não pode estar vazio, email deve ter um formato válido
+                (<code>@Email</code>) e telefone deve ter entre 8 e 15 caracteres. A API deve retornar respostas
+                adequadas para entradas inválidas.</p>
+            <p>Para facilitar a explicação e evitar repetição desnecessário, vamos implementar código que atenda ambos
+                os desafios. Para conseguir implementar esses desafios, entretanto, temos que entender dois conceitos
+                fundamentais: relacionamento entre Entidades com uso da JPA e a Validação de dados com a
+                <code>Jakarta Bean Validation</code>.</p>
+            <h3><strong>3.1 Uma breve introdução ao relacionamento entre Entidades</strong></h3>
+            <p>Relacionamentos de entidades na JPA são fundamentais para representar como os dados interagem entre si no
+                banco de dados. A JPA (Java Persistence API) fornece suporte para mapeamento de associações entre
+                entidades usando anotações específicas que permitem definir os tipos de relacionamento que podem ocorrer
+                entre essas entidades. Os relacionamentos mais comuns são OneToOne, OneToMany, ManyToOne e ManyToMany.
+                Quando mapeamos uma relação <strong>OneToOne</strong>, indicamos que uma entidade está associada
+                exclusivamente a outra entidade. Para isso, utilizamos a anotação <code>@OneToOne</code>, que pode ser
+                configurada com o atributo <code>mappedBy</code> para especificar o lado proprietário da relação.</p>
+            <p>No relacionamento <strong>ManyToOne</strong>, uma entidade pode estar associada a várias instâncias de
+                outra entidade, mas a relação inversa geralmente é <strong>OneToMany</strong>, ou seja, um único objeto
+                de uma entidade pode ter várias referências de outra entidade. Por exemplo, em uma aplicação de contatos
+                e endereços, cada endereço está associado a um único contato, mas um contato pode ter múltiplos
+                endereços. Isso é representado na JPA com <code>@ManyToOne</code> na classe <code>Address</code> e
+                <code>@OneToMany</code> na classe <code>Contact</code>. Além disso, é necessário configurar
+                adequadamente as anotações <code>@JoinColumn</code> para definir a chave estrangeira que conecta as
+                tabelas.</p>
+            <p>O relacionamento <strong>ManyToMany</strong> é usado quando múltiplas instâncias de uma entidade podem
+                estar associadas a múltiplas instâncias de outra. Esse tipo de relacionamento geralmente é mapeado por
+                meio de uma tabela intermediária que contém as chaves estrangeiras de ambas as entidades relacionadas.
+                Na JPA, usamos a anotação <code>@ManyToMany</code> para definir esse tipo de relacionamento, e podemos
+                usar a propriedade <code>mappedBy</code> para especificar o lado não proprietário da associação.</p>
+            <p>É importante entender que os relacionamentos na JPA podem ser configurados para serem unidirecionais ou
+                bidirecionais. Uma associação unidirecional significa que apenas uma entidade conhece a existência da
+                outra, enquanto uma associação bidirecional permite que ambas as entidades se conheçam mutuamente, o que
+                é útil quando queremos acessar dados relacionados de forma mais natural e eficiente. Quando
+                implementamos um relacionamento bidirecional, precisamos garantir que a sincronização entre os dois
+                lados do relacionamento seja tratada adequadamente. Isso é feito configurando o atributo
+                <code>mappedBy</code> no lado que não é o proprietário da relação, informando à JPA qual entidade é
+                responsável pelo gerenciamento do relacionamento.</p>
+            <p>Além disso, ao configurar relacionamentos, é fundamental definir adequadamente o comportamento de
+                <strong>cascade</strong> e <strong>orphanRemoval</strong>, que especificam se operações realizadas em
+                uma entidade principal devem ser propagadas para as entidades relacionadas. Por exemplo, ao excluir um
+                contato, podemos querer que todos os endereços associados também sejam removidos automaticamente, o que
+                é configurado com o uso da propriedade <code>cascade = CascadeType.ALL</code> e
+                <code>orphanRemoval = true</code> na anotação <code>@OneToMany</code>.</p>
+            <h3><strong>3.2 Validação de dados de forma simplificada</strong></h3>
+            <p>A validação de dados é um processo essencial para garantir que as informações fornecidas por usuários ou
+                sistemas externos sejam corretas, seguras e adequadas antes de serem processadas ou armazenadas. A
+                linguagem Java fornece várias maneiras de realizar validações, mas a abordagem mais comum e eficiente é
+                por meio das anotações de validação fornecidas pelo pacote <strong>Jakarta Bean Validation</strong>
+                (anteriormente conhecido como Java EE Bean Validation) e integrado ao Spring Framework por meio da
+                biblioteca <strong>Hibernate Validator</strong>. Esse mecanismo oferece uma maneira declarativa e
+                robusta para validar dados de entrada sem necessidade de escrever código complexo para cada regra de
+                validação.</p>
+            <p>O Jakarta Bean Validation utiliza anotações que são aplicadas diretamente sobre os atributos das classes,
+                facilitando o processo de validação e mantendo o código organizado e legível. As anotações mais comuns
+                incluem <code>@NotNull</code>, que garante que o valor de um campo não pode ser nulo;
+                <code>@NotBlank</code>, que assegura que um campo de texto não é vazio ou apenas contém espaços em
+                branco; <code>@Size</code>, que define o tamanho mínimo e máximo permitido para uma string ou coleção;
+                <code>@Pattern</code>, que permite especificar uma expressão regular para validação de formato; e
+                <code>@Email</code>, que verifica se um dado fornecido corresponde a um formato válido de endereço de
+                e-mail. Além dessas, existem várias outras anotações específicas que podem ser usadas dependendo das
+                necessidades da aplicação, podendo ser consultadas em <a
+                    href="https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-defineconstraints-spec">Hibernate
+                    Validator - Definição de Restrições (Documentação Oficial)</a></p>
+            <p>A configuração da validação no Spring Boot é bastante simples e, geralmente, basta adicionar a
+                dependência do <code>Hibernate Validator</code> no arquivo <code>pom.xml</code> do projeto. </p>
+            <p>Ao longo da disciplina vamos, evidentemente, utilizar as validações para o desenvolvimento de APIs com o
+                Spring Boot. Nesse contexto, o uso da anotação <code>@Valid</code> nos controladores REST é fundamental
+                para ativar o mecanismo de validação automática dos dados recebidos. Quando um cliente envia dados para
+                o servidor, o Spring automaticamente verifica se os dados atendem aos critérios estabelecidos pelas
+                anotações de validação na entidade ou no DTO (Data Transfer Object, padrão que abordaremos nas próximas
+                aulas) e, caso algum critério não seja satisfeito, uma exceção é lançada, normalmente a
+                <code>MethodArgumentNotValidException</code>. Essa exceção precisa ser tratada por um mecanismo de
+                tratamento de erros personalizado, como o <code>GlobalExceptionHandler</code> que implementamos
+                anteriormente, para que a aplicação possa responder de forma adequada e amigável ao cliente, geralmente
+                retornando um código de status HTTP 400 (Bad Request) junto com uma mensagem explicativa. Ou seja, a
+                partir daí basta aplicar as anotações necessárias nos atributos das entidades ou DTOs e não se esquecer
+                utilizar o <code>@Valid</code> nos métodos controladores. Além disso, o Spring Boot permite definir
+                mensagens de erro personalizadas para cada tipo de validação, tornando as respostas da API mais claras e
+                amigáveis para os consumidores do serviço.</p>
+            <p>Além das validações padrão fornecidas pela especificação Jakarta Bean Validation, é possível definir
+                validações personalizadas quando os requisitos do sistema são mais específicos. Para isso, criamos uma
+                anotação customizada e implementamos um validador que implementa a interface
+                <code>ConstraintValidator</code>. Esse mecanismo permite que os desenvolvedores criem suas próprias
+                regras de validação e as apliquem a campos ou classes inteiras, mantendo a flexibilidade e a
+                escalabilidade da aplicação. Futuramente exploraremos essa possibilidade na disciplina.</p>
+            <p>É importante destacar que a validação de dados deve ser realizada tanto no lado do cliente quanto no lado
+                do servidor. Embora bibliotecas de frontend como React e Angular forneçam recursos para validação de
+                formulários, a validação no servidor é indispensável para garantir a segurança e integridade dos dados,
+                pois os clientes podem ser manipulados ou burlados por usuários mal-intencionados. Por isso, as
+                validações feitas no servidor são a principal linha de defesa contra dados inválidos ou maliciosos.
+                <strong>Lembrem-se: temos controle real apenas sobre o lado do servidor. O lado cliente é do
+                    cliente!</strong></p>
+            <p>Vamos agora verificar o código que implementa os Desafios 1 e 2 da Aula 03.</p>
+            <hr>
+            <h2><strong>🔍4. Análise dos Códigos-fontes</strong></h2>
+            <p>Passemos, agora, a análise dos códigos que implementam os Desafios 1 e 2. Para fins de brevidade e
+                objetividade da explicação, apresentaremos todos em sequência. </p>
+            <ul>
+                <li>Caso exista algum erro de código-fonte abaixo, avise ao professor! Todas as correções pertinentes
+                    serão incorporadas!</li>
+            </ul>
+            <h3><strong>4.1 ✅Código da Entidade <code>Address</code></strong></h3>
+            <p>A classe <code>Address</code> foi implementada abaixo com os atributos e validações necessárias, de forma
+                a atender os Desafios 1 e 2. Vamos analisar o código:</p>
+            <pre><code class="language-java">@Entity
+public class Address {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = &quot;A rua não pode estar vazia&quot;)
+    private String rua;
+
+    @NotBlank(message = &quot;A cidade não pode estar vazia&quot;)
+    private String cidade;
+
+    @NotBlank(message = &quot;O estado não pode estar vazio&quot;)
+    @Size(min = 2, max = 2, message = &quot;O estado deve ter exatamente 2 caracteres (sigla)&quot;)
+    @Pattern(regexp = &quot;[A-Z]{2}&quot;, message = &quot;O estado deve ser representado por duas letras maiúsculas&quot;)
+    private String estado;
+
+    @NotBlank(message = &quot;O CEP não pode estar vazio&quot;)
+    @Pattern(regexp = &quot;\\d{5}-\\d{3}&quot;, message = &quot;O CEP deve estar no formato 99999-999&quot;)
+    private String cep;
+
+    @ManyToOne
+    @JoinColumn(name = &quot;contact_id&quot;, nullable = false)
+    @JsonBackReference
+    private Contact contact;
+}
+</code></pre>
+            <h3><strong>🔍Analisando o código</strong></h3>
+            <ul>
+                <li>A classe define os atributos exigidos: <code>rua</code>, <code>cidade</code>, <code>estado</code>,
+                    <code>cep</code> e a relação com o <code>Contact</code>.</li>
+                <li>Utiliza anotações de validação (<code>@NotBlank</code>, <code>@Size</code>, <code>@Pattern</code>)
+                    para garantir que os dados sejam válidos antes de serem persistidos.</li>
+                <li>A anotação <code>@ManyToOne</code> define a relação com a classe <code>Contact</code>, com a coluna
+                    <code>contact_id</code> no banco de dados.</li>
+                <li>A anotação <code>@JsonBackReference</code> é usada para evitar problemas de referência cíclica ao
+                    serializar os objetos (<code>Contact</code> e <code>Address</code>) para JSON. Quando uma entidade
+                    possui uma coleção de entidades relacionadas, como acontece em relações <code>OneToMany</code>, é
+                    necessário indicar que a serialização de JSON deve ignorar a referência de volta para o proprietário
+                    da relação. Dessa forma, evitamos erros como <code>StackOverflowException</code> quando a conversão
+                    para JSON é realizada.</li>
+            </ul>
+            <p>Além disso, percebam que por enquanto vamos transitar diretamente a entidade entre as diferentes camadas
+                da aplicação, inclusive expondo dados como o ID das entidades para o client. É por isso também que temos
+                que usar as anotações para evitar problemas de serialização. A solução para isso seria implementar
+                <strong>DTOs (Data Transfer Objects)</strong>. DTOs são classes criadas para transportar dados entre
+                diferentes camadas da aplicação. Quando implementamos DTOs estamos essencialmente <strong>separando a
+                    representação de dados da API (o que é retornado ou recebido pelo cliente) da modelagem interna da
+                    nossa aplicação</strong> (as entidades JPA que manipulam o banco de dados). Os DTOs são classes que
+                contêm apenas os dados que você quer expor na API, sem manter relações direcionais ou bidirecionais
+                presentes nas entidades.</p>
+            <p>Essa abordagem é melhor por alguns motivos:</p>
+            <ol>
+                <li>Permite a <strong>Independência da camada de persistência</strong>, onde o que é exposto na API não
+                    precisa ter o mesmo formato do banco de dados.</li>
+                <li><strong>Evita problemas de serialização cíclica:</strong> As entidades JPA podem manter suas
+                    relações bidirecionais, mas o Jackson só verá os DTOs.</li>
+                <li><strong>Segurança:</strong> Permite controlar exatamente o que é exposto ao cliente, sem expor dados
+                    sensíveis ou desnecessários.</li>
+                <li><strong>Flexibilidade:</strong> Facilita a evolução da API sem alterar diretamente a estrutura das
+                    entidades no banco de dados.</li>
+            </ol>
+            <p>Na próxima aula faremos essa melhoria no código, mas por enquanto basta que fiquem cientes que a
+                abordagem adotada até aqui é a mais didática, só que não necessariamente a mais adequada.</p>
+            <p>Evidentemente, também devemos atualizar a classe Contact. A implementação completa pode ser vista a
+                seguir.</p>
+            <h3><strong>4.2 ✅Código atualizado da Entidade <code>Contact</code></strong></h3>
+            <pre><code class="language-java">
+package br.ifsp.contacts.model;
+
+@Entity
+public class Contact {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @NotBlank(message = &quot;O nome não pode estar vazio&quot;)
+    private String nome;
+    
+    @NotBlank(message = &quot;O email não pode estar vazio&quot;)
+    @Email(message = &quot;Formato de email inválido&quot;)
+    private String email;
+    
+    @NotBlank(message = &quot;O telefone não pode estar vazio&quot;)
+    @Size(min = 8, max = 15, message = &quot;O telefone deve ter entre 8 e 15 caracteres&quot;)
+    @Pattern(regexp = &quot;\\d+&quot;, message = &quot;O telefone deve conter apenas números&quot;)
+    private String telefone;
+    
+    @OneToMany(mappedBy = &quot;contact&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @NotEmpty(message = &quot;O contato deve ter pelo menos um endereço&quot;)
+    private List&lt;Address&gt; addresses = new ArrayList&lt;&gt;();
+    
+    public Contact() {
+    }
+    
+    public Contact(String nome, String email, String telefone) {
+        this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
+    }
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public String getNome() {
+        return nome;
+    }
+    
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    
+    public String getTelefone() {
+        return telefone;
+    }
+    
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+    
+    public List&lt;Address&gt; getAddresses() {
+        return addresses;
+    }
+    
+    public void setAddresses(List&lt;Address&gt; addresses) {
+        if (addresses != null) {
+            addresses.forEach(address -&gt; address.setContact(this)); 
+            
+            if (this.addresses == null) { 
+                this.addresses = new ArrayList&lt;&gt;();
+            }
+            
+            this.addresses.clear(); 
+            this.addresses.addAll(addresses);         
+        }
+    }
+}
+</code></pre>
+            <h3><strong>🔍Analisando o código</strong></h3>
+            <p>A classe <code>Contact</code> é uma entidade JPA que representa um <strong>contato</strong> na aplicação
+                e está mapeada para uma tabela no banco de dados por meio da anotação <code>@Entity</code>. Esta classe
+                contém diversos atributos, incluindo uma lista de endereços (<code>List&lt;Address&gt; addresses</code>)
+                que se relaciona diretamente com a entidade <code>Address</code>. A seguir, vamos detalhar cada parte da
+                classe e como ela se relaciona com a classe <code>Address</code>.</p>
+            <h3>🔍 <strong>Atributos da Classe <code>Contact</code></strong></h3>
+            <ul>
+                <li><code>id</code>: É o identificador único do contato (<code>Long</code>) e é gerado automaticamente
+                    pelo banco de dados através da anotação
+                    <code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code>.</li>
+                <li><code>nome</code>: Nome do contato, com validação para garantir que não seja vazio
+                    (<code>@NotBlank</code>).</li>
+                <li><code>email</code>: Endereço de email do contato, validado tanto para não ser vazio
+                    (<code>@NotBlank</code>) quanto para ter um formato válido (<code>@Email</code>).</li>
+                <li><code>telefone</code>: Número de telefone do contato, validado para ter entre 8 e 15 caracteres
+                    (<code>@Size</code>), apenas números (<code>@Pattern</code>), e não ser vazio
+                    (<code>@NotBlank</code>).</li>
+                <li><code>addresses</code>: É uma lista de endereços (<code>Address</code>) associados a este contato.
+                    Essa relação é estabelecida por meio de uma associação <strong>OneToMany</strong>.</li>
+            </ul>
+            <p>O relacionamento entre <code>Contact</code> e <code>Address</code> é <strong>bidirecional</strong> e
+                configurado com as anotações <code>@OneToMany</code> na classe <code>Contact</code> e
+                <code>@ManyToOne</code> na classe <code>Address</code>, como visto na seção anterior. Vamos ver
+                detalhamente o mapeamento, que é feito da seguinte maneira:</p>
+            <h4>📌 <strong>Na Classe <code>Contact</code> (Dono do relacionamento):</strong></h4>
+            <pre><code class="language-java">@OneToMany(mappedBy = &quot;contact&quot;, cascade = CascadeType.ALL, orphanRemoval = true)
+@JsonManagedReference
+@NotEmpty(message = &quot;O contato deve ter pelo menos um endereço&quot;)
+private List&lt;Address&gt; addresses = new ArrayList&lt;&gt;();
+</code></pre>
+            <ul>
+                <li><code>@OneToMany</code>: Define que um contato pode ter vários endereços.</li>
+                <li><code>mappedBy = &quot;contact&quot;</code>: Indica que o relacionamento é mapeado pelo atributo
+                    <code>contact</code> na classe <code>Address</code>.</li>
+                <li><code>cascade = CascadeType.ALL</code>: Propaga todas as operações (persistência, remoção,
+                    atualização) feitas na entidade <code>Contact</code> para os seus endereços relacionados.</li>
+                <li><code>orphanRemoval = true</code>: Remove automaticamente os endereços que são removidos da lista
+                    <code>addresses</code>.</li>
+                <li><code>@JsonManagedReference</code>: Trabalha junto com <code>@JsonBackReference</code> na classe
+                    <code>Address</code> para evitar problemas de serialização cíclica (loop infinito) quando os objetos
+                    são convertidos para JSON.</li>
+                <li><code>@NotEmpty</code>: Garante que o contato sempre tenha pelo menos um endereço associado. Esse
+                    tipo de validação garante que cada contato deve ser salvo com pelo menos um endereço válido,
+                    evitando registros incompletos.</li>
+            </ul>
+            <p>É importante notar que o método <code>setAddresses()</code> é implementado de forma a garantir que todos
+                os endereços associados a este contato estejam sincronizados. Observe o trecho a seguir:</p>
+            <pre><code class="language-java">public void setAddresses(List&lt;Address&gt; addresses) {
+    if (addresses != null) {
+        addresses.forEach(address -&gt; address.setContact(this)); 
+        
+        if (this.addresses == null) { 
+            this.addresses = new ArrayList&lt;&gt;();
+        }
+        
+        this.addresses.clear(); 
+        this.addresses.addAll(addresses);         
+    }
+}
+</code></pre>
+            <p>Este método faz o seguinte:</p>
+            <ol>
+                <li><strong>Associa o contato atual a todos os endereços recebidos na lista:</strong> Para cada endereço
+                    fornecido, o método <code>address.setContact(this)</code> é chamado para garantir que o
+                    relacionamento bidirecional seja atualizado.</li>
+                <li><strong>Inicializa a lista de endereços se for nula:</strong> Garante que a lista nunca será
+                    manipulada sem ser inicializada.</li>
+                <li><strong>Limpa a lista de endereços atual:</strong> Evita duplicação de dados e garante que a lista
+                    de endereços seja atualizada completamente.</li>
+                <li><strong>Adiciona todos os endereços novos:</strong> Depois de limpar a lista, os novos endereços são
+                    adicionados, mantendo a consistência.</li>
+            </ol>
+            <p>A partir das duas entidades acima, temos o relacionamento completo. Caso tivéssemos mais entidades e
+                regras de negócio mais complexas, a ideia se manteria a mesma: as validaríamos e relacionaríamos
+                conforme a necessidade se apresentasse.</p>
+            <p>Passemos agora à análise da nossa classe <code>AddressRepository</code>.</p>
+            <h3><strong>4.3 ✅Repositório <code>AddressRepository</code></strong></h3>
+            <p>O repositório foi implementado de forma simples. Vamos conferir:</p>
+            <pre><code class="language-java">@Repository
+public interface AddressRepository extends JpaRepository&lt;Address, Long&gt; {
+    List&lt;Address&gt; findByContactId(Long contactId);
+}
+</code></pre>
+            <ul>
+                <li>A interface estende <code>JpaRepository&lt;Address, Long&gt;</code>, o que significa que herda todos
+                    os métodos básicos de manipulação (<code>save()</code>, <code>delete()</code>,
+                    <code>findById()</code>, etc.).</li>
+                <li>O método <code>findByContactId(Long contactId)</code> é adicionado para recuperar endereços
+                    associados a um contato específico.</li>
+                <li>A convenção de nomes usada (<code>findByContactId</code>) é suficiente para que o Spring Data JPA
+                    crie a consulta SQL apropriada automaticamente.</li>
+            </ul>
+            <p>Ou seja: até aqui, nenhuma novidade na criação do Repositório! Vamos verificar agora como ficaram nossos
+                controladores.</p>
+            <h3><strong>4.4 ✅Controller <code>AddressController</code></strong></h3>
+            <p>A classe <code>AddressController</code> é um controlador REST responsável por manipular requisições HTTP
+                relacionadas à entidade <code>Address</code> na aplicação. Ela é anotada com
+                <code>@RestController</code>, o que indica que seus métodos retornarão dados diretamente no corpo da
+                resposta (em formato JSON, por exemplo). Além disso, a anotação
+                <code>@RequestMapping(&quot;/api/addresses&quot;)</code> define o caminho base para todos os endpoints
+                dentro deste controlador. Vejamos o código abaixo.</p>
+            <pre><code class="language-java">package br.ifsp.contacts.controller;
+
+@RestController
+@RequestMapping(&quot;/api/addresses&quot;)
+public class AddressController {
+    
+    @Autowired
+    private ContactRepository contactRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
+    
+    @GetMapping(&quot;/contacts/{contactId}&quot;)
+    public List&lt;Address&gt; getAddressesByContact(@PathVariable Long contactId) {
+        Contact contact = contactRepository.findById(contactId)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + contactId));
+        
+        return contact.getAddresses();
+    }
+    
+    @PostMapping(&quot;/contacts/{contactId}&quot;)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Address createAddress(@PathVariable Long contactId, @RequestBody @Valid Address address) {
+        Contact contact = contactRepository.findById(contactId)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + contactId));
+        
+        address.setContact(contact);
+        return addressRepository.save(address);
+    }
+}
+</code></pre>
+            <h3>🔍 <strong>Analisando o código:</strong></h3>
+            <h3>📌 <strong>Injeção de Dependências (<code>@Autowired</code>)</strong></h3>
+            <p>A classe utiliza injeção de dependências para acessar os repositórios <code>ContactRepository</code> e
+                <code>AddressRepository</code>, que são necessários para buscar contatos existentes e salvar novos
+                endereços. Essa injeção é feita automaticamente pelo Spring por meio da anotação
+                <code>@Autowired</code>, como já vimos anteriormente. Nas próximas aulas vamos explorar também a injeção
+                de dependências por meio do método construtor, que é a alternativa mais recomendada pelos
+                desenvolvedores do Spring.</p>
+            <h3>📌 <strong>Método <code>getAddressesByContact()</code></strong></h3>
+            <pre><code class="language-java">@GetMapping(&quot;/contacts/{contactId}&quot;)
+public List&lt;Address&gt; getAddressesByContact(@PathVariable Long contactId) {
+    Contact contact = contactRepository.findById(contactId)
+            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + contactId));
+    
+    return contact.getAddresses();
+}
+</code></pre>
+            <p>Esse método é um endpoint <code>GET</code> que permite recuperar todos os endereços associados a um
+                contato específico. Ele é acessível por meio da URL:</p>
+            <pre><code>GET /api/addresses/contacts/{contactId}
+</code></pre>
+            <p><strong>O que acontece nesse método:</strong> </p>
+            <ol>
+                <li>O método recebe um <code>contactId</code> como parâmetro de URL e o busca no banco de dados usando o
+                    <code>contactRepository.findById()</code> que retorna um <code>Optional&lt;Contact&gt;</code>.</li>
+                <li>Se o contato não for encontrado, o método <code>orElseThrow()</code> lança uma exceção
+                    <code>ResourceNotFoundException</code>, que é tratada pelo <code>GlobalExceptionHandler</code> e
+                    resulta em um retorno com código HTTP 404 (Not Found).</li>
+                <li>Caso o contato seja encontrado, o método retorna a lista de endereços associados ao contato por meio
+                    do método <code>contact.getAddresses()</code>. </li>
+                <li>A resposta retornada é uma lista de objetos <code>Address</code> convertida automaticamente para
+                    JSON pelo Jackson. Esse passo é transparente ao usarmos o Spring Boot.</li>
+            </ol>
+            <h3>📌 <strong>Método <code>createAddress()</code></strong></h3>
+            <pre><code class="language-java">@PostMapping(&quot;/contacts/{contactId}&quot;)
+@ResponseStatus(HttpStatus.CREATED)
+public Address createAddress(@PathVariable Long contactId, @RequestBody @Valid Address address) {
+    Contact contact = contactRepository.findById(contactId)
+            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + contactId));
+    
+    address.setContact(contact);
+    return addressRepository.save(address);
+}
+</code></pre>
+            <p>Esse método é um endpoint <code>POST</code> que permite criar um novo endereço e associá-lo a um contato
+                existente. Ele é acessível por meio da URL:</p>
+            <pre><code>POST /api/addresses/contacts/{contactId}
+</code></pre>
+            <p><strong>O que acontece nesse método:</strong> </p>
+            <ol>
+                <li>O método recebe um <code>contactId</code> como parâmetro de URL e um objeto <code>Address</code>
+                    como corpo da requisição (<code>@RequestBody</code>).</li>
+                <li>A anotação <code>@Valid</code> é usada para garantir que o endereço enviado atende a todas as regras
+                    de validação definidas na classe <code>Address</code>.</li>
+                <li>O controlador busca o contato correspondente ao <code>contactId</code> usando
+                    <code>contactRepository.findById()</code>. Caso não seja encontrado, é lançada uma exceção
+                    <code>ResourceNotFoundException</code>.</li>
+                <li>Se o contato for encontrado, o endereço é associado ao contato usando o método
+                    <code>address.setContact(contact)</code>.</li>
+                <li>O endereço é salvo no banco de dados pelo <code>addressRepository.save(address)</code>.</li>
+                <li>A anotação <code>@ResponseStatus(HttpStatus.CREATED)</code> indica que, se o endereço for salvo com
+                    sucesso, o servidor retornará um código HTTP 201 (Created).</li>
+            </ol>
+            <h3><strong>Em resumo...</strong></h3>
+            <p>A classe <code>AddressController</code> foi implementada utilizando os conceitos já vistos previamente.
+                Vejamos agora como ficou o código atualizado do nosso <code>ContactController</code>.</p>
+            <h3>✅ <strong>4.4 Controller <code>ContactController</code></strong></h3>
+            <p>A classe <code>ContactController</code> é um <strong>controlador REST</strong>, responsável por fornecer
+                os endpoints para manipulação de recursos <code>Contact</code>. Ela é anotada com
+                <code>@RestController</code>, o que indica que seus métodos retornam dados diretamente como respostas
+                HTTP, geralmente em formato JSON. A anotação <code>@RequestMapping(&quot;/api/contacts&quot;)</code>
+                define a URL base para todos os endpoints do controlador.</p>
+            <p>O controlador utiliza injeção de dependência para receber um objeto do tipo
+                <code>ContactRepository</code>, que é responsável por realizar operações de acesso a dados relacionadas
+                aos contatos (CRUD). Essa injeção é feita automaticamente pelo Spring por meio da anotação
+                <code>@Autowired</code>, assim como na classe <code>AddressController</code>.</p>
+            <p>Vejamos, abaixo, seu código-fonte.</p>
+            <pre><code class="language-java">package br.ifsp.contacts.controller;
+
+@RestController
+@RequestMapping(&quot;/api/contacts&quot;)
+@Validated
+public class ContactController {
+
+    @Autowired
+    private ContactRepository contactRepository;
+
+    @GetMapping
+    public List&lt;Contact&gt; getAllContacts() {
+        return contactRepository.findAll();
+    }
+
+    @GetMapping(&quot;{id}&quot;)
+    public Contact getContactById(@PathVariable Long id) {
+        return contactRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Contact createContact(@Valid @RequestBody Contact contact) {
+        return contactRepository.save(contact);
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public Contact updateContact(@PathVariable Long id, @Valid @RequestBody Contact updatedContact) {
+        Contact existingContact = contactRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+
+        existingContact.setNome(updatedContact.getNome());
+        existingContact.setEmail(updatedContact.getEmail());
+        existingContact.setTelefone(updatedContact.getTelefone());
+        existingContact.setAddresses(updatedContact.getAddresses());
+
+        return contactRepository.save(existingContact);
+    }
+
+    @PatchMapping(&quot;/{id}&quot;)
+    public Contact updateContactPartial(@PathVariable Long id, @RequestBody Map&lt;String, String&gt; updates) {
+        Contact contact = contactRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+
+        updates.forEach((key, value) -&gt; {
+            switch (key) {
+                case &quot;nome&quot;:
+                    contact.setNome(value);
+                    break;
+                case &quot;telefone&quot;:
+                    contact.setTelefone(value);
+                    break;
+                case &quot;email&quot;:
+                    contact.setEmail(value);
+                    break;
+            }
+        });
+
+        return contactRepository.save(contact);
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public void deleteContact(@PathVariable Long id) {
+        contactRepository.deleteById(id);
+    }
+
+    @GetMapping(&quot;/search&quot;)
+    public List&lt;Contact&gt; searchContactsByName(@RequestParam String name) {
+        return contactRepository.findByNomeContainingIgnoreCase(name);
+    }
+}
+</code></pre>
+            <h3>📌 <strong>Métodos Implementados no Controller</strong></h3>
+            <p>O controlador <code>ContactController</code> oferece métodos CRUD e um método adicional para busca
+                personalizada. Vamos detalhá-los:</p>
+            <h4>✅ <code>getAllContacts()</code></h4>
+            <pre><code class="language-java">@GetMapping
+public List&lt;Contact&gt; getAllContacts() {
+    return contactRepository.findAll();
+}
+</code></pre>
+            <p>Este método retorna todos os contatos presentes no banco de dados. É um endpoint <code>GET</code>
+                acessível por:</p>
+            <pre><code>GET /api/contacts
+</code></pre>
+            <p>A resposta é uma lista de objetos <code>Contact</code>.</p>
+            <h4>✅ <code>getContactById()</code></h4>
+            <pre><code class="language-java">@GetMapping(&quot;{id}&quot;)
+public Contact getContactById(@PathVariable Long id)
+</code></pre>
+            <p>Esse método busca um contato específico por seu <code>id</code>. Ele retorna um erro
+                <code>404 - Not Found</code> caso o contato não exista, usando o método <code>orElseThrow()</code> que
+                lança a exceção <code>ResourceNotFoundException</code>. É acessível por:</p>
+            <pre><code>GET /api/contacts/{id}
+</code></pre>
+            <p>Se encontrado, retorna o objeto <code>Contact</code> correspondente.</p>
+            <h4>✅ <code>createContact()</code></h4>
+            <pre><code class="language-java">@PostMapping
+@ResponseStatus(HttpStatus.CREATED)
+public Contact createContact(@Valid @RequestBody Contact contact)
+</code></pre>
+            <p>Esse método cria um novo contato a partir dos dados enviados no corpo da requisição. A anotação
+                <code>@Valid</code> garante que as validações definidas na classe <code>Contact</code> sejam
+                respeitadas. É acessível por:</p>
+            <pre><code>POST /api/contacts
+</code></pre>
+            <p>Se o contato for criado com sucesso, retorna o objeto <code>Contact</code> salvo no banco de dados com o
+                código <code>201 - Created</code>.</p>
+            <h4>✅ <code>updateContact()</code></h4>
+            <pre><code class="language-java">@PutMapping(&quot;/{id}&quot;)
+public Contact updateContact(@PathVariable Long id, @Valid @RequestBody Contact updatedContact)
+</code></pre>
+            <p>Esse método atualiza todos os dados de um contato existente identificado pelo <code>id</code>. Caso o
+                contato não seja encontrado, é lançada uma <code>ResourceNotFoundException</code>. A atualização é feita
+                de forma completa, substituindo os dados antigos pelos novos. É acessível por:</p>
+            <pre><code>PUT /api/contacts/{id}
+</code></pre>
+            <p>Retorna o contato atualizado.</p>
+            <h4>✅ <code>updateContactPartial()</code></h4>
+            <pre><code class="language-java">@PatchMapping(&quot;/{id}&quot;)
+public Contact updateContactPartial(@PathVariable Long id, @RequestBody Map&lt;String, String&gt; updates)
+</code></pre>
+            <p>Este método permite atualizações <strong>parciais</strong> em um contato. Ele recebe um mapa
+                (<code>Map&lt;String, String&gt;</code>) contendo os campos que devem ser atualizados e seus novos
+                valores. Somente os campos presentes no mapa são modificados; os demais permanecem inalterados. É
+                acessível por:</p>
+            <pre><code>PATCH /api/contacts/{id}
+</code></pre>
+            <p>Caso o contato não seja encontrado, lança uma <code>ResourceNotFoundException</code>.</p>
+            <h4>✅ <code>deleteContact()</code></h4>
+            <pre><code class="language-java">@DeleteMapping(&quot;/{id}&quot;)
+public void deleteContact(@PathVariable Long id)
+</code></pre>
+            <p>Esse método exclui um contato identificado por seu <code>id</code>. A exclusão é feita por meio do método
+                <code>deleteById()</code> do <code>ContactRepository</code>. Se o contato não existir, o repositório não
+                realiza nenhuma ação. É acessível por:</p>
+            <pre><code>DELETE /api/contacts/{id}
+</code></pre>
+            <p>Retorna uma resposta sem conteúdo (<code>204 - No Content</code>) se a exclusão for bem-sucedida.</p>
+            <h4>✅ <code>searchContactsByName()</code></h4>
+            <pre><code class="language-java">@GetMapping(&quot;/search&quot;)
+public List&lt;Contact&gt; searchContactsByName(@RequestParam String name)
+</code></pre>
+            <p>Esse método realiza uma <strong>busca personalizada</strong> por nome. Ele utiliza o método
+                <code>findByNomeContainingIgnoreCase()</code> do <code>ContactRepository</code> para encontrar contatos
+                cujo nome contenha o termo pesquisado, independentemente de maiúsculas ou minúsculas. É acessível por:
+            </p>
+            <pre><code>GET /api/contacts/search?name=Joao
+</code></pre>
+            <p>Retorna uma lista de contatos que correspondem ao critério de busca.</p>
+            <h3>📌 <strong>Como os métodos interagem com a camada de persistência
+                    (<code>ContactRepository</code>)?</strong></h3>
+            <p>O controlador depende diretamente do repositório <code>ContactRepository</code> para todas as operações
+                de leitura, escrita, atualização e exclusão. A camada de persistência é configurada para lidar com
+                entidades JPA (<code>Contact</code>), o que significa que as operações de banco de dados são tratadas de
+                forma transparente pelo Spring Data JPA. É a mesmíssima coisa que já fizemos anteriormente. Percebam:
+                estamos apenas repetindo os mesmos padrões já vistos anteriormente.</p>
+            <h3>📌 <strong>Como os métodos tratam erros e validações?</strong></h3>
+            <ul>
+                <li><strong>Validação de Dados:</strong> A anotação <code>@Valid</code> garante que os objetos enviados
+                    na requisição atendam às regras definidas na classe <code>Contact</code>.</li>
+                <li><strong>Tratamento de Erros:</strong> O uso de <code>ResourceNotFoundException</code> integrado com
+                    o <code>GlobalExceptionHandler</code> garante que as requisições inválidas sejam respondidas de
+                    forma apropriada (<code>404 - Not Found</code>).</li>
+            </ul>
+            <p>É exatamente a mesma lógica que aplicamos no <code>AddressController</code>!</p>
+            <h3>✅ <strong>4.5 Melhorando o <code>GlobalExceptionHandler</code></strong></h3>
+            <p>A implementação inicial do <code>GlobalExceptionHandler</code> foi projetada para lidar apenas com
+                exceções genéricas (<code>Exception</code>) e com uma exceção personalizada específica
+                (<code>ResourceNotFoundException</code>). Essa abordagem já proporcionava uma maneira centralizada e
+                padronizada de tratar erros na aplicação. No entanto, ela carecia de um tratamento mais robusto para
+                situações comuns no desenvolvimento de APIs REST, especialmente em relação à validação de dados de
+                entrada.</p>
+            <p>A implementação inicial era limitada porque: </p>
+            <ul>
+                <li>Tratava apenas exceções genéricas (<code>Exception</code>) e <code>ResourceNotFoundException</code>.
+                </li>
+                <li>Não possuía suporte para o tratamento explícito de erros de validação.</li>
+                <li>Não fornecia mensagens detalhadas sobre quais campos específicos estavam inválidos, o que poderia
+                    dificultar a compreensão por parte do cliente da API.</li>
+            </ul>
+            <p>Podemos melhorar a implementação inicial, mostrada na seção 2.8, por meio do código-fonte abaixo</p>
+            <pre><code class="language-java">package br.ifsp.contacts.exception;
+
+import jakarta.validation.ConstraintViolationException;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    /**
+     * Trata erros de validação de entrada (ex: campos inválidos no @Valid)
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleValidationExceptions(MethodArgumentNotValidException exception) {
+        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();
+        exception.getBindingResult().getAllErrors().forEach((error) -&gt; {
+            if (error instanceof FieldError) {
+                String fieldName = ((FieldError) error).getField();
+                String errorMessage = error.getDefaultMessage();
+                errors.put(fieldName, errorMessage);
+            }
+        });
+        return ResponseEntity.badRequest().body(errors);
+    }
+    
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleGlobalValidationExceptions(ConstraintViolationException  exception) {
+        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();
+        exception.getConstraintViolations().forEach(violation -&gt; 
+            errors.put(violation.getPropertyPath().toString(), violation.getMessage())
+        );
+        return ResponseEntity.badRequest().body(errors);
+    }
+    
+    /**
+     * Trata exceções de recurso não encontrado
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleResourceNotFoundException(ResourceNotFoundException exception) {
+        Map&lt;String, String&gt; errorResponse = new HashMap&lt;&gt;();
+        errorResponse.put(&quot;error&quot;, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+    
+    /**
+     * Trata exceções genéricas que não foram capturadas pelos handlers anteriores.
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleGenericException(Exception exception) {
+        Map&lt;String, String&gt; errorResponse = new HashMap&lt;&gt;();
+        errorResponse.put(&quot;error&quot;, &quot;Erro interno no servidor. Entre em contato com o suporte.&quot;);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+    
+}
+</code></pre>
+            <h3>📌 <strong>O que foi melhorado na implementação final?</strong></h3>
+            <p>Essa implementação melhorada do <code>GlobalExceptionHandler</code> amplia significativamente o escopo de
+                tratamento de erros ao adicionar suporte para exceções de validação. Isso foi feito adicionando métodos
+                específicos para capturar e processar erros relacionados à entrada de dados inválida. Vamos analisar as
+                melhorias implementadas.</p>
+            <h3>📌 <strong>Suporte a <code>MethodArgumentNotValidException</code></strong></h3>
+            <p>O método <code>handleValidationExceptions()</code> foi adicionado para tratar exceções do tipo
+                <code>MethodArgumentNotValidException</code>. Essas exceções são lançadas quando um objeto validado com
+                a anotação <code>@Valid</code> não atende às regras definidas nas entidades, como
+                <code>@NotBlank</code>, <code>@Size</code>, <code>@Pattern</code>, etc.</p>
+            <pre><code class="language-java">@ExceptionHandler(MethodArgumentNotValidException.class)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleValidationExceptions(MethodArgumentNotValidException exception) {
+    Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();
+    exception.getBindingResult().getAllErrors().forEach((error) -&gt; {
+        if (error instanceof FieldError) {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        }
+    });
+    return ResponseEntity.badRequest().body(errors);
+}
+</code></pre>
+            <ul>
+                <li>Este método percorre todos os erros encontrados e os mapeia para um objeto <code>Map</code> que
+                    associa o nome do campo (<code>fieldName</code>) com a mensagem de erro (<code>errorMessage</code>).
+                </li>
+                <li>A resposta gerada é uma <code>ResponseEntity</code> contendo um <code>Map</code> que detalha todos
+                    os erros detectados, retornando o status HTTP <code>400 (Bad Request)</code>.</li>
+                <li>Essa implementação melhora a experiência do usuário, fornecendo feedback claro sobre o que precisa
+                    ser corrigido.</li>
+            </ul>
+            <h3>📌 <strong>Suporte a <code>ConstraintViolationException</code></strong></h3>
+            <p>O método <code>handleGlobalValidationExceptions()</code> foi adicionado para capturar exceções do tipo
+                <code>ConstraintViolationException</code>. Essas exceções geralmente ocorrem quando se tenta validar
+                dados em controladores que não recebem objetos completos, mas parâmetros individuais, por exemplo, ao
+                utilizar <code>@RequestParam</code> ou <code>@PathVariable</code> com validações <code>@Valid</code>.
+            </p>
+            <pre><code class="language-java">@ExceptionHandler(ConstraintViolationException.class)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleGlobalValidationExceptions(ConstraintViolationException exception) {
+    Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();
+    exception.getConstraintViolations().forEach(violation -&gt; 
+        errors.put(violation.getPropertyPath().toString(), violation.getMessage())
+    );
+    return ResponseEntity.badRequest().body(errors);
+}
+</code></pre>
+            <ul>
+                <li>Este método percorre todas as violações detectadas (<code>constraintViolations</code>) e as armazena
+                    em um <code>Map</code>.</li>
+                <li>A resposta HTTP retornada é <code>400 (Bad Request)</code>, apropriada para requisições inválidas.
+                </li>
+                <li>Este tratamento é útil para capturar erros em parâmetros simples, como um telefone inválido passado
+                    diretamente na URL.</li>
+            </ul>
+            <h3>📌 <strong>Tratamento Genérico para Outras Exceções</strong></h3>
+            <p>O método <code>handleGenericException()</code> é um fallback para qualquer exceção que não foi capturada
+                por métodos mais específicos.</p>
+            <pre><code class="language-java">@ExceptionHandler(Exception.class)
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleGenericException(Exception exception) {
+    Map&lt;String, String&gt; errorResponse = new HashMap&lt;&gt;();
+    errorResponse.put(&quot;error&quot;, &quot;Erro interno no servidor. Entre em contato com o suporte.&quot;);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+}
+</code></pre>
+            <ul>
+                <li>A captura genérica de exceções garante que erros inesperados sejam tratados com uma resposta padrão.
+                </li>
+                <li>Retorna o status HTTP <code>500 (Internal Server Error)</code>, indicando um problema do lado do
+                    servidor.</li>
+            </ul>
+            <p>Com isso, temos uma maior cobertura à validação na nossa aplicação, cobrindo todos os casos especificados
+                nos Desafios e Exercícios até o momento!</p>
+            <hr>
+            <h2>5. Estrutura do Projeto e testes após a implementação dos exercícios e desafios</h2>
+            <p>Após a implementação das classes acima, nossa estrutura de pacotes ficou da seguinte forma:</p>
+            <pre><code>.
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── br
+│   │   │       └── ifsp
+│   │   │           └── contacts
+│   │   │               ├── ContactsApplication.java
+│   │   │               ├── controller
+│   │   │               │   └── AddressController.java
+│   │   │               │   └── ContactController.java
+│   │   │               ├── model
+│   │   │               │   └── Address.java
+│   │   │               │   └── Contact.java
+│   │   │               ├── repository
+│   │   │               │   └── AddressRepository.java
+│   │   │               │   └── ContactRepository.java
+│   │   │               └── exception
+│   │   │                   └── GlobalExceptionHandler.java
+│   │   │                   └── ResourceNotFoundException.java
+│   │   └── resources
+│   │       └── application.properties
+│   └── test
+│       └── java
+└── pom.xml (ou build.gradle)
+</code></pre>
+            <p>Vamos ver agora como testar nossa API para garantir que todas as funcionalidades implementadas estão
+                funcionando corretamente! </p>
+            <h2>📌 <strong>Teste 1: Criar um Contato (<code>POST /api/contacts</code>)</strong></h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>POST</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/contacts</code></li>
+                <li><strong>Body (JSON):</strong></li>
+            </ol>
+            <pre><code class="language-json">{
+  &quot;nome&quot;: &quot;João Silva&quot;,
+  &quot;email&quot;: &quot;joao.silva@email.com&quot;,
+  &quot;telefone&quot;: &quot;11999999999&quot;,
+  &quot;addresses&quot;: [
+    {
+      &quot;rua&quot;: &quot;Rua A&quot;,
+      &quot;cidade&quot;: &quot;São Paulo&quot;,
+      &quot;estado&quot;: &quot;SP&quot;,
+      &quot;cep&quot;: &quot;12345-678&quot;
+    }
+  ]
+}
+</code></pre>
+            <ol start="4">
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>201 - Created</code></li>
+                        <li>Resposta com o contato criado, incluindo o endereço associado.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 2: Listar Todos os Contatos (<code>GET /api/contacts</code>)</strong></h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>GET</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/contacts</code></li>
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>200 - OK</code></li>
+                        <li>Resposta com a lista de contatos criados, incluindo seus endereços.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 3: Buscar Contato por ID (<code>GET /api/contacts/{id}</code>)</strong></h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>GET</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/contacts/1</code> (Substitua o <code>1</code>
+                    pelo ID do contato que você deseja consultar)</li>
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>200 - OK</code></li>
+                        <li>Retorno do contato correspondente ao ID especificado.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 4: Atualização Parcial de Contato (<code>PATCH /api/contacts/{id}</code>)</strong></h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>PATCH</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/contacts/1</code> (Substitua o <code>1</code>
+                    pelo ID do contato que você deseja atualizar)</li>
+                <li><strong>Body (JSON):</strong></li>
+            </ol>
+            <pre><code class="language-json">{
+  &quot;nome&quot;: &quot;João Silva Jr.&quot;,
+  &quot;telefone&quot;: &quot;11988888888&quot;
+}
+</code></pre>
+            <ol start="4">
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>200 - OK</code></li>
+                        <li>Retorno do contato atualizado, refletindo as alterações enviadas.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 5: Criar um Endereço para um Contato
+                    (<code>POST /api/addresses/contacts/{contactId}</code>)</strong></h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>POST</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/addresses/contacts/1</code> (Substitua o
+                    <code>1</code> pelo ID do contato que você deseja associar o endereço)</li>
+                <li><strong>Body (JSON):</strong></li>
+            </ol>
+            <pre><code class="language-json">{
+  &quot;rua&quot;: &quot;Rua B&quot;,
+  &quot;cidade&quot;: &quot;Rio de Janeiro&quot;,
+  &quot;estado&quot;: &quot;RJ&quot;,
+  &quot;cep&quot;: &quot;22222-222&quot;
+}
+</code></pre>
+            <ol start="4">
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>201 - Created</code></li>
+                        <li>O endereço deve ser salvo e associado ao contato especificado.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 6: Listar Endereços de um Contato
+                    (<code>GET /api/addresses/contacts/{contactId}</code>)</strong></h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>GET</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/addresses/contacts/1</code></li>
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>200 - OK</code></li>
+                        <li>Lista dos endereços associados ao contato especificado.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 7: Buscar Contatos por Nome (<code>GET /api/contacts/search?name=Joao</code>)</strong>
+            </h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>GET</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/contacts/search?name=Joao</code></li>
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>200 - OK</code></li>
+                        <li>Retorna uma lista de contatos cujos nomes correspondem parcial ou totalmente ao termo
+                            pesquisado.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 8: Exclusão de Contato (<code>DELETE /api/contacts/{id}</code>)</strong></h2>
+            <p>No Postman ou Insomnia:</p>
+            <ol>
+                <li><strong>Método:</strong> <code>DELETE</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/contacts/1</code></li>
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>204 - No Content</code></li>
+                        <li>O contato é excluído permanentemente do banco de dados.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h2>📌 <strong>Teste 9: Teste de Validação (<code>POST /api/contacts</code>)</strong></h2>
+            <p>Vamos verificar se as validações da entidade <code>Contact</code> funcionam corretamente. </p>
+            <ol>
+                <li><strong>Método:</strong> <code>POST</code></li>
+                <li><strong>URL:</strong> <code>http://localhost:8080/api/contacts</code></li>
+                <li><strong>Body (JSON):</strong></li>
+            </ol>
+            <pre><code class="language-json">{
+  &quot;nome&quot;: &quot;&quot;,
+  &quot;email&quot;: &quot;invalidEmail&quot;,
+  &quot;telefone&quot;: &quot;123&quot;,
+  &quot;addresses&quot;: []
+}
+</code></pre>
+            <ol start="4">
+                <li><strong>Resultado Esperado:</strong>
+                    <ul>
+                        <li>Código HTTP <code>400 - Bad Request</code></li>
+                        <li>Mensagens de erro indicando o que está inválido:</li>
+                    </ul>
+                </li>
+            </ol>
+            <pre><code class="language-json">{
+  &quot;nome&quot;: &quot;O nome não pode estar vazio&quot;,
+  &quot;email&quot;: &quot;Formato de email inválido&quot;,
+  &quot;telefone&quot;: &quot;O telefone deve ter entre 8 e 15 caracteres&quot;,
+  &quot;addresses&quot;: &quot;O contato deve ter pelo menos um endereço&quot;
+}
+</code></pre>
+            <hr>
+            <h2><strong>6. Recapitulando!</strong></h2>
+            <p>Nesta aula, aprimoramos a nossa API REST desenvolvida na aula anterior, implementando novos recursos e
+                adotando boas práticas essenciais para garantir a robustez e a consistência da aplicação. Abordamos
+                conceitos como <strong>consultas customizadas no JPA</strong> utilizando convenções de nomes e queries
+                personalizadas por meio da anotação <code>@Query</code>. Implementamos métodos PATCH para atualizações
+                parciais de recursos, utilizando o tipo <code>Map&lt;String, String&gt;</code> e garantindo que apenas
+                os campos especificados sejam modificados, mantendo os demais intactos.</p>
+            <p>O tratamento de erros foi aprimorado com a implementação de um <code>GlobalExceptionHandler</code>, que
+                captura e trata exceções específicas, como <code>ResourceNotFoundException</code>, garantindo respostas
+                HTTP adequadas e amigáveis. Exploramos a importância do tratamento de erros para garantir segurança,
+                clareza, padronização e uma melhor experiência do usuário.</p>
+            <p>Além disso, trabalhamos com <strong>relacionamentos de entidades usando JPA</strong>, implementando uma
+                relação bidirecional <code>OneToMany / ManyToOne</code> entre <code>Contact</code> e
+                <code>Address</code>. Também introduzimos conceitos de <strong>validação de dados</strong> utilizando a
+                <code>Jakarta Bean Validation</code> para garantir que os dados fornecidos pelos clientes sejam válidos
+                antes de serem processados pela aplicação.</p>
+            <p>Por fim, implementamos controladores REST (<code>ContactController</code> e
+                <code>AddressController</code>) para manipulação dessas entidades, expondo endpoints que permitem criar,
+                recuperar, atualizar e excluir contatos e seus respectivos endereços. </p>
+            <p>Além disso, mencionamos que a forma implementada atualmente é didática, porém pode ser aprimorada.
+                Fizemos uma breve introdução ao conceito de DTOs, o que nos leva aos...</p>
+            <hr>
+            <h2><strong>7. Exercícios 🤓</strong></h2>
+            <p><strong>1️⃣ - Implementação de DTOs (Data Transfer Objects)</strong><br>Atualmente, a API utiliza
+                entidades diretamente na comunicação entre o cliente e o servidor. Para melhorar a segurança, controle
+                dos dados expostos e evitar problemas de serialização cíclica, implemente DTOs para <code>Contact</code>
+                e <code>Address</code>. Substitua os objetos retornados pelos controladores por DTOs e modifique os
+                controladores para aceitar DTOs como entrada. </p>
+            <p><strong>2️⃣ - Persistência em Banco de Dados Relacional</strong><br>Até agora, estamos utilizando o banco
+                de dados em memória configurado pelo Spring Data JPA. Altere a aplicação para utilizar um banco de dados
+                relacional real, como MySQL ou PostgreSQL. Modifique o arquivo <code>application.properties</code>
+                configurando as propriedades de conexão, e adicione dependências adequadas no <code>pom.xml</code>.</p>
+            <p><strong>3️⃣ - Paginação e Ordenação</strong><br>Implemente paginação e ordenação nos métodos que retornam
+                listas de contatos e endereços. Utilize a interface <code>Pageable</code> do Spring Data JPA e crie
+                endpoints que aceitem parâmetros de paginação e ordenação na URL. Garanta que o resultado seja retornado
+                de forma paginada, e não como uma lista completa.</p>
+            <p><strong>4️⃣ - Implementação de Documentação da API com Swagger</strong><br>Agora que já implementamos
+                funcionalidades importantes na nossa API REST, é hora de garantir que os usuários da API possam
+                entendê-la e utilizá-la de forma adequada. Para isso, integre o Swagger, que permitirá a geração
+                automática de uma documentação interativa e amigável. Adicione as dependências adequadas no
+                <code>pom.xml</code>, crie uma Classe de Configuração, documente os Endpoints e Teste a Documentação.
+            </p>
+            <h3><strong>📌 Instruções Finais</strong></h3>
+            <ul>
+                <li>✅ Para os exercícios <strong>práticos (1 a 4)</strong> a entrega esperada é o código das novas rotas
+                    e prints das requisições no Postman ou Insomnia. <strong>Envie um link do GitHub</strong> ou um
+                    arquivo <strong>.zip</strong> com o código-fonte por meio do Moodle da disciplina.</li>
+                <li>✅ Para o exercício <strong>4</strong> entregue também prints mostrando o teste da documentação
+                    gerada pelo swagger. Adicione os prints ao repositório GIT ou no arquivo .zip juntamente com o
+                    código-fonte.</li>
+                <li>✅Teste todas as funcionalidades antes de enviar e garanta que o código está funcionando.</li>
+            </ul>
+            <h2><strong>Bons estudos e mãos à obra! 🛠🔥</strong></h2>
+
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus
+                    Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
