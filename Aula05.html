@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 01 - Revisão de Análise e Programação Orientada a Objetos</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="Aula04.html"><span class="mr-0"></span>04 - REST II</a>
+                </li>
+                <li class="active">
+                    <a href="Aula05.html"><span class="mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>08 - Exercício II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>09 - Docker</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>10 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>11 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VI</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+
+            <h1>Aula 05 - REST III: DTOs, Paginação, Versionamento e Documentação com Swagger</h1>
+            <p>Nesta aula, continuaremos aprimorando nossa API REST com Spring Boot, abordando tópicos como DTOs (Data
+                Transfer Objects), paginação, versionamento de API e documentação automática com Swagger. Vamos garantir
+                que nossa aplicação esteja mais robusta, escalável e fácil de consumir e, para isso, vamos seguir a
+                mesma lógica que já usamos previamente: introduzir os conceitos dessa aula por meio da resolução dos
+                exercícios da aula anterior.</p>
+            <p>Para tanto, vamos relembrar o que havia sido pedido:</p>
+            <ul>
+                <li>
+                    <p>O primeiro exercício consiste na implementação de DTOs (Data Transfer Objects), substituindo o
+                        uso direto das entidades “Contact” e “Address” por objetos específicos para transporte de dados.
+                        Essa alteração evita a exposição desnecessária de informações internas, aumenta a segurança e
+                        resolve problemas de serialização cíclica. </p>
+                </li>
+                <li>
+                    <p>O segundo se refere à persistência em um banco de dados relacional: em vez de utilizar o banco H2
+                        em memória, a aplicação deve ser configurada para usar um banco real como MySQL ou PostgreSQL, o
+                        que exige alterar o arquivo application.properties com as configurações adequadas de conexão,
+                        além de adicionar dependências correspondentes no pom.xml. </p>
+                </li>
+                <li>
+                    <p>O terceiro propõe a adoção de paginação e ordenação para os endpoints que retornam listas de
+                        contatos e endereços, implementando a interface Pageable do Spring Data JPA e permitindo que o
+                        cliente especifique parâmetros (exemplo: “page”, “size” e “sort”) para controlar como os
+                        resultados são exibidos. </p>
+                </li>
+                <li>
+                    <p>Finalmente, o quarto exercício requer a documentação da API com Swagger, adicionando as
+                        dependências do springdoc-openapi ao pom.xml, criando uma classe de configuração e anotando os
+                        endpoints para que a documentação seja gerada de modo automático e interativo, facilitando o
+                        entendimento e o uso da API.</p>
+                </li>
+            </ul>
+            <p>Vamos resolver esses exercícios de forma sequencial e abordar os conceitos envolvidos em cada um, assim
+                como fizemos na aula anterior.</p>
+            <hr>
+            <h2>1. Implementando DTOs (Data Transfer Objects)</h2>
+            <p>Vimos anteriormente, na Aula 04, alguns conceitos iniciais sobre DTOs, objetos que representam os dados
+                que realmente precisam ser transmitidos ou recebidos por sua aplicação, sem os detalhes internos de
+                implementação e persistência. Dessa forma, a camada de apresentação fica desacoplada das entidades,
+                reforçando a segurança, evitando ciclos de serialização e tornando a aplicação mais robusta e flexível a
+                mudanças. Ao expor as entidades JPA diretamente na API, podemos incorrer em uma série de inconvenientes
+                que comprometem tanto a segurança quanto a arquitetura do sistema e, por isso, justifica-se o uso de
+                DTOs. Vamos relembrar algumas vantagens de utilizarmos esse padrão:</p>
+            <p>Em primeiro lugar, há o risco de <strong>expor dados sensíveis</strong>: nem todos os campos internos de
+                uma entidade devem ser acessíveis ao cliente, mas, ao enviar as entidades sem filtragem, é possível que
+                informações privadas ou confidenciais sejam inadvertidamente reveladas. Apenas enviar objetos inteiros
+                em formato JSON, portanto, pode não ser (e em muitos casos não é) o mais adequado. Com DTOs, escolhemos
+                exatamente quais campos serão incluídos na resposta da API. Isso dá ao desenvolvedor controle total
+                sobre a exposição de dados, evitando vazamentos acidentais de informações.</p>
+            <p>Outro aspecto é a <strong>fragilidade do design</strong>: se as entidades JPA forem diretamente
+                utilizadas como formato de resposta e entrada da API, qualquer mudança na estrutura dessas entidades —
+                seja para fins de manutenção, otimização ou adaptação às regras de negócio — pode quebrar as integrações
+                existentes, pois os clientes dependem daquele formato exato. Com DTOs, é possível evoluir a estrutura
+                dos dados de sua aplicação sem afetar o contrato da API. Podemos alterar as entidades livremente e
+                adaptar os DTOs conforme necessário, mantendo compatibilidade com os consumidores da API.</p>
+            <p>Além disso, DTOs permitem aplicar validações específicas ao contexto da API, como campos obrigatórios
+                apenas na criação (@NotBlank, @Size, etc.). Isso evita poluir as entidades com validações específicas de
+                entrada de dados e permite uma <strong>validação contextualizada</strong> — útil quando os requisitos de
+                entrada diferem dos requisitos de persistência.</p>
+            <p>Outro ponto importante a se considerar é que muitas vezes a resposta da API precisa incluir dados
+                formatados, campos computados ou até mesmo combinar informações de múltiplas fontes. Com DTOs, você pode
+                criar estruturas sob medida para a resposta da API, como incluir contadores, nomes concatenados,
+                mensagens personalizadas, flags booleanas calculadas etc.</p>
+            <p>Em resumo:</p>
+            <ul>
+                <li>Entidades → representações do banco de dados (persistência)</li>
+                <li>DTOs → representações dos dados trafegados na API (camada de apresentação)</li>
+            </ul>
+            <p>Embora exija mais código inicialmente, o uso de DTOs é considerado boas práticas de engenharia de
+                software, especialmente em APIs públicas, e contribui significativamente para a qualidade do projeto ao
+                longo do tempo. <strong>Existem ao menos duas formas distintas de implementar DTOs</strong>: implementar
+                um DTO para a request e response, ou implementar DTOs distintos para request e response. </p>
+            <p>Há situações em que o uso de um único DTO tanto para entrada (request) quanto para saída (response) é
+                aceitável e até recomendável, especialmente em contextos mais simples. Um exemplo são APIs extremamente
+                simples e estáticas, com poucos endpoints, como um <code>GET /ping</code> ou um
+                <code>POST /login</code>, e que não têm a expectativa de crescimento ou mudanças estruturais — nesse
+                caso, utilizar um único DTO pode economizar tempo e reduzir complexidade. Da mesma forma, em aplicações
+                internas ou protótipos, como APIs utilizadas apenas por desenvolvedores em ambientes controlados (por
+                exemplo, um painel administrativo interno), essa separação pode ser adiada sem comprometer a
+                manutenibilidade ou segurança. Além disso, em situações em que os dados esperados na requisição são
+                exatamente os mesmos que serão retornados na resposta — ou seja, quando não há campos sensíveis,
+                timestamps ou dados internos da aplicação — também é viável utilizar o mesmo DTO para ambos os sentidos,
+                já que não há riscos de exposição indevida ou inconsistência no contrato da API.</p>
+            <p>Por outro lado, existem diversos cenários em que não é recomendado utilizar o mesmo DTO para requisição e
+                resposta. Um desses casos ocorre quando há relacionamentos complexos entre entidades — por exemplo, em
+                estruturas do tipo Cliente → Pedidos → Produtos —, onde o que é enviado ao servidor pode ser bastante
+                diferente do que precisa ser retornado ao cliente. Outro caso comum é quando há lógica de negócios
+                envolvida na resposta, como o cálculo de campos derivados, a exemplo de um campo <code>valorTotal</code>
+                calculado com base na <code>quantidade</code> e no <code>preço</code>. Também é importante separar DTOs
+                quando a aplicação possui múltiplos tipos de clientes consumindo a mesma API, como administradores,
+                usuários públicos ou clientes mobile, que exigem visões distintas do mesmo recurso - nesse tipo de
+                situação o uso de outros padrões, evidentemente, também serão necessários em conjunto com os DTOs. Os
+                abordaremos futuramente na disciplina. Além disso, em aplicações que exigem maior controle sobre
+                segurança e auditoria, é necessário evitar a exposição de dados sensíveis ou internos do sistema, o que
+                torna o uso de DTOs separados uma prática importante para garantir a integridade e a segurança da
+                informação.</p>
+            <p>Nesses casos em que estamos em projetos que buscam segurança, clareza e escalabilidade, separar DTOs para
+                requisição (RequestDTO) e resposta (ResponseDTO) é uma prática recomendada. Uma das principais vantagens
+                dessa separação é evitar a exposição de dados desnecessários ou sensíveis. Com um ResponseDTO,
+                controlamos exatamente quais informações serão retornadas ao cliente, omitindo campos técnicos como
+                <code>createdAt</code>, <code>updatedAt</code>, chaves estrangeiras como <code>contact_id</code>, ou
+                ainda flags de controle interno como <code>isDeleted</code>, <code>isVerified</code> e
+                <code>passwordHash</code>. Esses campos fazem sentido no contexto interno da aplicação e não devem ser
+                expostos externamente.</p>
+            <p>Além disso, essa separação impede que o cliente envie dados que não deveria ou não poderia definir. Por
+                exemplo, no caso de um ContactRequestDTO, o cliente pode fornecer apenas informações como nome, email e
+                endereços, enquanto campos como <code>id</code> ou <code>createdAt</code> devem ser gerados e
+                controlados exclusivamente pelo servidor. Dessa forma, garantimos que o cliente não tenha acesso
+                indevido a propriedades que fogem do seu escopo de atuação.</p>
+            <p>Outro benefício importante está na possibilidade de aplicar validações específicas para os dados de
+                entrada. Os RequestDTOs geralmente utilizam anotações como <code>@NotBlank</code>, <code>@Email</code>,
+                <code>@Size</code> ou <code>@Pattern</code> para garantir a integridade dos dados recebidos, enquanto os
+                ResponseDTOs não exigem esse tipo de validação, já que os dados já passaram por todas as regras de
+                negócio do servidor antes de serem retornados ao cliente. </p>
+            <p>Separar os DTOs também facilita a evolução da API. Com o tempo, novos requisitos podem exigir a inclusão
+                de campos na resposta que não precisam estar presentes na requisição, ou a descontinuação de campos que
+                antes eram obrigatórios na entrada. Além disso, essa separação permite criar diferentes versões do
+                ResponseDTO para públicos distintos, como administradores, usuários finais ou aplicações mobile,
+                adaptando a resposta conforme o contexto de uso.</p>
+            <p>Por fim, ao separar os DTOs, a documentação gerada automaticamente por ferramentas como Swagger ou
+                OpenAPI se torna mais precisa e compreensível. Com contratos distintos para entrada e saída, a API pode
+                ser melhor documentada e mais fácil de entender por desenvolvedores que a consumirão, evitando
+                ambiguidade e promovendo uma comunicação clara entre cliente e servidor.</p>
+            <h3>📌 Em resumo</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Recomendação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>API simples, dados triviais</td>
+                        <td>Pode usar o mesmo DTO</td>
+                    </tr>
+                    <tr>
+                        <td>Aplicação robusta e escalável</td>
+                        <td>Separar request/response</td>
+                    </tr>
+                    <tr>
+                        <td>Dados sensíveis envolvidos</td>
+                        <td>Separar request/response</td>
+                    </tr>
+                    <tr>
+                        <td>Requisitos de validação distintos</td>
+                        <td>Separar request/response</td>
+                    </tr>
+                    <tr>
+                        <td>Uso de Swagger/OpenAPI</td>
+                        <td>Separar para clareza</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Vamos verificar o código-fonte para criação dos DTOs da nossa aplicação. </p>
+            <h3>1.1 🤔 Fazer validações no DTO ou na Entidade?</h3>
+            <p>Em relação a questão de validação mencionada acima, vamos traduzir o exemplo dado nessa discussão muito
+                relevante que ocorreu no Stack Overflow sobre onde colocar as validações no seu sistema: se na
+                <strong>entidade JPA</strong>, se no <strong>DTO</strong>, ou em ambos. <a
+                    href="https://stackoverflow.com/questions/42280355/spring-rest-api-validation-should-be-in-dto-or-in-entity">Spring
+                    REST API validation - should be in DTO or in Entity? (Stack Overflow)</a>.</p>
+            <blockquote>
+                <p>Imagine que você tem uma entidade <code>User</code> com um campo <code>name</code>, e sua lógica de
+                    negócio exige que esse campo nunca seja nulo. Você também tem um <code>UserDTO</code> com o mesmo
+                    campo <code>name</code>.</p>
+                <p>Suponha que todas as suas validações, tanto na entidade quanto no DTO, são feitas utilizando a API
+                    <code>jakarta.validation</code>.</p>
+                <p>Se você validar apenas no controller (ou seja, validar o DTO com <code>@Valid</code>), você estará
+                    protegido contra a persistência de dados inválidos — mas apenas para requisições recebidas. Se
+                    houver um serviço interno que manipule diretamente a entidade (sem passar por uma requisição HTTP,
+                    por exemplo), ele poderá acabar salvando uma entidade inválida no banco de dados sem que você
+                    perceba, a menos que haja uma restrição na própria coluna do banco (como <code>NOT NULL</code>).</p>
+                <p>Então você pode pensar: “OK, vou mover as anotações de validação do DTO para a entidade e pronto!”.
+                    Bem, sim… e não.</p>
+                <p>Se você validar apenas na entidade, você de fato estará protegido tanto contra dados inválidos vindos
+                    de requisições externas quanto contra erros internos na camada de serviço. No entanto, isso pode
+                    trazer um problema de <strong>desempenho</strong>. Segundo Anghel Leonard, no livro <em>Spring Boot
+                        Persistence Best Practices</em>, toda vez que você carrega uma entidade do banco de dados, o
+                    Hibernate consome memória e CPU para manter o estado dessa entidade no contexto de persistência,
+                    mesmo que ela esteja em “modo somente leitura”.</p>
+                <p>Agora pense: se o campo <code>name</code> estiver nulo e você validar isso apenas na entidade, o que
+                    acontece?</p>
+                <ol>
+                    <li>Você inicia uma transação.</li>
+                    <li>Carrega a entidade do banco.</li>
+                    <li>Modifica a entidade.</li>
+                    <li>Tenta persistir.</li>
+                    <li>O Hibernate valida.</li>
+                    <li>A transação é revertida.</li>
+                    <li>E todo esse esforço (bastante custoso) foi feito <strong>só para no fim dar erro e descartar
+                            tudo</strong>.</li>
+                </ol>
+                <p>Isso poderia ter sido evitado com uma validação mais simples e imediata — por exemplo, no DTO,
+                    <strong>antes mesmo de começar qualquer interação com o banco de dados</strong>.&quot;</p>
+            </blockquote>
+            <p>Ou seja, a partir dos argumentos acima fica evidente que uma boa prática é a de validação em ambas as
+                camadas: tanto de transporte, quanto de persistência. O <em>tradeoff</em> é um eventual impacto de
+                performance, mas que pode se mostrar negligente quando considerada a economia de recursos que se obtém
+                evitando-se operações desnecessárias na camada de persistência.</p>
+            <h3>1.2 🤔 Implementar os DTOs como Classes ou por meio de Records?</h3>
+            <p>Ao implementar DTOs (Data Transfer Objects) em Java, podemos optar por duas abordagens principais: o uso
+                de <strong>classes tradicionais</strong> ou de <strong><code>records</code></strong>, um recurso
+                introduzido no Java 14 e estabilizado a partir do Java 16. Ambas as formas cumprem o mesmo propósito —
+                transportar dados entre diferentes camadas da aplicação, como entre a camada de serviço e a camada de
+                apresentação (ou entre client e server) — mas apresentam diferenças significativas quanto à concisão,
+                imutabilidade, compatibilidade e flexibilidade. A escolha entre uma ou outra abordagem depende das
+                necessidades do projeto e das preferências da equipe de desenvolvimento.</p>
+            <h3>DTOs como Classes</h3>
+            <p>A abordagem tradicional utiliza classes Java no estilo POJO (Plain Old Java Object), com atributos
+                privados, métodos getters e setters, construtores e, opcionalmente, sobrescrita de métodos como
+                <code>equals()</code>, <code>hashCode()</code> e <code>toString()</code>. </p>
+            <p><strong>Exemplo:</strong></p>
+            <pre><code class="language-java">public class ContactResponseDTO {
+                private String nome;
+                private String email;
+            
+                public ContactResponseDTO(String nome, String email) {
+                    this.nome = nome;
+                    this.email = email;
+                }
+            
+                public String getNome() {
+                    return nome;
+                }
+            
+                public String getEmail() {
+                    return email;
+                }
+            }
+            </code></pre>
+            <p>A principal vantagem do uso de classes é a <strong>flexibilidade</strong>. Podemos incluir lógica interna
+                nos métodos, adicionar métodos auxiliares, sobrecargar construtores e até mesmo usar herança. Isso
+                permite, por exemplo, criar hierarquias de DTOs ou adicionar comportamentos mais elaborados ao objeto.
+                Além disso, essa abordagem é ideal para sistemas legados ou bibliotecas que exigem POJOs clássicos, como
+                alguns recursos do Jackson em versões mais antigas. Frameworks e projetos em versões antigas do Java
+                podem simplesmente não possuir suporte aos <code>records</code>.</p>
+            <p>Por outro lado, um ponto negativo é o <strong>boilerplate</strong>: classes DTO podem se tornar longas e
+                repetitivas, especialmente em aplicações grandes que lidam com muitos atributos. Isso pode tornar o
+                código mais difícil de manter a longo prazo. Entretanto, é possível diminuir o boilerplate com
+                bibliotecas como o <strong>Lombok</strong>, que veremos nas próximas seções.</p>
+            <h5>Herança em DTOs? 😱</h5>
+            <p>Apesar de termos citado acima que o uso de classes para implementação de DTOs é mais flexível, temos que
+                ter em mente que <strong>a herança em DTOs é um anti-pattern na maioria dos casos ⚠️</strong> </p>
+            <p>Embora tecnicamente <strong>possível</strong>, usar <strong>herança em DTOs geralmente não é
+                    recomendado</strong> — e por um motivo muito importante: <strong>DTOs não representam entidades do
+                    domínio com uma hierarquia semântica &quot;é-um&quot;</strong>, mas sim <strong>estruturas planas e
+                    transitórias de dados</strong> usadas para transporte entre camadas ou sistemas.</p>
+            <h5>🚫 <strong>Por que herança não faz sentido em DTOs na maioria dos casos?</strong></h5>
+            <ol>
+                <li>
+                    <p><strong>Violação do princípio de responsabilidade única</strong><br>DTOs devem ter <strong>uma
+                            única função clara</strong>: transportar dados. Ao adicionar herança, começamos a introduzir
+                        um comportamento &quot;estrutural&quot; que remete à modelagem de domínio — e isso
+                        <strong>mistura responsabilidades</strong> que deveriam estar separadas.</p>
+                </li>
+                <li>
+                    <p><strong>A herança pressupõe uma relação semântica forte (&quot;é-um&quot;)</strong><br>Se criamos
+                        <code>ClienteDTO</code> que herda de <code>PessoaDTO</code>, estamos dizendo que <strong>todo
+                            Cliente é uma Pessoa</strong>, <strong>em todos os contextos</strong>. Mas e se a API de
+                        clientes for consumida por um sistema que <strong>não conhece</strong> o DTO de Pessoa? Ou pior:
+                        e se o DTO de Pessoa tiver campos que não fazem sentido para Cliente?<br>→ Isso quebra o
+                        <strong>princípio da substituição de Liskov</strong> e compromete o reuso.</p>
+                </li>
+                <li>
+                    <p><strong>Aumenta o acoplamento entre componentes</strong><br>A herança cria uma dependência forte
+                        entre DTOs, o que dificulta a manutenção e evolução do código — especialmente em sistemas
+                        distribuídos ou com múltiplos consumidores. Cada alteração na superclasse impacta todas as
+                        subclasses.</p>
+                </li>
+                <li>
+                    <p><strong>Dificulta a documentação, o versionamento e a serialização</strong><br>Ferramentas como
+                        Swagger/OpenAPI perdem clareza ao lidar com hierarquias de DTOs. Além disso, algumas bibliotecas
+                        de serialização (como Jackson) exigem configurações adicionais para lidar com polimorfismo, o
+                        que torna o sistema mais complexo sem necessidade.</p>
+                </li>
+            </ol>
+            <h5>✅ <strong>Composição é a abordagem recomendada</strong></h5>
+            <p><strong>Composição</strong> resolve todos os problemas anteriores: ao invés de herdar de uma superclasse,
+                o DTO <strong>declara explicitamente os campos que precisa</strong>, ou <strong>utiliza outros DTOs como
+                    campos compostos</strong>.</p>
+            <h5>🧱 Exemplo com composição (boa prática):</h5>
+            <pre><code class="language-java">public record PessoaDTO(String nome, String email) {}
+            
+            public record ClienteDTO(PessoaDTO pessoa, String numeroCartaoFidelidade) {}
+            </code></pre>
+            <p>Essa abordagem:</p>
+            <ul>
+                <li>✅ Separa os contextos</li>
+                <li>✅ Reduz acoplamento</li>
+                <li>✅ Torna a API mais clara</li>
+                <li>✅ É mais fácil de manter, testar e documentar</li>
+            </ul>
+            <h5>📌 Quando herança <em>pode</em> ser aceitável?</h5>
+            <p>Em casos como:</p>
+            <ul>
+                <li>Aplicações internas, controladas e pequenas</li>
+                <li>Frameworks que impõem herança em contratos (por exemplo, quando se usa <code>BaseRequestDTO</code>,
+                    <code>BaseResponseDTO</code> com metadados comuns)</li>
+                <li>Ambientes onde a equipe <strong>consciente dos riscos</strong> opta pela herança para <strong>reuso
+                        puramente estrutural</strong></li>
+            </ul>
+            <p>Mesmo assim, <strong>é preciso pesar os custos</strong>, pois esses benefícios normalmente <strong>podem
+                    ser obtidos com composição</strong>, de forma mais segura e modular.</p>
+            <p><strong>DTOs representam dados de transporte, não estruturas de domínio</strong>. E por isso,
+                <strong>usar composição é quase sempre a melhor escolha.</strong></p>
+            <p>🔎 <strong>Lembrem-se sempre</strong>: para fazer boas escolhas técnicas, é essencial <strong>compreender
+                    os conceitos por trás das ferramentas</strong>. Só assim conseguimos tomar decisões conscientes,
+                alinhadas ao propósito do código e às necessidades reais do projeto.</p>
+            <h3>DTOs como Records</h3>
+            <p>Com a introdução dos <code>records</code> no Java, a linguagem passou a oferecer uma maneira muito mais
+                concisa de declarar classes imutáveis que servem unicamente para armazenar dados. Um <code>record</code>
+                em Java automaticamente cria os campos, construtor, métodos getters, além de <code>equals()</code>,
+                <code>hashCode()</code> e <code>toString()</code>.</p>
+            <p><strong>Exemplo:</strong></p>
+            <pre><code class="language-java">public record ContactResponseDTO(String nome, String email) {}
+            </code></pre>
+            <p>O maior benefício do uso de <code>records</code> está na sua simplicidade e imutabilidade. Com poucas
+                linhas, temos uma estrutura de dados clara, imutável e segura, ideal para representar objetos de
+                transporte em APIs REST. Isso se alinha a boas práticas modernas que favorecem a imutabilidade e o uso
+                de objetos simples para troca de dados.</p>
+            <p>No entanto, os <code>records</code> têm suas limitações. Por serem imutáveis, não permitem que seus
+                campos sejam alterados após a construção do objeto, o que pode ser uma barreira em cenários que exigem
+                mutabilidade. Além disso, <code>records</code> não suportam herança (embora possam implementar
+                interfaces) e oferecem menos flexibilidade para incluir lógica interna elaborada. Em frameworks mais
+                antigos ou bibliotecas que esperam um POJO com getters e setters tradicionais, o uso de
+                <code>records</code> pode não funcionar corretamente.</p>
+            <p>🧠 <strong>Mas e em APIs complexas? Posso usar records?</strong></p>
+            <p><strong>Sim! E muitas equipes fazem isso.</strong> A chave está em manter a <strong>função do DTO
+                    simples</strong>: transportar dados. Se você adota uma arquitetura bem separada (com serviços,
+                conversores, validadores e mapeadores bem definidos), o DTO pode — e deve — continuar sendo apenas um
+                recipiente de dados. </p>
+            <p>Exemplo: mesmo em uma API com dezenas de endpoints, como um sistema de e-commerce, é comum encontrar
+                registros como:</p>
+            <pre><code class="language-java">public record ProductResponseDTO(
+                Long id,
+                String nome,
+                BigDecimal preco,
+                int estoqueDisponivel
+            ) {}
+            </code></pre>
+            <p>Ou seja: se o DTO <strong>não precisa de lógica complexa ou mutabilidade</strong>, mesmo em APIs grandes,
+                <strong>o record continua sendo uma excelente escolha</strong>.</p>
+            <h4>Comparativo entre Classes e Records</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Situação</th>
+                        <th>Usar <code>record</code></th>
+                        <th>Usar <code>class</code></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DTO simples (sem lógica)</td>
+                        <td>✅</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Necessidade de lógica de transformação</td>
+                        <td>-</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Integração com bibliotecas legadas</td>
+                        <td>-</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Herança entre tipos de DTO</td>
+                        <td>-</td>
+                        <td>✅</td>
+                    </tr>
+                    <tr>
+                        <td>Aplicações modernas com arquitetura limpa</td>
+                        <td>✅</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>A escolha entre usar <code>records</code> ou classes tradicionais para representar DTOs deve ser feita
+                com base nos requisitos do projeto. Em APIs simples ou aplicações modernas, <code>records</code>
+                costumam ser a escolha ideal por sua concisão e imutabilidade. Já em contextos que compatibilidade com
+                frameworks antigos, as classes ainda são a opção mais robusta.</p>
+            <h2>1.3 ✅ <strong>(Finalmente) Implementando nossos DTOs</strong></h2>
+            <p>Como visto acima, temos duas maneiras de implementar nossos DTOs: com classes ou records. Ao longo da
+                disciplina vamos abordar ambas as formas.</p>
+            <p>Nesse primeiro momento vamos implementar os DTOs de nossa aplicação fazendo o uso de classes e os
+                separaremos em DTOs de <code>Request</code> e DTOs de <code>Response</code>. Vamos usar o
+                <code>ModelMapper</code> para mapear nossos records e utilizar o <code>Lombok</code> para diminuir
+                código boilerplate.</p>
+            <p>Faremos dessa forma por um único motivo: explorar esse tipo de implementação e ferramenta no Java. Nem
+                sempre vamos trabalhar com projetos que utilizam versões modernas da linguagem e, em muitos casos, os
+                sistemas em produção são legados e ainda utilizam Java 8. O Java 17 também é LTS e tem suporte
+                prolongado, mas isso não significa que todos os projetos estejam migrados para ele — e muito menos para
+                o Java 21.</p>
+            <p>Essa abordagem nos permite aprender conceitos fundamentais do ecossistema Java de forma mais completa:
+                veremos como o <code>Lombok</code> pode nos ajudar na redução de código repetitivo, como funcionam os
+                mapeamentos manuais e automáticos com <code>ModelMapper</code>, e entenderemos as diferenças práticas
+                entre uma modelagem com classes e uma com records. Mais adiante, teremos a oportunidade de refatorar os
+                mesmos DTOs utilizando <code>records</code> e comparar os impactos de cada abordagem, tanto na
+                legibilidade quanto na manutenibilidade do código. </p>
+            <p>O <strong>Lombok</strong> é uma biblioteca Java que ajuda a reduzir o código repetitivo (boilerplate) em
+                classes, especialmente em projetos que utilizam muitos DTOs ou modelos com getters, setters,
+                construtores e métodos como <code>toString</code> ou <code>equals</code>. Através de anotações simples o
+                Lombok gera automaticamente esses métodos em tempo de compilação, tornando o código mais limpo, legível
+                e fácil de manter. Ele é amplamente utilizado em aplicações Spring Boot e facilita o desenvolvimento sem
+                comprometer a estrutura da aplicação. As anotações do <strong>Lombok</strong> como <code>@Getter</code>,
+                <code>@Setter</code>, <code>@AllArgsConstructor</code>, <code>@NoArgsConstructor</code> e
+                <code>@Data</code> servem para eliminar a repetição de código &quot;boilerplate&quot; nas classes Java.
+            </p>
+            <ul>
+                <li><code>@Getter</code> e <code>@Setter</code> geram automaticamente os métodos <em>get</em> e
+                    <em>set</em> para todos os atributos da classe (ou para um atributo específico, se usados
+                    diretamente sobre ele). </li>
+                <li><code>@NoArgsConstructor</code> cria um construtor sem argumentos (necessário, por exemplo, para
+                    frameworks como o JPA). </li>
+                <li><code>@AllArgsConstructor</code> gera um construtor com todos os atributos da classe como
+                    parâmetros. </li>
+                <li><code>@Data</code> combina várias anotações úteis: <code>@Getter</code>, <code>@Setter</code>,
+                    <code>@ToString</code>, <code>@EqualsAndHashCode</code> e <code>@RequiredArgsConstructor</code>,
+                    cobrindo boa parte das necessidades de uma classe simples de modelo ou DTO.</li>
+            </ul>
+            <p>Essas anotações deixam o código mais limpo, reduzindo a verbosidade típica do Java.</p>
+            <p>Para configurar a biblioteca <strong>Lombok</strong>, adicione a seguinte dependência no
+                <code>pom.xml</code>:</p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+                &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+                &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+                &lt;version&gt;1.18.28&lt;/version&gt;
+                &lt;scope&gt;provided&lt;/scope&gt;
+            &lt;/dependency&gt;
+            </code></pre>
+            <p>Em nosso contexto, de uma aplicação pequena e com pouquíssimas regras de negócio, entretanto, é
+                importante salientar que <strong>não faz sentido adotar uma implementação mais complexa a não ser por
+                    fins pedagógicos de demonstração de estruturas e ferramentas</strong>, o que é exatamente nosso
+                caso. Poderíamos tranquilamente criar os getters e setters &quot;na mão&quot; sem grande prejuízo de
+                tempo. </p>
+            <p>É preciso entender que optar por estruturas excessivamente sofisticadas em sistemas simples pode nos
+                levar ao chamado Overengineering — ou “superengenharia”. Esse termo descreve a prática de criar soluções
+                desnecessariamente complexas para problemas simples. Em vez de facilitar, o excesso de abstrações,
+                padrões ou camadas técnicas pode dificultar a manutenção, tornar o código mais difícil de entender e até
+                mesmo atrapalhar a produtividade da equipe.</p>
+            <p>Em outras palavras: só porque algo é possível tecnicamente, não significa que seja a melhor escolha para
+                aquele momento ou projeto. Ou, como diria sua mãe: não é porque você pode, que você deve. Uma
+                arquitetura deve ser proporcional à complexidade e às necessidades da aplicação. Por isso, ainda que
+                exploremos ferramentas como DTOs separados, mapeamentos automáticos e uso de bibliotecas auxiliares, é
+                essencial entender que essas decisões devem sempre ser tomadas com base no contexto, na equipe e nos
+                objetivos do sistema — e não apenas por modismos ou pelo desejo de usar todas as tecnologias
+                disponíveis.</p>
+            <p>Dito isso, e entendendo o contexto em que nossa aplicação está inserida, vamos organizar nossos DTOs por
+                meio da seguinte <strong>📁 Estrutura de Diretórios</strong></p>
+            <pre><code>src/
+            └── main/
+                └── java/
+                    └── br/
+                        └── ifsp/
+                            └── contacts/
+                                ├── config/
+                                │   └── MapperConfig.java
+                                ├── dto/
+                                │   ├── contact/
+                                │   │   ├── ContactRequestDTO.java
+                                │   │   ├── ContactResponseDTO.java
+                                │   │   └── ContactPatchDTO.java
+                                │   │
+                                │   └── address/
+                                │       ├── AddressRequestDTO.java
+                                │       └── AddressResponseDTO.java
+            </code></pre>
+            <p>✨ Separar os DTOs em <code>Request</code> e <code>Response</code> nos ajuda a ter mais <strong>clareza e
+                    controle sobre o fluxo de dados</strong> que entra e sai da nossa aplicação. Perceba, também, que
+                iremos criar um <code>ContactPatchDTO</code>, que será utilizado para atualizarmos um contato por meio
+                de uma requisição <code>PATCH</code>. Os motivos para isso serão explorados quando abordarmos sua
+                implementação. 🧑🏻‍💻</p>
+            <p>Vamos começar a explorar as implementações pelos DTOs que transportam os endereços.</p>
+            <h3>✅ DTOs de Endereço (<code>Address</code>)</h3>
+            <h3>📥 <code>AddressRequestDTO.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.contacts.dto.address;
+            
+            @Data
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public class AddressRequestDTO {
+                    @NotBlank(message = &quot;A rua não pode estar vazia&quot;)
+                    String rua;
+            
+                    @NotBlank(message = &quot;A cidade não pode estar vazia&quot;)
+                    String cidade;
+            
+                    @NotBlank(message = &quot;O estado não pode estar vazio&quot;)
+                    @Size(min = 2, max = 2, message = &quot;O estado deve ter exatamente 2 letras&quot;)
+                    @Pattern(regexp = &quot;[A-Z]{2}&quot;, message = &quot;O estado deve ser representado por duas letras maiúsculas&quot;)
+                    String estado;
+            
+                    @NotBlank(message = &quot;O CEP não pode estar vazio&quot;)
+                    @Pattern(regexp = &quot;\\d{5}-\\d{3}&quot;, message = &quot;O CEP deve estar no formato 99999-999&quot;)
+                    String cep;
+            }
+            </code></pre>
+            <p>Esse DTO, implementado como <strong>classe com Lombok</strong>, representa o <strong>corpo da
+                    requisição</strong> para criação ou atualização de um endereço. Ele contém apenas os campos que o
+                cliente deve fornecer, com anotações de validação para garantir a integridade dos dados enviados.</p>
+            <h4>📤 <code>AddressResponseDTO.java</code></h4>
+            <pre><code class="language-java">package br.ifsp.contacts.dto.address;
+            
+            @Data
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public class AddressResponseDTO {
+                    private Long id;
+                    private String rua;
+                    private String cidade;
+                    private String estado;
+                    private String cep;
+            }
+            </code></pre>
+            <p>Essa <strong>classe</strong> representa a <strong>resposta que a API retorna</strong> ao cliente. Com o
+                uso do Lombok, eliminamos boilerplate como getters e construtores. O campo <code>id</code> é incluído
+                porque se trata de um dado <strong>gerado pelo sistema</strong> e importante para a leitura e
+                manipulação dos dados pelo consumidor da API.</p>
+            <h3>✅ DTOs de Contato (<code>Contact</code>)</h3>
+            <h3>📥 <code>ContactRequestDTO.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.contacts.dto.contact;
+            
+            @Data
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public class ContactRequestDTO {
+                    @NotBlank(message = &quot;O nome não pode estar vazio&quot;)
+                    private String nome;
+            
+                    @NotBlank(message = &quot;O email não pode estar vazio&quot;)
+                    @Email(message = &quot;Formato de email inválido&quot;)
+                    private String email;
+            
+                    @NotBlank(message = &quot;O telefone não pode estar vazio&quot;)
+                    @Size(min = 8, max = 15, message = &quot;O telefone deve ter entre 8 e 15 caracteres&quot;)
+                    @Pattern(regexp = &quot;\\d+&quot;, message = &quot;O telefone deve conter apenas números&quot;)
+                    private String telefone;
+            
+                    @NotEmpty(message = &quot;O contato deve ter pelo menos um endereço&quot;)
+                    private List&lt;AddressRequestDTO&gt; addresses;
+            }
+            </code></pre>
+            <p>A classe <code>ContactRequestDTO</code> representa os dados que o cliente envia para <strong>criar ou
+                    atualizar</strong> um contato. A estrutura mantém as validações exigidas pela aplicação e requer
+                pelo menos um endereço, garantindo a integridade dos dados recebidos pela API.</p>
+            <h3>📤 <code>ContactResponseDTO.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.contacts.dto.contact;
+            
+            @Data
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public class ContactResponseDTO {
+                    private Long id;
+                    private String nome;
+                    private String email;
+                    private String telefone;
+                    private List&lt;AddressResponseDTO&gt; addresses;
+            }
+            </code></pre>
+            <p>O <code>ContactResponseDTO</code> representa os dados que a API retorna ao cliente ao consultar um
+                contato. Ele inclui o <code>id</code>, informações pessoais do contato (nome, email, telefone) e a lista
+                de endereços associados, já convertidos para <code>AddressResponseDTO</code>. É usado exclusivamente
+                para <strong>respostas</strong> e nunca para envio de dados ao servidor.</p>
+            <h3>📤 <code>ContactPatchDTO.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.contacts.dto.contact;
+            
+            @Data
+            @NoArgsConstructor
+            @AllArgsConstructor
+            public class ContactPatchDTO {
+                private Optional&lt;String&gt; nome = Optional.empty();
+                private Optional&lt;String&gt; email = Optional.empty();
+                private Optional&lt;String&gt; telefone = Optional.empty();
+            }
+            </code></pre>
+            <p>O <code>ContactPatchDTO</code> foi criado especificamente para atender ao <strong>endpoint
+                    PATCH</strong>, que permite <strong>atualizações parciais</strong> de um recurso — no nosso caso, um
+                <code>Contact</code>.</p>
+            <p>Usamos <code>Optional&lt;String&gt;</code> em cada campo para representar claramente a <strong>presença
+                    ou ausência de um valor na requisição</strong>. Isso nos ajuda a:</p>
+            <ul>
+                <li>Saber se o cliente quer ou não atualizar determinado campo.</li>
+                <li>Evitar atualizar campos com <code>null</code> acidentalmente.</li>
+                <li>Tornar o código de atualização mais expressivo e seguro, sem precisar verificar <code>null</code>
+                    diretamente.</li>
+            </ul>
+            <p>Criamos um DTO exclusivo para PATCH pelos seguintes motivos:</p>
+            <ul>
+                <li>O PATCH não exige todos os campos (como <code>nome</code>, <code>email</code> e
+                    <code>telefone</code>), mas sim <strong>somente os que o cliente deseja modificar</strong>.</li>
+                <li>Os DTOs de <code>Request</code> e <code>Response</code> são pensados para representar requisições
+                    completas (POST/PUT) e respostas completas (GET).</li>
+                <li>Um DTO exclusivo com <code>Optional</code> representa perfeitamente a <strong>semântica de
+                        atualização parcial</strong>, garantindo clareza no contrato da API e facilitando a manutenção e
+                    validação.</li>
+            </ul>
+            <p>Essa abordagem torna a API mais robusta, bem documentada, e alinhada às boas práticas de desenvolvimento
+                RESTful.</p>
+            <h2>1.4 ✡️ Conversão entre Entidades e DTOs</h2>
+            <p>Fazer a conversão entre entidades e DTOs é uma prática fundamental em APIs bem projetadas. Para reforçar
+                o que vimos anteriormente: as entidades representam o modelo de domínio da aplicação e contêm toda a
+                lógica de negócios e mapeamento com o banco de dados, incluindo relacionamentos complexos, anotações de
+                persistência e campos internos que não devem ser expostos. Já os DTOs (Data Transfer Objects) são
+                estruturas mais simples, voltadas exclusivamente para transportar dados entre o cliente e o servidor.
+            </p>
+            <p>Quando recebemos uma requisição ou retornamos uma resposta, portanto, queremos converter os dados de uma
+                Entidade para um DTO e vice-versa. Para facilitar esse processo de conversão e evitar a escrita manual
+                de código repetitivo, podemos utilizar a biblioteca <strong>ModelMapper</strong>, que mapeia
+                automaticamente os campos entre objetos com nomes semelhantes. Ela ajuda a manter o código limpo e
+                padronizado, além de reduzir erros e acelerar o desenvolvimento. Por isso, configuramos um
+                <code>@Bean</code> do ModelMapper na classe principal da aplicação, permitindo que ele seja injetado e
+                utilizado em qualquer parte do sistema para conversões consistentes entre entidades e DTOs.</p>
+            <p>No contexto do Spring Framework, um <em>Bean</em> é um objeto cuja instância é criada, configurada e
+                gerenciada automaticamente pelo Spring, por meio do seu container de Inversão de Controle (IoC). Quando
+                anotamos um método com <code>@Bean</code>, estamos informando ao Spring que o objeto retornado por
+                aquele método deve ser registrado no contexto da aplicação como um componente gerenciado. Isso significa
+                que o Spring cuidará do ciclo de vida desse objeto e permitirá que ele seja injetado em outras partes do
+                sistema com o uso da anotação <code>@Autowired</code>.</p>
+            <p>Por exemplo, ao configurarmos um método <code>modelMapper()</code> anotado com <code>@Bean</code>, o
+                Spring criará uma instância da classe <code>ModelMapper</code>, armazenará essa instância em seu
+                contexto interno e a disponibilizará para uso em toda a aplicação. Quando uma classe precisar de um
+                <code>ModelMapper</code>, basta declarar um campo anotado com <code>@Autowired</code>, e o Spring se
+                encarregará de injetar a instância configurada.</p>
+            <p>Esse comportamento tem várias vantagens. Primeiro, evita a criação repetida de instâncias de objetos que
+                poderiam ser reaproveitados, promovendo reutilização e economia de recursos. Além disso, ao centralizar
+                a criação e configuração dos objetos, favorece a manutenção e o teste do código, já que os componentes
+                não são fortemente acoplados às suas dependências. Em outras palavras, os beans contribuem para uma
+                arquitetura mais flexível, coesa e desacoplada, permitindo que o desenvolvedor foque na lógica de
+                negócio em vez de se preocupar com detalhes de instanciamento e configuração.</p>
+            <h3>🛑 ESPERE! Antes de prosseguir, vamos relembrar os conceitos de Inversão de Controle e Injeção de
+                Dependência</h3>
+            <p>Os termos &quot;container de inversão de controle&quot; (IoC Container) e &quot;container de injeção de
+                dependência&quot; (DI Container) são frequentemente utilizados como sinônimos, e essa confusão é
+                compreensível, já que ambos os conceitos estão intimamente relacionados. No entanto, existe uma
+                distinção sutil entre eles que ajuda a compreender melhor o funcionamento interno do Spring e de
+                frameworks semelhantes.</p>
+            <p>Inversão de Controle (IoC) é um princípio de design que propõe uma mudança na forma como o código lida
+                com a criação e o gerenciamento de objetos. Em vez de o próprio código instanciar e controlar seus
+                objetos diretamente, essa responsabilidade é delegada a um container, que passa a cuidar desse processo.
+                Esse container é o IoC Container, responsável por instanciar classes, resolver e injetar dependências,
+                inicializar objetos e gerenciar seu ciclo de vida ao longo da execução da aplicação. O programador,
+                portanto, apenas declara o que precisa, e o container provê as instâncias apropriadas no momento
+                adequado.</p>
+            <p>Dentro desse processo, a injeção de dependência (DI) surge como uma técnica concreta para realizar a
+                inversão de controle. Por meio da injeção de dependência, o container fornece automaticamente as
+                dependências que uma classe necessita — geralmente serviços, repositórios ou outras estruturas — sem que
+                a própria classe tenha que criá-las. Isso pode ser feito de diferentes formas: via construtor, via
+                métodos <code>set</code>, ou até diretamente nos atributos da classe, por meio de anotações como
+                <code>@Autowired</code>.</p>
+            <p>O IoC Container, portanto, representa um conceito mais amplo, englobando todo o gerenciamento dos
+                componentes da aplicação, enquanto o DI Container é um subconjunto especializado dessa infraestrutura,
+                focado exclusivamente no fornecimento de dependências entre objetos. Podemos dizer que todo DI Container
+                é um IoC Container, mas o inverso não é necessariamente verdadeiro, já que a inversão de controle vai
+                além da simples injeção — ela pode envolver, por exemplo, a gestão do ciclo de vida dos objetos,
+                configuração dinâmica, escopos, eventos, aspectos transversais (AOP), entre outros recursos.</p>
+            <p>No contexto do Spring Framework, essa estrutura é implementada principalmente pelas interfaces
+                <code>ApplicationContext</code> e <code>BeanFactory</code>. O Spring oferece um IoC Container completo,
+                com suporte robusto à injeção de dependência. Quando utilizamos anotações como <code>@Component</code>,
+                <code>@Autowired</code> ou declaramos um <code>@Bean</code> em uma classe de configuração, estamos, na
+                prática, utilizando a funcionalidade de DI provida pelo IoC Container do Spring para automatizar a
+                construção e o fornecimento dos nossos objetos de forma segura, reutilizável e desacoplada.</p>
+            <p>Portanto, o IoC Container é a base sobre a qual o Spring se estrutura, e a injeção de dependência é uma
+                das principais ferramentas disponíveis nesse modelo. Essa arquitetura nos permite construir aplicações
+                mais limpas, testáveis e de fácil manutenção, separando claramente a lógica de negócio da infraestrutura
+                e tornando o código mais declarativo e orientado a contratos.</p>
+            <p>Para mais informações, consulte a <a
+                    href="https://docs.spring.io/spring-framework/reference/core/beans/introduction.html">Introdução aos
+                    Beans no Spring Framework</a>.</p>
+            <p>Entendidas as diferenças entre IoC e DI, vamos continuar o que estávamos fazendo anteriormente: a
+                implementação do ModelMapper em nosso projeto.</p>
+            <h3>Como configurar o ModelMapper?</h3>
+            <p>Para configurar a biblioteca <strong>ModelMapper</strong>, adicione a seguinte dependência no
+                <code>pom.xml</code>:</p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+                &lt;groupId&gt;org.modelmapper&lt;/groupId&gt;
+                &lt;artifactId&gt;modelmapper&lt;/artifactId&gt;
+                &lt;version&gt;3.1.1&lt;/version&gt;
+            &lt;/dependency&gt;
+            </code></pre>
+            <p>Configure o bean na classe <code>MapperConfig</code>, criada no pacote config:</p>
+            <pre><code class="language-java">package br.ifsp.contacts.config;
+            
+            @Configuration
+            public class MapperConfig {
+            
+                    @Bean
+                    public ModelMapper modelMapper() {
+                            ModelMapper modelMapper = new ModelMapper();
+                            return modelMapper;
+                    }
+            }
+            </code></pre>
+            <p>Agora temos que atualizar nossos controllers para utilizarmos os DTOs em nossas requisições e respostas
+                ao invés das Entidades.</p>
+            <p>Será que você consegue, a partir das configurações acima, refatorar os controllers da nossa aplicação? 🤓
+            </p>
+            <p>Para evitar duplicação de apresentação código (e também mais uma refatoração, já que temos que adicionar
+                a paginação no próximo exercício!), vamos apresentá-los posteriormente. De qualquer forma, dê uma
+                pausinha e caso não tenha conseguido fazer os exercícios da última aula, tente refatorar os controllers
+                para que trabalhem com nossos DTOs.</p>
+            <hr>
+            <h2>2. 📖 Paginação e Ordenação</h2>
+            <p>A paginação é uma prática importante no desenvolvimento de APIs que lidam com grandes volumes de dados,
+                pois permite que esses dados sejam entregues em partes menores, conhecidas como páginas. Ao invés de
+                retornar todos os registros de uma só vez, a API responde com uma fração controlada deles, o que melhora
+                o desempenho da aplicação, reduz o uso de memória e otimiza o tempo de resposta — tanto no servidor
+                quanto para o usuário final. Isso tem impacto direto na experiência do usuário, pois garante que as
+                informações sejam carregadas de forma mais rápida e fluida, mesmo em dispositivos com recursos limitados
+                ou conexões de rede lentas.</p>
+            <p>Um dos conceitos associados a esse comportamento é o <em>lazy loading</em>, ou carregamento sob demanda.
+                Em vez de carregar todos os dados logo de início, o sistema busca apenas os dados necessários naquele
+                momento (por exemplo, os 10 primeiros itens) e carrega os próximos à medida que o usuário interage com a
+                aplicação, como ao rolar a página. Isso evita sobrecarga no frontend e garante uma melhor percepção de
+                velocidade por parte do usuário.</p>
+            <p>No ecossistema Spring, a paginação é implementada através das interfaces <code>Pageable</code> e
+                <code>Page</code>. A interface <code>Pageable</code> representa a requisição de uma página específica e
+                carrega as informações sobre qual página foi solicitada, qual o tamanho da página e quais os critérios
+                de ordenação. O Spring monta automaticamente esse objeto com base em parâmetros da URL, como
+                <code>page=0&amp;size=10&amp;sort=nome,asc</code>. Já a interface <code>Page&lt;T&gt;</code> é a
+                resposta retornada quando utilizamos um método paginado no repositório. Ela contém tanto a lista de
+                dados quanto metadados relevantes, como o número total de elementos, total de páginas, número da página
+                atual e o tamanho da página.</p>
+            <p>Do ponto de vista do backend e dos acessos ao banco de dados, a paginação também é extremamente benéfica.
+                Consultas paginadas geram instruções SQL otimizadas com <code>LIMIT</code> e <code>OFFSET</code>, o que
+                significa que o banco só precisa retornar exatamente a quantidade solicitada de dados — e não a tabela
+                inteira. Isso diminui significativamente a pressão sobre o banco de dados, melhora a escalabilidade da
+                aplicação e torna os sistemas mais preparados para lidar com múltiplos acessos simultâneos. Ou seja, a
+                paginação é uma estratégia técnica e de usabilidade que traz vantagens tanto para a infraestrutura
+                quanto para a experiência do usuário. Ela reduz o tráfego de rede, o tempo de carregamento das
+                informações e o uso de recursos computacionais, enquanto aumenta a escalabilidade e a clareza da
+                navegação em APIs REST.</p>
+            <p>O Spring Data JPA, por padrão, utiliza a contagem zero-based (ou seja, começa na página 0). No entanto,
+                você pode manipular o valor do parâmetro <code>page</code> recebido na controller, subtraindo 1 antes de
+                construir o <code>Pageable</code>. Por exemplo, eventualmente em nossa implementação poderíamos fazer
+                algo como:</p>
+            <pre><code class="language-java">@GetMapping
+            public ResponseEntity&lt;Page&lt;ContactResponseDTO&gt;&gt; getPaginatedContacts(
+                    @RequestParam(defaultValue = &quot;1&quot;) @Min(1) int page,
+                    @RequestParam(defaultValue = &quot;10&quot;) int size,
+                    @RequestParam(defaultValue = &quot;nome&quot;) String sort,
+                    @RequestParam(defaultValue = &quot;asc&quot;) String direction
+            ) {
+                Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+                Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sortDirection, sort));
+            
+                Page&lt;ContactResponseDTO&gt; resultPage = contactService.getAllPaginated(pageable);
+            
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(resultPage);
+            }
+            </code></pre>
+            <p>Essa adaptação mantém a semântica de uso mais amigável para o usuário (paginação a partir de 1) sem
+                alterar a lógica da infraestrutura do Spring (que continua baseada no zero). É uma prática recomendada
+                para sistemas com UI paginada, como painéis administrativos, apps ou sites públicos com listagens.</p>
+            <p>O método acima é um exemplo interessante de onde podemos eventualmente chegar em nosso sistema. Por hora,
+                entretanto, vamos começar da maneira mais simples </p>
+            <h3>2.1 ✅ <strong>Implementação da paginação</strong></h3>
+            <p>Como vimos acima, o Spring Data JPA facilita bastante a implementação de paginação por meio das
+                interfaces <code>Page</code> e <code>Pageable</code>. Vamos implementá-las alterando, primeiro, nossos
+                repositórios e fazendo com que nossas queries retornem <code>Page</code>.</p>
+            <h4>Modificando os Repositórios</h4>
+            <p>Para paginar os resultados, basta que os métodos dos repositórios retornem um objeto
+                <code>Page&lt;T&gt;</code>. O Spring cuida do resto! Vamos atualizar ambos repositórios de nossa
+                aplicação.</p>
+            <p><strong><code>AddressRepository.java</code></strong></p>
+            <pre><code class="language-java">@Repository
+            public interface AddressRepository extends JpaRepository&lt;Address, Long&gt; {
+                Page&lt;Address&gt; findByContactId(Long contactId, Pageable pageable);
+            }
+            </code></pre>
+            <p>👉 Esse método agora retorna uma <code>Page</code> de endereços, filtrando por <code>contactId</code> e
+                aplicando paginação via o parâmetro <code>Pageable</code>, que será montado no controller a partir dos
+                parâmetros da URL.</p>
+            <p><strong><code>ContactRepository.java</code></strong></p>
+            <pre><code class="language-java">@Repository
+            public interface ContactRepository extends JpaRepository&lt;Contact, Long&gt; {
+                Page&lt;Contact&gt; findByNomeContainingIgnoreCase(String nome, Pageable pageable);
+            }
+            </code></pre>
+            <p>👉 Aqui, o método busca contatos que contenham o nome informado (ignorando maiúsculas e minúsculas),
+                retornando os dados em formato paginado também. A interface <code>Pageable</code> pode incluir, além da
+                página e quantidade de itens, a ordenação.</p>
+            <h4>Atualizando os Controllers</h4>
+            <p><strong><code>ContactController.java</code></strong></p>
+            <p>Método <code>searchContactsByName</code></p>
+            <pre><code class="language-java">    @GetMapping(&quot;/search&quot;)
+                public Page&lt;ContactResponseDTO&gt; searchContactsByName(@RequestParam String name, Pageable pageable) {
+                    return contactRepository.findByNomeContainingIgnoreCase(name, pageable)
+                            .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+                }
+            </code></pre>
+            <p>🧠 <strong>Explicação</strong>:<br>Esse endpoint recebe dois parâmetros:</p>
+            <ul>
+                <li><code>name</code> → termo de busca (obrigatório)</li>
+                <li><code>pageable</code> → automaticamente preenchido pelo Spring com base nos parâmetros da URL
+                    (<code>page</code>, <code>size</code>, <code>sort</code>, etc.)</li>
+            </ul>
+            <p>O método retorna uma <code>Page</code> de <code>ContactResponseDTO</code>, convertendo os objetos
+                <code>Contact</code> usando o <code>ModelMapper</code>.</p>
+            <p>📌 <strong>Exemplo de requisição no Postman</strong>:</p>
+            <pre><code>GET http://localhost:8080/api/contacts/search?name=ana&amp;page=0&amp;size=5&amp;sort=nome,asc
+            </code></pre>
+            <p>Método <code>getAllContacts</code></p>
+            <pre><code class="language-java">@GetMapping
+            public Page&lt;ContactDTO&gt; getAllContacts(
+                    @RequestParam(defaultValue = &quot;0&quot;) int page,
+                    @RequestParam(defaultValue = &quot;10&quot;) int size,
+                    @RequestParam(defaultValue = &quot;nome&quot;) String sort) {
+                
+                Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+                Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
+                return contacts.map(contact -&gt; modelMapper.map(contact, ContactDTO.class));
+            }
+            </code></pre>
+            <p>🧠 <strong>Explicação</strong>:<br>Aqui criamos manualmente o <code>Pageable</code> com:</p>
+            <ul>
+                <li><code>page</code> → número da página (inicia em 0)</li>
+                <li><code>size</code> → número de registros por página</li>
+                <li><code>sort</code> → campo para ordenação (ex: nome, email)</li>
+            </ul>
+            <p>Usamos o método <code>findAll()</code> do <code>JpaRepository</code>, que aceita um <code>Pageable</code>
+                e retorna um <code>Page</code>. Depois, mapeamos os objetos da entidade para DTOs.</p>
+            <p>📌 <strong>Exemplo de requisição no Postman</strong>:</p>
+            <pre><code>GET http://localhost:8080/api/contacts?page=1&amp;size=5&amp;sort=email
+            </code></pre>
+            <p><strong><code>AddressController.java</code></strong></p>
+            <p>Método <code>getAddressesByContact</code></p>
+            <pre><code class="language-java">    @GetMapping(&quot;/contacts/{contactId}&quot;)
+                public Page&lt;AddressResponseDTO&gt; getAddressesByContact(@PathVariable Long contactId, Pageable pageable) {
+                    return addressRepository.findByContactId(contactId, pageable)
+                            .map(address -&gt; modelMapper.map(address, AddressResponseDTO.class));
+                }
+            </code></pre>
+            <p>🧠 <strong>Explicação</strong>:<br>Esse endpoint retorna os endereços de um contato específico, também de
+                forma paginada.</p>
+            <p>📌 <strong>Exemplo no Postman</strong>:</p>
+            <pre><code>GET http://localhost:8080/api/addresses/contacts/2?page=0&amp;size=3&amp;sort=cidade,desc
+            </code></pre>
+            <p>Aqui, buscamos os endereços do contato com ID 2, na <strong>primeira página</strong>, com <strong>3
+                    endereços por página</strong>, ordenados por <strong>cidade (em ordem decrescente)</strong>.</p>
+            <h3>✅ Resumo prático:</h3>
+            <ul>
+                <li>Use <code>Page&lt;T&gt;</code> como tipo de retorno nos repositórios.</li>
+                <li>Construa ou injete <code>Pageable</code> nos controladores.</li>
+                <li>O método <code>.map()</code> de <code>Page</code> facilita a conversão de entidades para DTOs.</li>
+                <li>Parâmetros de paginação são passados via URL e entendidos automaticamente pelo Spring.</li>
+            </ul>
+            <p>Até que não foi tão difícil implementar a paginação, né? O Spring realmente nos ajuda bastante com essa
+                infraestrutura de requisitos que dão suporte às funcionalidades de nossa aplicação. Essa é a vantagem de
+                utilizar um framework robusto ao invés de fazer tudo &quot;na mão&quot;. Por outro lado, é importante
+                não ficar muito confortável e dependente das ferramentas sem saber como elas funcionam por baixo dos
+                panos. Tente imaginar: como poderíamos implementar uma versão rudimentar de paginação sem uso das
+                interfaces já fornecidas pelo Spring? 💭</p>
+            <p>Reflita um pouco antes de passar à próxima seção.</p>
+            <hr>
+            <h2>3. 📖 Implementação de Banco de Dados</h2>
+            <p>Até este ponto da aplicação, utilizamos um banco de dados em memória, geralmente o H2, que é configurado
+                automaticamente pelo Spring Boot durante o desenvolvimento. Essa abordagem é útil para testes rápidos,
+                pois dispensa instalação e configuração de servidores de banco, mas os dados são perdidos ao reiniciar a
+                aplicação, e não é adequada para ambientes de produção ou para testes mais realistas.</p>
+            <p>Agora, vamos configurar a aplicação para utilizar um banco de dados relacional real, como o MySQL ou o
+                PostgreSQL, garantindo persistência de dados entre execuções, maior controle sobre o ambiente e maior
+                proximidade com cenários do mundo real.</p>
+            <h3>🔧 Passo 1 – Adicionando a dependência no <code>pom.xml</code></h3>
+            <p>A primeira etapa é incluir a dependência do driver JDBC correspondente ao banco de dados escolhido.
+                Exemplo com <strong>MySQL</strong>:</p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+                &lt;groupId&gt;com.mysql&lt;/groupId&gt;
+                &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+                &lt;version&gt;8.0.33&lt;/version&gt;
+            &lt;/dependency&gt;
+            </code></pre>
+            <p>Se preferir usar <strong>PostgreSQL</strong>, a dependência seria:</p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+                &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+                &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+                &lt;version&gt;42.5.1&lt;/version&gt;
+            &lt;/dependency&gt;
+            </code></pre>
+            <h3>⚙️ Passo 2 – Configurando a conexão no <code>application.properties</code></h3>
+            <p>Em seguida, precisamos fornecer ao Spring os dados de conexão do banco de dados real. Supondo o uso de
+                MySQL, configure o arquivo <code>src/main/resources/application.properties</code> com:</p>
+            <pre><code class="language-properties">spring.datasource.url=jdbc:mysql://localhost:3306/contacts_db
+            spring.datasource.username=root
+            spring.datasource.password=123456
+            spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+            
+            # Configuração do JPA
+            spring.jpa.hibernate.ddl-auto=update
+            spring.jpa.show-sql=true
+            spring.jpa.properties.hibernate.format_sql=true
+            spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+            </code></pre>
+            <p>Vamos entender essa configuração acima linha por linha.</p>
+            <pre><code class="language-properties">spring.datasource.url=jdbc:mysql://localhost:3306/contacts_db
+            </code></pre>
+            <p>Essa linha define a <strong>URL de conexão JDBC</strong> com o banco de dados MySQL. No exemplo, estamos
+                nos conectando a um banco chamado <code>contacts_db</code> hospedado no próprio computador
+                (<code>localhost</code>) na porta padrão do MySQL (<code>3306</code>).</p>
+            <pre><code class="language-properties">spring.datasource.username=root
+            spring.datasource.password=123456
+            </code></pre>
+            <p>Essas duas linhas especificam as <strong>credenciais de acesso</strong> ao banco de dados — no caso, o
+                usuário <code>root</code> e a senha <code>123456</code>. Esses dados devem ser ajustados conforme a
+                configuração do seu ambiente.</p>
+            <pre><code class="language-properties">spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+            </code></pre>
+            <p>Aqui, indicamos explicitamente a <strong>classe do driver JDBC</strong> que será usada para se comunicar
+                com o banco MySQL. Essa linha nem sempre é obrigatória, pois o Spring Boot costuma inferi-la
+                automaticamente a partir da URL de conexão, mas é uma boa prática incluí-la para evitar ambiguidades.
+            </p>
+            <pre><code class="language-properties">spring.jpa.hibernate.ddl-auto=update
+            </code></pre>
+            <p>Essa opção instrui o <strong>Hibernate</strong> (a implementação de JPA utilizada pelo Spring Boot) a
+                <strong>atualizar automaticamente o esquema do banco</strong> com base nas entidades da aplicação. Ou
+                seja, se você adicionar um campo ou uma nova entidade, o banco será modificado para refletir isso na
+                próxima inicialização. Para ambientes de produção, recomenda-se evitar <code>update</code> e usar
+                <code>validate</code>, <code>none</code> ou controlar via ferramentas de versionamento de schema como
+                <strong>Flyway</strong> ou <strong>Liquibase</strong>.</p>
+            <pre><code class="language-properties">spring.jpa.show-sql=true
+            </code></pre>
+            <p>Essa linha ativa o <strong>log das instruções SQL</strong> executadas pelo Hibernate no console. Isso
+                ajuda bastante durante o desenvolvimento, pois permite verificar o que está sendo enviado ao banco de
+                dados.</p>
+            <pre><code class="language-properties">spring.jpa.properties.hibernate.format_sql=true
+            </code></pre>
+            <p>Aqui, ativamos a <strong>formatação das queries SQL</strong> no console, deixando-as mais legíveis (com
+                quebras de linha e indentação).</p>
+            <pre><code class="language-properties">spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+            </code></pre>
+            <p>Por fim, essa linha define o <strong>dialeto SQL</strong> que o Hibernate deve usar. O dialeto adapta a
+                geração de queries de acordo com as particularidades do banco (sintaxe, funções, tipos de dados etc). No
+                caso, estamos dizendo para o Hibernate usar o <strong>dialeto específico do MySQL 8</strong>.</p>
+            <p>Essa configuração completa conecta o Spring Boot a um banco de dados relacional real, garante
+                persistência de dados e permite que o Hibernate cuide do mapeamento entre as classes Java e as tabelas
+                no banco.</p>
+            <p><strong>Atenção! Essa configuração pode mudar dependendo da versão de seu banco de dados e do SO de sua
+                    máquina‼️</strong></p>
+            <p>No meu notebook (OS X) a configuração ficou da seguinte forma:</p>
+            <pre><code># MySQL Database Configuration
+            spring.datasource.url=jdbc:mysql://localhost:3306/contacts_db?useSSL=false&amp;serverTimezone=UTC
+            spring.datasource.username=user
+            spring.datasource.password=password
+            
+            # Hibernate JPA Configuration
+            spring.jpa.hibernate.ddl-auto=create
+            spring.jpa.show-sql=true
+            spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+            </code></pre>
+            <p>Sem a flag <code>useSSL=false&amp;serverTimezone=UTC</code> o mariadb não permitia a conexão 🫠</p>
+            <p>Contudo, testando no PC com Linux via WSL a configuração mostrada acima deu certo. Ou seja: podem existir
+                pequenas diferenças. Utilizem esses eventuais problemas como oportunidade de pesquisa e aprendizagem!
+            </p>
+            <p>Feita essa ressalva, vamos falar um pouco sobre um tema que mencionamos acima: migrations!</p>
+            <h4>🔄 O que são <strong>Migrations</strong>?</h4>
+            <p>Quando utilizamos a configuração <code>spring.jpa.hibernate.ddl-auto=update</code>, como visto
+                anteriormente, o Hibernate assume a responsabilidade de <strong>criar e alterar automaticamente o
+                    esquema do banco de dados</strong> com base nas entidades da aplicação. Essa abordagem é conveniente
+                durante o desenvolvimento, mas pode ser <strong>arriscada em ambientes de produção</strong>, onde uma
+                pequena alteração no código pode gerar mudanças indesejadas (e até destrutivas) no banco.</p>
+            <p>É nesse contexto que entram as <strong>migrations</strong> — ou <strong>migrações de banco de
+                    dados</strong>.</p>
+            <p>Uma <em>migration</em> é, basicamente, um <strong>registro controlado e versionado de alterações
+                    estruturais no banco de dados</strong>, como criação de tabelas, adição de colunas, criação de
+                índices, entre outros. Essas alterações são descritas em arquivos e aplicadas <strong>de forma
+                    previsível e segura</strong> a cada nova versão do sistema.</p>
+            <p>Em vez de deixar o Hibernate alterar o banco automaticamente, com migrations a equipe de desenvolvimento
+                define <strong>exatamente o que deve ser alterado</strong>, em qual ordem, e com possibilidade de
+                rollback se necessário. Isso traz muito mais <strong>controle, rastreabilidade e segurança</strong> para
+                o processo de evolução do schema.</p>
+            <p>🛠️ Ferramentas populares para migrations:</p>
+            <ul>
+                <li><strong>Flyway</strong>: baseia-se em scripts SQL ou Java e é amplamente utilizado em projetos
+                    Spring Boot. Integra-se facilmente ao ciclo de vida da aplicação.</li>
+                <li><strong>Liquibase</strong>: usa XML, YAML, JSON ou SQL para definir mudanças e também oferece
+                    ferramentas avançadas de auditoria e rollback.</li>
+            </ul>
+            <p>Por hora nos manteremos com a implementação mais simples, mas em aulas posteriores abordaremos a
+                configuração e integração dessas ferramentas em nossa aplicação 🤩</p>
+            <p>Agora basta seguir para o passo 3...</p>
+            <h3>🧪 Passo 3 – Criando o banco de dados</h3>
+            <p>Antes de executar a aplicação, certifique-se de que o banco de dados
+                <strong><code>contacts_db</code></strong> já está criado no servidor MySQL (ou PostgreSQL) local. Você
+                pode criá-lo via terminal ou usando um cliente gráfico como <strong>MySQL Workbench</strong> ou
+                <strong>pgAdmin</strong>.</p>
+            <pre><code class="language-sql">CREATE DATABASE contacts_db;
+            </code></pre>
+            <h3>✅ Resultado</h3>
+            <p>Ao iniciar a aplicação, o Spring Boot utilizará a nova configuração, conectando-se ao banco de dados
+                relacional, criando as tabelas com base nas entidades mapeadas com <code>@Entity</code>, e persistindo
+                os dados de forma permanente.</p>
+            <p>Esse processo aproxima a aplicação do cenário de produção, permite maior controle sobre o ambiente de
+                dados, e possibilita o uso de recursos avançados como índices, constraints e consultas otimizadas —
+                fundamentais em aplicações reais. A configuração acima é suficiente para fazer a migração do banco H2 em
+                memória, que estávamos utilizando, para o MySQL ou Postgres.</p>
+            <p>Isso foi possível por nos valermos do poder do ORM fornecido pelo Spring. </p>
+            <h3>💪 Reforçando os conceitos de ORM</h3>
+            <p>Esse é um bom momento para relembrarmos um conceito importante: a sigla <strong>ORM</strong> significa
+                <em>Object-Relational Mapping</em> (Mapeamento Objeto-Relacional) e trata-se de uma técnica que permite
+                que desenvolvedores interajam com bancos de dados relacionais usando objetos da linguagem de
+                programação, em vez de escrever diretamente comandos SQL. ORMs abstraem a complexidade do mundo
+                relacional e nos permitem trabalhar no mundo orientado a objetos. Em Java, o ORM é frequentemente
+                realizado por meio da especificação <strong>JPA (Java Persistence API)</strong>, sendo o
+                <strong>Hibernate</strong> a implementação mais popular dessa especificação. </p>
+            <p>O principal objetivo do ORM é reduzir a complexidade do acesso a dados e evitar o acoplamento direto
+                entre o código da aplicação e o banco de dados. Com um ORM, classes Java são mapeadas para tabelas do
+                banco, e os atributos dessas classes representam as colunas. O desenvolvedor pode persistir, atualizar,
+                consultar e remover objetos com comandos simples e legíveis — como <code>repository.save(objeto)</code>
+                ou <code>repository.findAll()</code> — em vez de escrever instruções SQL completas.</p>
+            <p>Esse modelo oferece diversos benefícios: melhora a produtividade, favorece o reuso de código, centraliza
+                as regras de negócio na aplicação e, sobretudo, <strong>torna muito simples mudar de banco de dados sem
+                    alterar a lógica da aplicação</strong> — como acabamos de fazer.</p>
+            <p>A migração do banco de dados H2 (em memória) para o MySQL foi um excelente exemplo prático da
+                flexibilidade que o ORM proporciona. No nosso projeto, bastou alterar algumas configurações no arquivo
+                <code>application.properties</code> — como a URL de conexão, o usuário e a senha — e adicionar a
+                dependência do driver do MySQL no <code>pom.xml</code>. A estrutura do código, as entidades JPA, os
+                repositórios e os controladores permaneceram absolutamente inalterados.</p>
+            <p>Essa transição transparente só é possível porque o Hibernate é responsável por gerar e executar os
+                comandos SQL apropriados para o banco configurado, a partir das anotações nas entidades. Isso demonstra
+                na prática o <strong>desacoplamento entre a aplicação e o banco de dados</strong>, o que facilita muito
+                a portabilidade, a manutenção e a evolução do sistema. Em ambientes reais, essa capacidade é
+                extremamente valiosa: permite começar o desenvolvimento com um banco mais simples (como o H2), e migrar
+                para uma solução mais robusta (como MySQL, PostgreSQL, etc.) sem grandes retrabalhos.</p>
+            <p>Se quisermos, podemos até mesmo trocar o banco novamente — por PostgreSQL, MariaDB, Oracle — e, desde que
+                os dialetos e drivers estejam corretamente configurados, o restante da aplicação continuará funcionando
+                da mesma forma. Isso é o poder do ORM aliado à padronização do JPA.</p>
+            <p>Agora falta apenas documentar nossa API com Swagger!</p>
+            <hr>
+            <h2>4. Documentação com Swagger/OpenAPI</h2>
+            <h3>🔍 <strong>O que é Swagger?</strong></h3>
+            <p>O Swagger (atualmente conhecido como Swagger UI ou Springdoc OpenAPI em projetos Spring modernos) é uma
+                ferramenta que permite documentar automaticamente uma API REST com base nas anotações feitas no código.
+                Ele gera uma interface interativa no navegador onde qualquer pessoa pode consultar os endpoints,
+                visualizar os parâmetros, tipos de retorno e até realizar chamadas HTTP diretamente pela interface web.
+            </p>
+            <p>A grande vantagem é que ele <strong>aumenta a transparência e a usabilidade da API</strong>, além de
+                <strong>reduzir a necessidade de documentações manuais</strong>.</p>
+            <h3>🛠️ Como integrar o Swagger com Spring Boot?</h3>
+            <p><strong>Adicione a dependência no <code>pom.xml</code></strong>:</p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+                &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+                &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+                &lt;version&gt;2.7.0&lt;/version&gt;
+            &lt;/dependency&gt;
+            </code></pre>
+            <p><strong>Configuração Básica</strong>
+                Anote a classe principal da aplicação, <code>ContactsApiApplication</code>, com
+                <code>@OpenAPIDefinition</code>.</p>
+            <pre><code class="language-java">package br.ifsp.contacts;
+            
+            import org.springframework.boot.SpringApplication;
+            import org.springframework.boot.autoconfigure.SpringBootApplication;
+            
+            import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+            import io.swagger.v3.oas.annotations.info.Info;
+            
+            @OpenAPIDefinition(info = @Info(title = &quot;Contacts API&quot;, version = &quot;1.0&quot;, description = &quot;Documentação da API de Contatos&quot;))
+            @SpringBootApplication
+            public class ContactsApiApplication {
+            
+                public static void main(String[] args) {
+                    SpringApplication.run(ContactsApiApplication.class, args);
+                }
+            }
+            </code></pre>
+            <p>Essa anotação faz parte da especificação OpenAPI/Swagger. Ela é usada para documentar a API de forma
+                automática, com suporte à interface gráfica do Swagger UI.</p>
+            <p>Com isso, quando a aplicação estiver rodando, o Swagger UI será carregado com as seguintes informações:
+            </p>
+            <ul>
+                <li>Título: &quot;Contacts API&quot;</li>
+                <li>Versão: 1.0</li>
+                <li>Descrição: &quot;Documentação da API de Contatos&quot;</li>
+            </ul>
+            <p>Esses dados aparecem na interface do Swagger (/swagger-ui.html ou /swagger-ui/index.html), facilitando o
+                uso da API por desenvolvedores e testadores.</p>
+            <p><strong>Tudo pronto! 🤠</strong></p>
+            <p>Com a configuração feita, o próximo passo é refatorar nossos controllers adicionando anotações
+                descritivas nos endpoints — essas descrições serão utilizadas pelo Swagger para gerar uma documentação
+                rica, interativa e fácil de entender.</p>
+            <p>Vamos ver o estado atual do nosso sistema de gestão de contatos!</p>
+            <hr>
+            <h2>5. Estado atual do sistema</h2>
+            <p>Ao longo dessa aula estruturamos a aplicação seguindo boas práticas de organização de código e
+                responsabilidades bem definidas entre os pacotes. Adotamos conceitos importantes como uso de DTOs para
+                entrada e saída de dados, integração com o banco de dados relacional (MySQL) via Spring Data JPA,
+                paginação e ordenação com <code>Pageable</code>, e mapeamento automático entre entidades e DTOs com
+                ModelMapper. Também discutimos aspectos teóricos como a diferença entre entidades e DTOs, uso de Lombok
+                para redução de boilerplate, princípios de Inversão de Controle e Injeção de Dependência, além da
+                documentação interativa com Swagger/OpenAPI.</p>
+            <p>Nossa aplicação foi organizada em camadas: <code>config</code> para configurações globais,
+                <code>controller</code> para os endpoints, <code>dto</code> para os objetos de transporte,
+                <code>model</code> para as entidades JPA, <code>repository</code> para o acesso a dados,
+                <code>exception</code> para tratamentos personalizados de erro, e <code>resources</code> para
+                configurações de ambiente. Essa estrutura é nada mais do que uma sequência lógica do que já havíamos
+                adotado nas aulas anteriores.</p>
+            <p>Nesse estágio atual, portanto, nosso sistema está com a seguinte estrutura de diretórios:</p>
+            <pre><code>contacts-api/
+            ├── pom.xml
+            ├── src/
+            │   └── main/
+            │       ├── java/
+            │       │   └── br/
+            │       │       └── ifsp/
+            │       │           └── contacts/
+            │       │               ├── config/
+            │       │               │   └── MapperConfig.java
+            │       │               ├── controller/
+            │       │               │   ├── AddressController.java
+            │       │               │   └── ContactController.java
+            │       │               ├── dto/
+            │       │               │   ├── address/
+            │       │               │   │   ├── AddressRequestDTO.java
+            │       │               │   │   └── AddressResponseDTO.java
+            │       │               │   └── contact/
+            │       │               │       ├── ContactRequestDTO.java
+            │       │               │       ├── ContactResponseDTO.java
+            │       │               │       └── ContactPatchDTO.java
+            │       │               ├── exception/
+            │       │               │   └── ResourceNotFoundException.java
+            │       │               │   └── GlobalExceptionHandler.java
+            │       │               ├── model/
+            │       │               │   ├── Address.java
+            │       │               │   └── Contact.java
+            │       │               ├── repository/
+            │       │               │   ├── AddressRepository.java
+            │       │               │   └── ContactRepository.java
+            │       │               └── ContactsApiApplication.java
+            │       └── resources/
+            │           ├── application.properties
+            │           └── static/
+            └── target/
+            </code></pre>
+            <p>Os DTOs, Repositórios e Modelos já foram apresentados anteriormente, bem como o <code>MapperConfig</code>
+                e o <code>ContactsApiApplication</code>. As exceções foram apresentadas na aula passada e não tiveram
+                mudança. </p>
+            <p>Vamos ver, portanto, como estão os nossos controllers.</p>
+            <p><strong><code>ContactController.java</code></strong></p>
+            <p>O código-fonte de nosso <code>ContactController</code> ficou da seguinte maneira:</p>
+            <pre><code class="language-java">package br.ifsp.contacts.controller;
+            
+            import org.modelmapper.ModelMapper;
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.data.domain.Page;
+            import org.springframework.data.domain.PageRequest;
+            import org.springframework.data.domain.Pageable;
+            import org.springframework.data.domain.Sort;
+            import org.springframework.validation.annotation.Validated;
+            import org.springframework.web.bind.annotation.DeleteMapping;
+            import org.springframework.web.bind.annotation.GetMapping;
+            import org.springframework.web.bind.annotation.PatchMapping;
+            import org.springframework.web.bind.annotation.PathVariable;
+            import org.springframework.web.bind.annotation.PostMapping;
+            import org.springframework.web.bind.annotation.PutMapping;
+            import org.springframework.web.bind.annotation.RequestBody;
+            import org.springframework.http.HttpStatus;
+            import org.springframework.web.bind.annotation.RequestMapping;
+            import org.springframework.web.bind.annotation.RequestParam;
+            import org.springframework.web.bind.annotation.ResponseStatus;
+            import org.springframework.web.bind.annotation.RestController;
+            
+            import br.ifsp.contacts.dto.contact.ContactPatchDTO;
+            import br.ifsp.contacts.dto.contact.ContactRequestDTO;
+            import br.ifsp.contacts.dto.contact.ContactResponseDTO;
+            import br.ifsp.contacts.exception.ResourceNotFoundException;
+            import br.ifsp.contacts.model.Address;
+            import br.ifsp.contacts.model.Contact;
+            import br.ifsp.contacts.repository.ContactRepository;
+            import io.swagger.v3.oas.annotations.Operation;
+            import io.swagger.v3.oas.annotations.tags.Tag;
+            import jakarta.validation.Valid;
+            
+            @RestController
+            @RequestMapping(&quot;/api/contacts&quot;)
+            @Tag(name = &quot;Contatos&quot;, description = &quot;Operações relacionadas a contatos&quot;)
+            @Validated
+            public class ContactController {
+            
+                @Autowired
+                private ContactRepository contactRepository;
+            
+                @Autowired
+                private ModelMapper modelMapper;
+            
+                @Operation(summary = &quot;Buscar todos os contatos paginados&quot;)
+                @GetMapping
+                public Page&lt;ContactResponseDTO&gt; getAllContacts(
+                        @RequestParam(defaultValue = &quot;0&quot;) int page,
+                        @RequestParam(defaultValue = &quot;10&quot;) int size,
+                        @RequestParam(defaultValue = &quot;nome&quot;) String sort) {
+            
+                    Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+                    Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
+                    return contacts.map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+                }
+            
+                @Operation(summary = &quot;Buscar contato por ID&quot;)
+                @GetMapping(&quot;{id}&quot;)
+                public ContactResponseDTO getContactById(@PathVariable Long id) {
+                    Contact contact = contactRepository.findById(id)
+                            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+                    return modelMapper.map(contact, ContactResponseDTO.class);
+                }
+            
+                @Operation(summary = &quot;Criar novo contato&quot;)
+                @PostMapping
+                @ResponseStatus(HttpStatus.CREATED)
+                public ContactResponseDTO createContact(@Valid @RequestBody ContactRequestDTO dto) {
+                    // Mapeia os campos simples
+                    Contact contact = new Contact(dto.getNome(), dto.getEmail(), dto.getTelefone());
+            
+                    // Mapeia os endereços manualmente
+                    var addresses = dto.getAddresses().stream()
+                            .map(addrDto -&gt; {
+                                Address address = new Address();
+                                address.setRua(addrDto.getRua());
+                                address.setCidade(addrDto.getCidade());
+                                address.setEstado(addrDto.getEstado());
+                                address.setCep(addrDto.getCep());
+                                address.setContact(contact); 
+                                return address;
+                            }).toList();
+            
+                    contact.setAddresses(addresses);
+            
+                    Contact saved = contactRepository.save(contact);
+                    return modelMapper.map(saved, ContactResponseDTO.class);
+                }
+            
+                @Operation(summary = &quot;Atualizar contato por ID&quot;)
+                @PutMapping(&quot;/{id}&quot;)
+                public ContactResponseDTO updateContact(@PathVariable Long id, @Valid @RequestBody ContactRequestDTO dto) {
+                    Contact existingContact = contactRepository.findById(id)
+                            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+            
+                    modelMapper.map(dto, existingContact);
+                    existingContact.getAddresses().forEach(addr -&gt; addr.setContact(existingContact));
+                    Contact updated = contactRepository.save(existingContact);
+                    return modelMapper.map(updated, ContactResponseDTO.class);
+                }
+            
+                @Operation(summary = &quot;Atualização parcial de contato&quot;)
+                @PatchMapping(&quot;/{id}&quot;)
+                public ContactResponseDTO updateContactPartial(@PathVariable Long id, @RequestBody ContactPatchDTO dto) {
+                    Contact existingContact = contactRepository.findById(id)
+                            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+            
+                    dto.getNome().ifPresent(existingContact::setNome);
+                    dto.getEmail().ifPresent(existingContact::setEmail);
+                    dto.getTelefone().ifPresent(existingContact::setTelefone);
+            
+                    Contact saved = contactRepository.save(existingContact);
+                    return modelMapper.map(saved, ContactResponseDTO.class);
+                }
+            
+                @Operation(summary = &quot;Excluir contato&quot;)
+                @DeleteMapping(&quot;/{id}&quot;)
+                @ResponseStatus(HttpStatus.NO_CONTENT)
+                public void deleteContact(@PathVariable Long id) {
+                    contactRepository.deleteById(id);
+                }
+            
+                @Operation(summary = &quot;Buscar contatos pelo nome&quot;)
+                @GetMapping(&quot;/search&quot;)
+                public Page&lt;ContactResponseDTO&gt; searchContactsByName(@RequestParam String name, Pageable pageable) {
+                    return contactRepository.findByNomeContainingIgnoreCase(name, pageable)
+                            .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+                }
+            }
+            </code></pre>
+            <p>Optamos por manter os <code>import</code> para que vocês não se confundam, pois há annotations com os
+                mesmos nomes em pacotes diferentes quando estamos falando de <code>Page</code> e <code>Pageable</code>.
+            </p>
+            <p>Já o nosso <code>AddressController</code> ficou como mostrado a seguir.</p>
+            <p><strong><code>AddressController.java</code></strong></p>
+            <pre><code class="language-java">package br.ifsp.contacts.controller;
+            
+            import org.modelmapper.ModelMapper;
+            import org.springframework.beans.factory.annotation.Autowired;
+            import org.springframework.data.domain.Page;
+            import org.springframework.data.domain.Pageable;
+            import org.springframework.http.HttpStatus;
+            import org.springframework.web.bind.annotation.RequestMapping;
+            import org.springframework.web.bind.annotation.ResponseStatus;
+            import org.springframework.web.bind.annotation.RestController;
+            
+            import br.ifsp.contacts.dto.address.AddressRequestDTO;
+            import br.ifsp.contacts.dto.address.AddressResponseDTO;
+            import br.ifsp.contacts.exception.ResourceNotFoundException;
+            import br.ifsp.contacts.model.Address;
+            import br.ifsp.contacts.model.Contact;
+            import br.ifsp.contacts.repository.AddressRepository;
+            import br.ifsp.contacts.repository.ContactRepository;
+            import io.swagger.v3.oas.annotations.Operation;
+            import jakarta.validation.Valid;
+            
+            import org.springframework.web.bind.annotation.GetMapping;
+            import org.springframework.web.bind.annotation.PathVariable;
+            import org.springframework.web.bind.annotation.PostMapping;
+            import org.springframework.web.bind.annotation.RequestBody;
+            
+            @RestController
+            @RequestMapping(&quot;/api/addresses&quot;)
+            public class AddressController {
+            
+                @Autowired
+                private ContactRepository contactRepository;
+            
+                @Autowired
+                private AddressRepository addressRepository;
+            
+                @Autowired
+                private ModelMapper modelMapper;
+            
+                @Operation(summary = &quot;Buscar todos os endereços de um contato&quot;)
+                @GetMapping(&quot;/contacts/{contactId}&quot;)
+                public Page&lt;AddressResponseDTO&gt; getAddressesByContact(@PathVariable Long contactId, Pageable pageable) {
+                    return addressRepository.findByContactId(contactId, pageable)
+                            .map(address -&gt; modelMapper.map(address, AddressResponseDTO.class));
+                }
+            
+                @Operation(summary = &quot;Criar novo endereço para um contato&quot;)
+                @PostMapping(&quot;/contacts/{contactId}&quot;)
+                @ResponseStatus(HttpStatus.CREATED)
+                public AddressResponseDTO createAddress(@PathVariable Long contactId, @RequestBody @Valid AddressRequestDTO dto) {
+                    Contact contact = contactRepository.findById(contactId)
+                            .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + contactId));
+            
+                    Address address = modelMapper.map(dto, Address.class);
+                    address.setContact(contact);
+                    Address saved = addressRepository.save(address);
+                    return modelMapper.map(saved, AddressResponseDTO.class);
+                }
+            }
+            </code></pre>
+            <hr>
+            <h2>📚 Conclusões</h2>
+            <p>Ao longo desta aula, demos mais um passo importante na consolidação das boas práticas no desenvolvimento
+                de APIs RESTful com Spring Boot. </p>
+            <p>Começamos discutindo a importância do uso de DTOs (Data Transfer Objects), separando os modelos internos
+                da estrutura de dados trafegada pela API. Com isso, ganhamos maior controle sobre o que é exposto ao
+                cliente, evitamos vazamentos de dados sensíveis, reduzimos o acoplamento entre as camadas e preparamos o
+                terreno para uma evolução mais segura da aplicação. Vimos também as vantagens (e limitações) do uso de
+                records e classes com Lombok, além das diferenças entre DTOs de request, response e atualizações
+                parciais com PATCH.</p>
+            <p>Na sequência, implementamos a paginação e ordenação utilizando os recursos nativos do Spring Data JPA, o
+                que nos permitiu trabalhar com grandes volumes de dados de forma mais performática e organizada.
+                Discutimos a importância de oferecer ao cliente o controle sobre a quantidade e ordenação dos dados
+                retornados, além dos impactos positivos na escalabilidade e usabilidade do sistema.</p>
+            <p>Depois, configuramos nossa aplicação para utilizar um banco de dados relacional real (MySQL/PostgreSQL)
+                em vez do banco em memória (H2). Essa mudança nos aproximou de um ambiente mais próximo do mundo real,
+                permitindo persistência entre execuções e maior controle sobre os dados. Também discutimos conceitos
+                importantes como ORM, JPA e o papel das migrations no controle de versionamento do banco.</p>
+            <p>Por fim, integramos a ferramenta Swagger/OpenAPI para documentar nossa API de forma automática,
+                interativa e acessível, promovendo uma comunicação mais clara entre o back-end e seus consumidores. Com
+                apenas algumas anotações e configurações, conseguimos disponibilizar uma interface gráfica que facilita
+                a exploração e o teste da nossa API — um recurso indispensável em qualquer aplicação moderna.</p>
+            <p>Além dos aspectos técnicos, a aula também reforçou princípios importantes da Engenharia de Software, como
+                a separação de responsabilidades, a validação contextualizada, o desacoplamento entre camadas, o cuidado
+                com overengineering e a importância de decisões técnicas conscientes, baseadas no contexto da aplicação
+                e não apenas em modismos.</p>
+            <p>Se há uma mensagem principal que queremos reforçar aqui, é esta: não estamos apenas aprendendo frameworks
+                ou ferramentas — estamos aprendendo a construir software com qualidade, clareza e propósito. E isso
+                exige não só domínio técnico, mas também reflexão, criticidade e boas escolhas arquiteturais.</p>
+            <p>Continue praticando, testando e, acima de tudo, questionando o porquê de cada decisão técnica. Isso é o
+                que transforma uma aplicação funcional em uma aplicação profissional — e um desenvolvedor iniciante em
+                um desenvolvedor consciente.</p>
+            <p>É importante lembrar que ainda temos muito pela frente. Nas próximas aulas, abordaremos temas como
+                segurança (autenticação e autorização com JWT), versionamento de APIs, e a construção de testes
+                automatizados para garantir a qualidade e a confiabilidade do sistema. Esses tópicos aprofundarão ainda
+                mais nossa aplicação e nosso conhecimento em desenvolvimento de sistemas, de forma geral.</p>
+            <p>Mas também é fundamental reconhecer o quanto já avançamos. Desde a nossa primeira aula, passamos por
+                conceitos fundamentais de REST, criamos nossos primeiros endpoints, aprendemos a estruturar o projeto
+                com camadas bem definidas, vimos o tratamento de exceções, adotamos boas práticas com DTOs e validações,
+                configuramos a persistência com banco relacional, aplicamos paginação e ordenação, e finalizamos com a
+                documentação interativa da API. Até que não estamos mal, né?! 🎉</p>
+            <p>É isso, pessoal! Nos vemos na próxima aula! E não se esqueçam do...</p>
+            <h2>Exercício 🚀</h2>
+            <p>Para essa semana teremos apenas um exercício.</p>
+            <p><strong>1️⃣ - Melhoria nos Controllers</strong><br>A implementação atual dos controllers funciona, mas
+                poderia ser aprimorada. Você sabe como? Comente o código-fonte dos dois controllers, avalie os métodos e traga, na próxima aula, ao menos um
+                aprimoramento neles.</p>
+            <p><strong>Bons estudos!</strong> </p>
+
+
+
+
+
+
+
+
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus
+                    Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
