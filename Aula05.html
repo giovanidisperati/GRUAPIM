@@ -1266,12 +1266,7 @@
             
                 @Operation(summary = &quot;Buscar todos os contatos paginados&quot;)
                 @GetMapping
-                public Page&lt;ContactResponseDTO&gt; getAllContacts(
-                        @RequestParam(defaultValue = &quot;0&quot;) int page,
-                        @RequestParam(defaultValue = &quot;10&quot;) int size,
-                        @RequestParam(defaultValue = &quot;nome&quot;) String sort) {
-            
-                    Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+                public Page&lt;ContactResponseDTO&gt; getAllContacts(Pageable pageable) {
                     Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
                     return contacts.map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
                 }
