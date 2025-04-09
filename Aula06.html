@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 06 - Testes e Refatoração</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="Aula04.html"><span class="mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="Aula05.html"><span class="mr-0"></span>05 - REST III</a>
+                </li>
+                <li class="active">
+                    <a href="Aula06.html"><span class="mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>08 - Exercício II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>09 - Docker</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>10 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>11 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VI</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+
+            <h1>Aula 06 – Refatoração dos Controllers, camada de serviço e Introdução aos Testes Automatizados</h1>
+            <p>Na Aula 05, estruturamos nossa API com uso de DTOs, paginamos os endpoints, substituímos o banco em
+                memória por um banco relacional real e documentamos todos os nossos recursos com Swagger. Agora,
+                avançaremos um passo além na maturidade da nossa aplicação: vamos realizar uma <strong>refatoração
+                    completa dos nossos controllers</strong>, otimizar o uso do <code>ModelMapper</code> para reduzir
+                mapeamentos manuais, separar a lógica da controller na camada de serviço e, ainda, iniciaremos a
+                <strong>introdução aos testes automatizados</strong> da aplicação.</p>
+            <p>Como sempre, seguiremos um processo prático dando início de onde paramos na aula anterior: nosso
+                exercício pedia. Começaremos com a <strong>refatoração dos endpoints</strong>, adotando o padrão
+                <code>ResponseEntity</code> — um dos mais recomendados para retornos HTTP em APIs Spring Boot.</p>
+            <hr>
+            <h2>1. Refatorando nossos Controllers com <code>ResponseEntity</code></h2>
+            <p>Até aqui, utilizamos retornos diretos como <code>ContactResponseDTO</code> ou
+                <code>Page&lt;ContactResponseDTO&gt;</code> nos métodos de nossos controllers. Embora essa abordagem
+                funcione bem, ela <strong>não oferece controle detalhado sobre o que está sendo retornado na resposta
+                    HTTP</strong>, como cabeçalhos, status específicos ou metadados adicionais - para isso precisamos
+                usar anotações como <code>@ResponseStatus(HttpStatus.OK)</code> e outros artifícios de implementação.
+            </p>
+            <p>O uso da classe <code>ResponseEntity&lt;T&gt;</code> resolve essa limitação, fornecendo uma interface
+                simplificada para uso. Essa classe encapsula:</p>
+            <ul>
+                <li>o <strong>corpo da resposta</strong> (um DTO, por exemplo),</li>
+                <li>o <strong>status HTTP</strong> (200 OK, 201 Created, 204 No Content, 404 Not Found, etc),</li>
+                <li>e opcionalmente <strong>cabeçalhos adicionais</strong>.</li>
+            </ul>
+            <h3>1.1 Por que usar <code>ResponseEntity</code>?</h3>
+            <p>Adotar o <code>ResponseEntity</code> proporciona mais <strong>clareza, flexibilidade e aderência aos
+                    padrões HTTP</strong>, além de preparar a aplicação para requisitos mais avançados, como:</p>
+            <ul>
+                <li>inclusão de cabeçalhos de autenticação ou cache,</li>
+                <li>retorno de localizações (<code>Location</code>) após criação de recursos,</li>
+                <li>respostas com conteúdos customizados ou sem corpo (<code>204 No Content</code>),</li>
+                <li>e suporte facilitado a testes e a respostas específicas em diferentes cenários.</li>
+            </ul>
+            <p>Além disso, ele torna explícito para quem lê o código qual é o status retornado pela requisição, o que
+                melhora a manutenção e a legibilidade da aplicação, sendo o uso de <code>ResponseEntity</code> a
+                implementação preferida pela comunidade Spring.</p>
+            <h3>✨ Vantagens do uso de <code>ResponseEntity</code></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        <th>Benefício</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Controle explícito do status</td>
+                        <td>Podemos retornar 200, 201, 204, 400, 404, 500, etc.</td>
+                    </tr>
+                    <tr>
+                        <td>Headers customizados</td>
+                        <td>Podemos adicionar cabeçalhos HTTP (como <code>Location</code>)</td>
+                    </tr>
+                    <tr>
+                        <td>Corpo da resposta opcional</td>
+                        <td>Podemos retornar apenas status, sem corpo (<code>noContent()</code>)</td>
+                    </tr>
+                    <tr>
+                        <td>Adequação a testes e versionamento</td>
+                        <td>Facilita asserções em testes e torna o contrato mais claro</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>1.2 Sintaxe básica de <code>ResponseEntity</code></h3>
+            <p>O <code>ResponseEntity</code> possui uma forma mais verbosa de uso, como mostrado abaixo</p>
+            <pre><code class="language-java">return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(contactResponseDTO); 
+</code></pre>
+            <p>E uma forma mais enxuta com métodos auxiliares:</p>
+            <pre><code class="language-java">return ResponseEntity.ok(dto); // 200 OK com corpo
+return ResponseEntity.noContent().build(); // 204 No Content
+</code></pre>
+            <h3>1.3 Refatorando um exemplo de endpoint</h3>
+            <p>Antes da refatoração:</p>
+            <pre><code class="language-java">@DeleteMapping(&quot;/{id}&quot;)
+@ResponseStatus(HttpStatus.NO_CONTENT)
+public void deleteContact(@PathVariable Long id) {
+    contactRepository.deleteById(id);
+}
+</code></pre>
+            <p>Após refatoração:</p>
+            <pre><code class="language-java">@DeleteMapping(&quot;/{id}&quot;)
+public ResponseEntity&lt;Void&gt; deleteContact(@PathVariable Long id) {
+    if (!contactRepository.existsById(id)) {
+        throw new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id);
+    }
+    contactRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
+}
+</code></pre>
+            <p>Observe que com <code>ResponseEntity</code> ganhamos <strong>clareza semântica</strong>. Além disso,
+                adicionamos a cláusula de verificação para checar se o id passado como argumento existe em nossa base de
+                dados, já que por algum motivo desconhecido havia me esquecido de implementar isso anteriormente. 🫠</p>
+            <h3>1.4 Padrão a ser adotado nos métodos</h3>
+            <p>A seguir estão os padrões que iremos aplicar na refatoração dos métodos da controller:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo de operação</th>
+                        <th>Código HTTP</th>
+                        <th>Exemplo Spring</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Buscar recurso</td>
+                        <td>200 OK</td>
+                        <td><code>ResponseEntity.ok(resource)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Criar recurso</td>
+                        <td>201 Created</td>
+                        <td><code>ResponseEntity.status(CREATED).body(resource)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Atualizar recurso</td>
+                        <td>200 OK</td>
+                        <td><code>ResponseEntity.ok(resource)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Atualizar parcial</td>
+                        <td>200 OK</td>
+                        <td><code>ResponseEntity.ok(resource)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Deletar recurso</td>
+                        <td>204 NoContent</td>
+                        <td><code>ResponseEntity.noContent().build()</code></td>
+                    </tr>
+                    <tr>
+                        <td>Recurso não encontrado</td>
+                        <td>404 Not Found</td>
+                        <td>Lançar <code>ResourceNotFoundException</code> para ser tratada globalmente</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>1.5 Refatorando os métodos do Controller</h3>
+            <p>Além da refatoração do endpoint de deleção de um contato, vejamos a refatoração de mais alguns dos
+                métodos do <code>ContactController</code> e <code>AddressController</code>, substituindo os retornos
+                diretos pelos retornos com <code>ResponseEntity</code>. O objetivo é tornar os endpoints mais claros e
+                preparados para evoluções, como headers, cache, redirecionamentos ou alterações no corpo da resposta.
+            </p>
+            <p>Para manter a aula leve e compreensível, mostraremos alguns métodos como exemplo a seguir. A versão final
+                de todos os métodos será apresentada ao final da seção, como fizemos na Aula 05.</p>
+            <h3>🧱 Exemplo 1: <code>createContact()</code></h3>
+            <p>Na aula anterior nosso método estava da seguinte forma:</p>
+            <pre><code class="language-java">@PostMapping
+@ResponseStatus(HttpStatus.CREATED)
+public ContactResponseDTO createContact(@Valid @RequestBody ContactRequestDTO dto) {
+    // Mapeia os campos simples
+    Contact contact = new Contact(dto.getNome(), dto.getEmail(), dto.getTelefone());
+            
+    // Mapeia os endereços manualmente
+    var addresses = dto.getAddresses().stream()
+        .map(addrDto -&gt; {
+            Address address = new Address();
+            address.setRua(addrDto.getRua());
+            address.setCidade(addrDto.getCidade());
+            address.setEstado(addrDto.getEstado());
+            address.setCep(addrDto.getCep());
+            address.setContact(contact); 
+            return address;
+        }).toList();
+            
+    contact.setAddresses(addresses);
+            
+    Contact saved = contactRepository.save(contact);
+    return modelMapper.map(saved, ContactResponseDTO.class);
+}
+</code></pre>
+            <p>Agora, vamos refatorar nosso método e deixá-lo como mostrado a seguir:</p>
+            <pre><code class="language-java">@PostMapping
+public ResponseEntity&lt;ContactResponseDTO&gt; createContact(@Valid @RequestBody ContactRequestDTO dto) {
+    Contact contact = modelMapper.map(dto, Contact.class);
+    contact.getAddresses().forEach(address -&gt; address.setContact(contact));
+    Contact saved = contactRepository.save(contact);
+    ContactResponseDTO responseDTO = modelMapper.map(saved, ContactResponseDTO.class);
+    return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+}
+</code></pre>
+            <p>No primeiro método a criação de um novo contato é realizada de maneira bastante manual. Inicialmente, os
+                campos do objeto <code>Contact</code> são populados diretamente a partir dos valores do DTO, utilizando
+                um construtor explícito. Em seguida, os endereços são mapeados um a um através de um
+                <code>stream</code>, onde cada <code>AddressRequestDTO</code> é convertido manualmente em uma instância
+                da entidade <code>Address</code>. Durante esse processo, também é feita a associação entre cada endereço
+                e o contato recém-criado, garantindo o vínculo bidirecional necessário para persistência correta com
+                JPA. Após o mapeamento, a lista de endereços é atribuída ao contato e, por fim, o contato é salvo no
+                banco e convertido em um <code>ContactResponseDTO</code> utilizando o <code>ModelMapper</code>.</p>
+            <p>Essa abordagem, embora funcional, gera um acúmulo de responsabilidades no controller e uma repetição
+                considerável de código, o que pode dificultar a manutenção à medida que a aplicação cresce.</p>
+            <p>Já o segundo método apresenta uma versão mais enxuta e elegante da mesma funcionalidade. Nessa versão
+                refatorada, o <code>ModelMapper</code> é utilizado diretamente para mapear o
+                <code>ContactRequestDTO</code> para a entidade <code>Contact</code>, eliminando a necessidade de
+                instanciar o objeto manualmente e escrever código repetitivo para setar os atributos. O único passo que
+                permanece manual é a associação entre os endereços e o contato — e isso é feito de forma simples e
+                clara, com um <code>forEach</code>. Após o salvamento da entidade no banco, o resultado é novamente
+                convertido para o DTO de resposta com o <code>ModelMapper</code>.</p>
+            <p>Outro ponto de melhoria é o uso do <code>ResponseEntity</code> para retornar a resposta da API. Com isso,
+                temos controle explícito sobre o status HTTP (201 Created), o que torna a resposta mais alinhada às
+                práticas RESTful e facilita o envio de cabeçalhos adicionais, se necessário.</p>
+            <p>Essa refatoração traz diversos benefícios: o código fica mais limpo, a responsabilidade de conversão
+                entre DTOs e entidades é centralizada no <code>ModelMapper</code>, e o controller passa a ser
+                responsável apenas por orquestrar as chamadas — o que é exatamente seu papel. Além disso, a nova versão
+                favorece a legibilidade, testabilidade e manutenção do código, características essenciais em projetos
+                profissionais e de médio a longo prazo.</p>
+            <p>Uma melhoria posterior seria a implementação de uma camada de serviço, por meio da extração da lógica e
+                simplificação ainda maior do nosso Controller. Abordaremos esse padrão organizacional posteriormente na
+                aula.</p>
+            <h3>🧱 Exemplo 2: <code>getAllContacts()</code></h3>
+            <p>Na aula anterior nosso método estava da seguinte forma:</p>
+            <pre><code class="language-java">@GetMapping
+public Page&lt;ContactResponseDTO&gt; getAllContacts(Pageable pageable) {
+    Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
+    return contacts.map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+}            
+</code></pre>
+            <p>Agora, vamos refatorar nosso método e deixá-lo como mostrado a seguir:</p>
+            <pre><code class="language-java">@GetMapping
+public ResponseEntity&lt;Page&lt;ContactResponseDTO&gt;&gt; getAllContacts(Pageable pageable) {
+    Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
+    Page&lt;ContactResponseDTO&gt; responseDTO = contacts
+        .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+    return ResponseEntity.ok(responseDTO);
+}
+</code></pre>
+            <p>Como percebem, seguimos a mesma linha de refatoração que fizemos anteriormente, ou seja, a diferença
+                entre os dois métodos está na forma como a resposta é construída e retornada para o cliente. Ambos
+                realizam a mesma tarefa essencial: recuperar todos os contatos de forma paginada e convertê-los para um
+                Page<ContactResponseDTO>, utilizando o ModelMapper para transformar os objetos da entidade Contact em
+                    objetos de transferência de dados (DTO). No entanto, a segunda versão aplica uma refatoração
+                    importante ao envolver o retorno em um ResponseEntity, enquanto a primeira retorna diretamente o
+                    Page resultante.</p>
+            <p>Na primeira versão a resposta da requisição é retornada de maneira direta. O Spring Boot, por padrão,
+                interpreta o tipo de retorno e aplica um status HTTP 200 (OK) automaticamente. Esse estilo é válido e
+                perfeitamente funcional, principalmente em projetos menores ou em endpoints que não exigem
+                personalizações adicionais no cabeçalho da resposta ou no status. No entanto, essa abordagem oferece
+                menos controle sobre o que está sendo retornado, já que não há flexibilidade para modificar status HTTP,
+                cabeçalhos ou outras configurações da resposta de forma explícita.</p>
+            <p>Já a versão refatorada segue uma prática mais robusta e alinhada às boas práticas em APIs RESTful:
+                utiliza o ResponseEntity, para representar toda a resposta HTTP, incluindo corpo, status e cabeçalhos.
+                Ao encapsular a resposta em um ResponseEntity.ok(...), o método deixa claro e explícito que está
+                retornando uma resposta com status HTTP 200 (OK), além de permitir, se necessário, o uso de outros
+                métodos como .status(), .headers(), ou até mesmo .noContent() para outros cenários.</p>
+            <h3>🤠 Resumo</h3>
+            <p>Refatorar os métodos do controller para retornar <code>ResponseEntity</code> é um pequeno ajuste com
+                <strong>impacto positivo</strong> na legibilidade, testabilidade e padronização da API. Essa abordagem
+                permite que, futuramente, adicionemos headers, links, status alternativos ou tratamentos especiais sem
+                precisar alterar a assinatura do método.</p>
+            <p>Além disso, a documentação gerada pelo Swagger/OpenAPI também pode ser enriquecida com status HTTP mais
+                precisos e podemos alterar a injeção de dependência que vinhamos usando com <code>@Autowired</code> para
+                injeção via construtor!</p>
+            <p>Vamos implementar essas refatorações e rever o nosso código completo do controller.</p>
+            <hr>
+            <h2>2. Refatorando nossos Controllers com <code>ResponseEntity</code></h2>
+            <p>Após a implementação das refatorações mencionadas acima (<code>ResponseEntity</code>, melhoria na
+                documentação Swagger, injeção de dependência via construtor) chegamos à seguinte implementação do
+                Controller.</p>
+            <pre><code class="language-java">package br.ifsp.contacts.controller;
+
+@Tag(name = &quot;Contatos&quot;, description = &quot;API para gerenciamento de contatos&quot;)
+@Validated
+@RestController
+@RequestMapping(&quot;/api/contacts&quot;)
+public class ContactController {
+
+        private final ContactRepository contactRepository;
+        private final ModelMapper modelMapper;
+
+        public ContactController(ContactRepository contactRepository, ModelMapper modelMapper) {
+                this.contactRepository = contactRepository;
+                this.modelMapper = modelMapper;
+        }
+
+        /**
+         * Retorna uma lista paginada de todos os contatos.
+         * 
+         * @param pageable informações de paginação
+         * @return página de contatos
+         */
+        @Operation(summary = &quot;Listar todos os contatos&quot;, description = &quot;Retorna uma lista paginada de todos os contatos cadastrados no sistema&quot;)
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contatos encontrados com sucesso&quot;),
+                        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+        })
+        @GetMapping
+        public ResponseEntity&lt;Page&lt;ContactResponseDTO&gt;&gt; getAllContacts(Pageable pageable) {
+                Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
+                Page&lt;ContactResponseDTO&gt; responseDTO = contacts
+                                .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+                return ResponseEntity.ok(responseDTO);
+        }
+
+        /**
+         * Busca um contato pelo ID.
+         * 
+         * @param id identificador do contato
+         * @return contato encontrado
+         * @throws ResourceNotFoundException se o contato não for encontrado
+         */
+        @Operation(summary = &quot;Buscar contato por ID&quot;, description = &quot;Retorna um contato específico com base no ID fornecido&quot;)
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contato encontrado com sucesso&quot;),
+                        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+                        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+        })
+        @GetMapping(&quot;/{id}&quot;)
+        public ResponseEntity&lt;ContactResponseDTO&gt; getContactById(@PathVariable Long id) {
+                Contact contact = contactRepository.findById(id)
+                                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+
+                ContactResponseDTO responseDTO = modelMapper.map(contact, ContactResponseDTO.class);
+                return ResponseEntity.ok(responseDTO);
+        }
+
+        /**
+         * Cria um novo contato.
+         * 
+         * @param dto dados do contato a ser criado
+         * @return contato criado
+         */
+        @Operation(summary = &quot;Criar novo contato&quot;, description = &quot;Cria um novo contato com os dados fornecidos&quot;)
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Contato criado com sucesso&quot;),
+                        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Dados inválidos&quot;),
+                        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+        })
+        @PostMapping
+        public ResponseEntity&lt;ContactResponseDTO&gt; createContact(@Valid @RequestBody ContactRequestDTO dto) {
+                Contact contact = modelMapper.map(dto, Contact.class);
+                contact.getAddresses().forEach(address -&gt; address.setContact(contact));
+                Contact saved = contactRepository.save(contact);
+                ContactResponseDTO responseDTO = modelMapper.map(saved, ContactResponseDTO.class);
+                return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        }
+
+        /**
+         * Atualiza um contato existente.
+         * 
+         * @param id  identificador do contato
+         * @param dto novos dados do contato
+         * @return contato atualizado
+         * @throws ResourceNotFoundException se o contato não for encontrado
+         */
+        @Operation(summary = &quot;Atualizar contato&quot;, description = &quot;Atualiza todos os dados de um contato existente&quot;)
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contato atualizado com sucesso&quot;),
+                        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Dados inválidos&quot;),
+                        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+                        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+        })
+        @PutMapping(&quot;/{id}&quot;)
+        public ResponseEntity&lt;ContactResponseDTO&gt; updateContact(@PathVariable Long id,
+                        @Valid @RequestBody ContactRequestDTO dto) {
+                Contact existingContact = contactRepository.findById(id)
+                                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+
+                modelMapper.map(dto, existingContact);
+                existingContact.getAddresses().forEach(address -&gt; address.setContact(existingContact));
+
+                Contact updated = contactRepository.save(existingContact);
+                ContactResponseDTO responseDTO = modelMapper.map(updated, ContactResponseDTO.class);
+                return ResponseEntity.ok(responseDTO);
+        }
+
+        /**
+         * Atualiza parcialmente um contato existente.
+         * 
+         * @param id  identificador do contato
+         * @param dto dados a serem atualizados
+         * @return contato atualizado
+         * @throws ResourceNotFoundException se o contato não for encontrado
+         */
+        @Operation(summary = &quot;Atualizar contato parcialmente&quot;, description = &quot;Atualiza apenas os campos especificados de um contato existente&quot;)
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contato atualizado com sucesso&quot;),
+                        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+                        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+        })
+        @PatchMapping(&quot;/{id}&quot;)
+        public ResponseEntity&lt;ContactResponseDTO&gt; updateContactPartial(@PathVariable Long id,
+                        @RequestBody ContactPatchDTO dto) {
+                Contact existingContact = contactRepository.findById(id)
+                                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+                dto.getNome().ifPresent(existingContact::setNome);
+                dto.getEmail().ifPresent(existingContact::setEmail);
+                dto.getTelefone().ifPresent(existingContact::setTelefone);
+                Contact saved = contactRepository.save(existingContact);
+                ContactResponseDTO responseDTO = modelMapper.map(saved, ContactResponseDTO.class);
+                return ResponseEntity.ok(responseDTO);
+        }
+
+        /**
+         * Exclui um contato.
+         * 
+         * @param id identificador do contato
+         * @return resposta sem conteúdo
+         * @throws ResourceNotFoundException se o contato não for encontrado
+         */
+        @Operation(summary = &quot;Excluir contato&quot;, description = &quot;Remove permanentemente um contato do sistema&quot;)
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Contato excluído com sucesso&quot;),
+                        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+                        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+        })
+        @DeleteMapping(&quot;/{id}&quot;)
+        public ResponseEntity&lt;Void&gt; deleteContact(@PathVariable Long id) {
+                if (!contactRepository.existsById(id)) {
+                        throw new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id);
+                }
+                contactRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+        }
+
+        /**
+         * Busca contatos pelo nome.
+         * 
+         * @param name     nome ou parte do nome a ser pesquisado
+         * @param pageable informações de paginação
+         * @return lista paginada de contatos que correspondem ao critério de busca
+         */
+        @Operation(summary = &quot;Buscar contatos por nome&quot;, description = &quot;Retorna uma lista paginada de contatos cujo nome contém o termo pesquisado&quot;)
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Busca realizada com sucesso&quot;),
+                        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+        })
+        @GetMapping(&quot;/search&quot;)
+        public ResponseEntity&lt;Page&lt;ContactResponseDTO&gt;&gt; searchContactsByName(@RequestParam String name,
+                        Pageable pageable) {
+                Page&lt;Contact&gt; contacts = contactRepository.findByNomeContainingIgnoreCase(name, pageable);
+                Page&lt;ContactResponseDTO&gt; responseDTO = contacts
+                                .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+                return ResponseEntity.ok(responseDTO);
+        }
+}
+</code></pre>
+            <p>Vamos usar essa oportunidade para relembrar (e reforçar) os conceitos que vimos anteriormente. Passemos à
+                análise do nosso código, método a método!</p>
+            <h3>🔎 Construtor da classe</h3>
+            <p>Nosso construtor ficou da seguinte forma na nova versão.</p>
+            <pre><code class="language-java">public ContactController(ContactRepository contactRepository, ModelMapper modelMapper) {
+    this.contactRepository = contactRepository;
+    this.modelMapper = modelMapper;
+}
+</code></pre>
+            <p>Nessa versão refatorada implementamos a <strong>injeção de dependência via construtor</strong>, que é
+                considerada uma prática superior à injeção feita diretamente em atributos com <code>@Autowired</code> no
+                desenvolvimento com Spring Boot. Isso se deve a diversos motivos técnicos e de boas práticas que
+                promovem código mais limpo, seguro, testável e fácil de manter.</p>
+            <p>Um dos principais benefícios da injeção via construtor é a <strong>possibilidade de declarar os atributos
+                    como <code>final</code></strong>, o que garante que essas dependências nunca serão modificadas após
+                a inicialização da classe. Isso reforça o princípio da imutabilidade, contribuindo para a segurança do
+                código e reduzindo a possibilidade de exceções do tipo <code>NullPointerException</code>.</p>
+            <p>Além disso, essa abordagem <strong>facilita os testes unitários</strong>. Ao utilizar construtores, o
+                desenvolvedor pode instanciar a classe sob teste passando diretamente objetos mockados ou stubs das
+                dependências, sem depender do contexto do Spring para realizar injeções automáticas. Isso torna o código
+                mais independente, modular e fácil de testar em isolamento.</p>
+            <p>Outro ponto positivo é a <strong>clareza e a legibilidade do código</strong>. Quando os construtores são
+                usados explicitamente, é fácil visualizar todas as dependências de uma classe logo de início, sem a
+                necessidade de examinar todos os campos ou anotações espalhadas pela classe. Esse aspecto torna o código
+                mais autodescritivo, o que facilita a compreensão tanto por outros desenvolvedores quanto por
+                ferramentas de análise estática.</p>
+            <p>A injeção via construtor também ajuda a evitar <strong>dependências ocultas ou parcialmente
+                    injetadas</strong>. A injeção em atributos ocorre após a construção do objeto, o que pode gerar
+                problemas em métodos anotados com <code>@PostConstruct</code> ou em inicializações que dependam dessas
+                injeções logo na criação do bean. Já com o construtor, as dependências são garantidas no momento da
+                criação do objeto, tornando o ciclo de vida mais previsível e seguro. Por exemplo, imagine um cenário em
+                que uma classe ReportService utiliza uma dependência chamada EmailService, injetada com @Autowired, e
+                dentro do método init(), anotado com @PostConstruct, tenta usá-la imediatamente. Existe o risco de
+                emailService ainda não estar injetado nesse momento, resultando em um NullPointerException difícil de
+                diagnosticar. Ao utilizar injeção via construtor, no entanto, esse risco desaparece, pois o Spring só
+                consegue instanciar o objeto ReportService se todas as dependências passadas no construtor forem
+                resolvidas previamente. Assim, ao chegar no @PostConstruct, temos a certeza de que o objeto está
+                completamente pronto para uso, com todas as dependências já disponíveis. O código abaixo mostra esse
+                cenário:</p>
+            <pre><code class="language-java">@Component
+public class ReportService {
+
+    @Autowired
+    private EmailService emailService;
+
+    private String status;
+
+    @PostConstruct
+    public void init() {
+        // Tentamos usar o emailService logo após a construção do bean
+        this.status = emailService.sendReport(&quot;Relatório inicial&quot;);
+    }
+}
+</code></pre>
+            <p>Se o <code>EmailService</code> ainda não tiver sido injetado no momento em que o método init() é
+                executado, isso pode gerar um <code>NullPointerException</code>. Esse tipo de erro é sutil, porque
+                depende do ciclo de vida do Spring, do modo como o bean é criado, se há proxies envolvidos, e da ordem
+                de inicialização dos beans. Embora o Spring costume cuidar disso corretamente na maioria dos casos, é um
+                risco real quando usamos <code>@Autowired</code> diretamente no atributo.</p>
+            <p>Além disso, essa prática de injeção via construtor se integra muito bem com ferramentas como o
+                <strong>Lombok</strong>. Ao declarar os atributos como <code>final</code>, é possível usar a anotação
+                <code>@RequiredArgsConstructor</code>, que automaticamente gera um construtor com todos os campos
+                necessários, eliminando a necessidade de escrever código adicional, ao mesmo tempo em que preserva todos
+                os benefícios da injeção via construtor.</p>
+            <p>Naturalmente, há exceções. Em classes muito simples ou com apenas uma dependência, a utilização direta de
+                <code>@Autowired</code> pode ser aceitável. E se uma classe possui muitas dependências (acima de 4 ou
+                5), isso pode ser um sinal de que ela está assumindo responsabilidades demais, sendo mais adequado
+                refatorá-la antes de decidir pela forma de injeção. </p>
+            <p>Em resumo, a injeção de dependência via construtor promove <strong>imutabilidade, testabilidade,
+                    legibilidade e segurança</strong>, além de favorecer a manutenção e evolução do código. Por essas
+                razões, ela é atualmente a abordagem <strong>mais recomendada no ecossistema Spring</strong>,
+                especialmente em classes anotadas com <code>@Service</code>, <code>@Controller</code>,
+                <code>@Component</code> e <code>@RestController</code>.</p>
+            <p>Vamos agora analisar os métodos!</p>
+            <h3>🔎 Método 1: <code>getAllContacts(Pageable pageable)</code></h3>
+            <pre><code class="language-java">/**
+* Retorna uma lista paginada de todos os contatos.
+* 
+* @param pageable informações de paginação
+* @return página de contatos
+*/
+@Operation(summary = &quot;Listar todos os contatos&quot;, description = &quot;Retorna uma lista paginada de todos os contatos cadastrados no sistema&quot;)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contatos encontrados com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+@GetMapping
+public ResponseEntity&lt;Page&lt;ContactResponseDTO&gt;&gt; getAllContacts(Pageable pageable) {
+    Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
+    Page&lt;ContactResponseDTO&gt; responseDTO = contacts
+        .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+    return ResponseEntity.ok(responseDTO);
+}
+</code></pre>
+            <p>Acabamos de ver esse método na explicação acima, mas vamos reforçar os conceitos.</p>
+            <p>Este método é responsável por retornar todos os contatos cadastrados, com suporte à paginação. A anotação
+                <code>@GetMapping</code> expõe o método via HTTP GET na URL <code>/api/contacts</code>.</p>
+            <p>Como vimos na aula anterior, o parâmetro <code>Pageable pageable</code> é um objeto especial do Spring
+                Data que encapsula informações sobre a requisição de paginação: número da página (<code>page</code>),
+                tamanho da página (<code>size</code>) e critério de ordenação (<code>sort</code>). Esses parâmetros
+                podem ser passados diretamente pela URL. Por exemplo:</p>
+            <pre><code>GET /api/contacts?page=0&amp;size=10&amp;sort=nome,asc
+</code></pre>
+            <p>Internamente, o método chama <code>contactRepository.findAll(pageable)</code> para buscar os dados já
+                paginados no banco de dados. O retorno é um <code>Page&lt;Contact&gt;</code>, uma interface que
+                representa uma &quot;página&quot; de objetos com metadados como total de elementos, número da página,
+                número total de páginas etc.</p>
+            <p>Em seguida, cada objeto <code>Contact</code> é mapeado para <code>ContactResponseDTO</code> usando o
+                <code>ModelMapper</code>, uma biblioteca que converte objetos com base em seus atributos de mesmo nome
+                (configurada e adicionada ao projeto na aula anterior). O método <code>map()</code> da interface
+                <code>Page</code> é usado aqui:</p>
+            <pre><code class="language-java">Page&lt;ContactResponseDTO&gt; responseDTO = contacts
+        .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+</code></pre>
+            <p>Aqui, <code>contacts</code> é um objeto do tipo <code>Page&lt;Contact&gt;</code>, ou seja, uma lista
+                paginada de contatos. O método <code>map()</code> da interface <code>Page</code> aplica uma
+                transformação a cada elemento da lista interna, retornando um novo <code>Page</code> com os elementos
+                convertidos — nesse caso, de <code>Contact</code> para <code>ContactResponseDTO</code>.</p>
+            <p>A transformação é feita através de uma <code>Function&lt;T, R&gt;</code>, fornecida por meio de uma
+                expressão lambda. Uma <code>Function&lt;T, R&gt;</code> é uma interface funcional da API de funções do
+                Java (<code>java.util.function</code>) que representa uma função que recebe um valor do tipo
+                <code>T</code> e retorna um valor do tipo <code>R</code>. Em outras palavras, é uma função que
+                transforma um valor de um tipo em outro. Vamos exemplificar com um código simples que transforma um
+                inteiro em uma String:</p>
+            <pre><code class="language-java">Function&lt;Integer, String&gt; intToString = num -&gt; &quot;Número: &quot; + num;
+
+String resultado = intToString.apply(10);
+// resultado: &quot;Número: 10&quot;
+</code></pre>
+            <p>Esse trecho de código acima utiliza a interface funcional <code>Function&lt;T, R&gt;</code> da API do
+                Java para definir uma função que recebe um número inteiro (<code>Integer</code>) como entrada e retorna
+                uma <code>String</code> como saída.</p>
+            <p>Na linha:</p>
+            <pre><code class="language-java">Function&lt;Integer, String&gt; intToString = num -&gt; &quot;Número: &quot; + num;
+</code></pre>
+            <p>estamos criando uma variável chamada <code>intToString</code> do tipo
+                <code>Function&lt;Integer, String&gt;</code>. Isso significa que essa função aceitará um valor do tipo
+                <code>Integer</code> (número inteiro) e retornará um valor do tipo <code>String</code>. A implementação
+                é feita com uma expressão lambda: <code>num -&gt; &quot;Número: &quot; + num</code>, o que quer dizer
+                que, ao receber um número <code>num</code>, a função concatenará a string
+                <code>&quot;Número: &quot;</code> com esse número, produzindo uma nova string como resultado.</p>
+            <p>Em seguida, temos a linha:</p>
+            <pre><code class="language-java">String resultado = intToString.apply(10);
+</code></pre>
+            <p>Aqui, estamos chamando o método <code>apply</code> da função, passando o valor <code>10</code> como
+                argumento. Isso faz com que a função seja executada e retorne a string
+                <code>&quot;Número: 10&quot;</code>, que é atribuída à variável <code>resultado</code>.</p>
+            <p>Portanto, ao final da execução desse trecho, a variável <code>resultado</code> conterá o valor
+                <code>&quot;Número: 10&quot;</code>. Esse exemplo ilustra de forma simples como a interface
+                <code>Function</code> pode ser usada para representar transformações de dados no estilo funcional.</p>
+            <p>Da mesma forma, o modelMapper.map(...) é invocado para cada Contact e transforma o objeto em seu
+                correspondente ContactResponseDTO. A expressão
+                <code>contact -&gt; modelMapper.map(contact, ContactResponseDTO.class)</code> é uma
+                <code>Function&lt;Contact, ContactResponseDTO&gt;</code>!</p>
+            <p>💡Caso a explicação não tenha ficado suficientemente clara, consulte a <a
+                    href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html">Documentação da
+                    interface Function (Java 8)</a> e também o artigo da Baeldung, <a
+                    href="https://www.baeldung.com/java-8-functional-interfaces">Baeldung: Java 8 Functional
+                    Interfaces</a>.</p>
+            <p>Por fim, o método retorna o resultado com <code>ResponseEntity.ok(responseDTO)</code>, encapsulando o
+                conteúdo e o código de status HTTP 200 (OK).</p>
+            <p>Feitas essas considerações, passemos ao próximo método!</p>
+            <h3>🔎 Método 2: <code>getContactById(Long id)</code></h3>
+            <pre><code class="language-java">/**
+* Busca um contato pelo ID.
+* 
+* @param id identificador do contato
+* @return contato encontrado
+* @throws ResourceNotFoundException se o contato não for encontrado
+*/
+@Operation(summary = &quot;Buscar contato por ID&quot;, description = &quot;Retorna um contato específico com base no ID fornecido&quot;)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contato encontrado com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+@GetMapping(&quot;/{id}&quot;)
+public ResponseEntity&lt;ContactResponseDTO&gt; getContactById(@PathVariable Long id) {
+    Contact contact = contactRepository.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+
+    ContactResponseDTO responseDTO = modelMapper.map(contact, ContactResponseDTO.class);
+    return ResponseEntity.ok(responseDTO);
+}
+</code></pre>
+            <p>Este método busca um contato específico a partir de seu <code>id</code>. A anotação
+                <code>@PathVariable</code> indica que o valor da variável <code>id</code> será extraído diretamente da
+                URL (por exemplo: <code>/api/contacts/5</code>), como vimos nas aulas anteriores.</p>
+            <p>O método tenta encontrar o contato via <code>contactRepository.findById(id)</code>. Caso o contato não
+                exista, é lançada uma exceção personalizada <code>ResourceNotFoundException</code>, que será tratada
+                pelo <code>GlobalHandlerException</code> (visto na aula 04), um <code>@ControllerAdvice</code> global da
+                aplicação.</p>
+            <p>O código utiliza dois recursos importantes em aplicações modernas com Spring Boot: o método
+                <code>.orElseThrow()</code> da classe <code>Optional</code>, e as anotações do Swagger (mais
+                precisamente, da especificação OpenAPI 3) para documentação automática da API. Vamos entender cada parte
+                com mais profundidade.</p>
+            <p>O método <code>.orElseThrow()</code> é uma forma moderna e concisa de tratar situações em que um valor
+                pode ou não estar presente, representado por um objeto <code>Optional</code>. Vimos o uso de
+                <code>Optional</code> nas aulas 03, 04 e 05. Mesmo assim, vamos reforçar o que é e como funciona. No
+                contexto do código:</p>
+            <pre><code class="language-java">Contact contact = contactRepository.findById(id)
+    .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+</code></pre>
+            <p>A chamada <code>contactRepository.findById(id)</code> retorna um <code>Optional&lt;Contact&gt;</code> —
+                ou seja, um recipiente que <strong>pode ou não conter</strong> um objeto <code>Contact</code>. Isso é
+                uma forma segura de evitar exceções como <code>NullPointerException</code>, forçando o desenvolvedor a
+                lidar com a possibilidade de ausência do valor.</p>
+            <p>O método <code>.orElseThrow()</code> verifica se há um valor presente. Caso <strong>haja</strong>, o
+                valor é retornado. Caso <strong>não haja</strong>, a função passada como argumento é executada, lançando
+                uma exceção customizada — no caso, uma <code>ResourceNotFoundException</code> com uma mensagem
+                personalizada. Isso permite que o controle de fluxo seja feito de maneira limpa, sem necessidade de
+                <code>if (contact == null)</code> ou blocos <code>try/catch</code>.</p>
+            <p>Esse padrão torna o código mais expressivo, seguro e aderente ao paradigma funcional introduzido com o
+                <code>Optional</code> a partir do Java 8.</p>
+            <p>Além disso, o trecho de código também utiliza anotações da biblioteca <code>springdoc-openapi</code>
+                (implementação da especificação OpenAPI para projetos Spring Boot) para gerar automaticamente
+                documentação interativa da API — geralmente acessível via <code>/swagger-ui.html</code> ou
+                <code>/swagger-ui/index.html</code>. </p>
+            <pre><code class="language-java">@Operation(summary = &quot;Buscar contato por ID&quot;, description = &quot;Retorna um contato específico com base no ID fornecido&quot;)
+</code></pre>
+            <p>Essa anotação descreve o propósito do endpoint. O campo <code>summary</code> é uma descrição curta e
+                objetiva, enquanto o <code>description</code> pode conter mais detalhes. Essa informação será exibida na
+                interface gráfica do Swagger e também usada na geração de documentação no formato JSON/YAML da OpenAPI.
+            </p>
+            <pre><code class="language-java">@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contato encontrado com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+</code></pre>
+            <p>Jã essa estrutura acima define <strong>quais respostas o endpoint pode retornar</strong>, informando:</p>
+            <ul>
+                <li>O <strong>código HTTP</strong> (<code>responseCode</code>) que pode ser devolvido,</li>
+                <li>A <strong>descrição textual</strong> do que esse código representa no contexto da operação,</li>
+                <li>E opcionalmente, o <strong>conteúdo da resposta</strong> via <code>@Content</code> (nesse exemplo,
+                    deixado vazio).</li>
+            </ul>
+            <p>Essas anotações ajudam outras pessoas desenvolvedoras — e até o próprio time — a compreender rapidamente
+                o comportamento esperado da API, suas possíveis respostas e os erros que podem ocorrer, tudo de forma
+                automatizada e centralizada.</p>
+            <p>Em resumo, o método <code>.orElseThrow()</code> traz elegância e segurança ao tratamento de dados
+                opcionais, eliminando verificações manuais de nulo e oferecendo uma forma fluente de lançar exceções
+                customizadas. Já as anotações <code>@Operation</code> e <code>@ApiResponses</code> são fundamentais para
+                gerar documentação automática, interativa e padronizada da API, que tornam o sistema mais compreensível,
+                fácil de usar e alinhado às boas práticas de desenvolvimento de software moderno. 😊</p>
+            <p>Por fim, se o contato for encontrado, ele é convertido para <code>ContactResponseDTO</code> usando o
+                <code>ModelMapper</code> e retornado dentro de um <code>ResponseEntity</code>.</p>
+            <h3>🔎 Método 3: <code>createContact(ContactRequestDTO dto)</code></h3>
+            <pre><code class="language-java">/**
+* Cria um novo contato.
+* 
+* @param dto dados do contato a ser criado
+* @return contato criado
+*/
+@Operation(summary = &quot;Criar novo contato&quot;, description = &quot;Cria um novo contato com os dados fornecidos&quot;)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Contato criado com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Dados inválidos&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+@PostMapping
+public ResponseEntity&lt;ContactResponseDTO&gt; createContact(@Valid @RequestBody ContactRequestDTO dto) {
+    Contact contact = modelMapper.map(dto, Contact.class);
+    contact.getAddresses().forEach(address -&gt; address.setContact(contact));
+    Contact saved = contactRepository.save(contact);
+    ContactResponseDTO responseDTO = modelMapper.map(saved, ContactResponseDTO.class);
+    return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+}
+</code></pre>
+            <p>Este método é responsável por criar um novo contato. A anotação <code>@PostMapping</code> define que ele
+                será acessado via HTTP POST. A anotação <code>@RequestBody</code> indica que o corpo da requisição será
+                convertido para um objeto <code>ContactRequestDTO</code>, que representa os dados recebidos. Relembrando
+                o que vimos nas aulas anteriores, a anotação <code>@RequestBody</code> no Spring Boot tem um papel
+                importante em métodos que recebem dados enviados pelo cliente no corpo de uma requisição HTTP —
+                geralmente em requisições do tipo <code>POST</code>, <code>PUT</code> ou <code>PATCH</code>. </p>
+            <p>Quando essa anotação é aplicada a um parâmetro de um método no controller, como no caso:</p>
+            <pre><code class="language-java">public ResponseEntity&lt;ContactResponseDTO&gt; createContact(@Valid @RequestBody ContactRequestDTO dto)
+</code></pre>
+            <p>ela <strong>instrui o Spring</strong> a <strong>deserializar automaticamente o corpo da requisição
+                    (normalmente em JSON)</strong> para uma instância da classe especificada, neste caso,
+                <code>ContactRequestDTO</code>. Ou seja, o Spring irá:</p>
+            <ol>
+                <li>Ler o corpo da requisição HTTP (por exemplo, um JSON enviado via POST);</li>
+                <li>Usar uma biblioteca de mapeamento de objetos (por padrão, o Jackson) para converter os dados para o
+                    tipo <code>ContactRequestDTO</code>;</li>
+                <li>Entregar esse objeto já populado ao método do controller, pronto para ser utilizado na lógica de
+                    negócios.</li>
+            </ol>
+            <p>Por exemplo, se o cliente enviar a seguinte requisição:</p>
+            <pre><code class="language-http">POST /api/contacts
+Content-Type: application/json
+
+{
+  &quot;nome&quot;: &quot;Maria Oliveira&quot;,
+  &quot;email&quot;: &quot;maria@email.com&quot;,
+  &quot;telefone&quot;: &quot;11999999999&quot;,
+  &quot;addresses&quot;: [
+    {
+      &quot;rua&quot;: &quot;Rua das Flores&quot;,
+      &quot;cidade&quot;: &quot;São Paulo&quot;,
+      &quot;estado&quot;: &quot;SP&quot;,
+      &quot;cep&quot;: &quot;01234-567&quot;
+    }
+  ]
+}
+</code></pre>
+            <p>O Spring automaticamente transforma esse corpo JSON em um objeto <code>ContactRequestDTO</code> com os
+                respectivos campos preenchidos — sem que o desenvolvedor precise escrever manualmente qualquer código de
+                parsing ou conversão.</p>
+            <p>Além disso, como o DTO é anotado com <code>@Valid</code>, o Spring também realiza <strong>validação
+                    automática dos campos</strong> com base nas anotações de Bean Validation (como
+                <code>@NotBlank</code>, <code>@Email</code>, etc.). Se houver qualquer erro de validação, o Spring
+                lançará uma exceção do tipo <code>MethodArgumentNotValidException</code>, que pode ser tratada
+                globalmente para retornar uma resposta padronizada de erro.</p>
+            <p>Portanto, o uso do <code>@RequestBody</code> promove maior desacoplamento entre os dados da requisição e
+                a lógica da aplicação, além de permitir a integração limpa com validação e documentação automática da
+                API.</p>
+            <p>O objeto DTO é convertido diretamente para a entidade <code>Contact</code> com o
+                <code>ModelMapper</code>. Contudo, como a entidade <code>Contact</code> tem uma relação bidirecional com
+                <code>Address</code> (endereços), é necessário que cada endereço tenha seu campo <code>contact</code>
+                corretamente associado. Isso é feito manualmente com:</p>
+            <pre><code class="language-java">contact.getAddresses().forEach(address -&gt; address.setContact(contact));
+</code></pre>
+            <p>Aqui estamos usando, novamente, a interface funcional do Java para facilitar nossa sintaxe. A linha acima
+                é equivalente a:</p>
+            <pre><code class="language-java">for (Address address : contact.getAddresses()) {
+    address.setContact(contact);
+}
+</code></pre>
+            <p>De qualquer forma, seja usando a forma funcional (com <code>Lambda</code>) ou imperativa (com
+                <code>foreach</code>), sem esse trecho o campo <code>contact</code> dentro de cada <code>Address</code>
+                ficaria <code>null</code>. Como resultado:</p>
+            <ul>
+                <li>O JPA/Hibernate não conseguiria gerar corretamente a chave estrangeira (<code>contact_id</code>, por
+                    exemplo) na tabela de endereços;</li>
+                <li>Poderiam surgir erros de integridade referencial no banco de dados;</li>
+            </ul>
+            <p>Depois de configurar as associações, o contato é salvo via <code>contactRepository.save(contact)</code>.
+                O objeto salvo (que agora tem <code>id</code> e os endereços com <code>contact_id</code>) é convertido
+                para <code>ContactResponseDTO</code> e retornado com código 201 (CREATED) usando:</p>
+            <pre><code class="language-java">return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+</code></pre>
+            <p>E assim, mais um método de nosso Controller está refatorado. Passemos ao próximo!</p>
+            <h3>🔎 Método 4: <code>updateContact(Long id, ContactRequestDTO dto)</code></h3>
+            <pre><code class="language-java">/**
+* Atualiza um contato existente.
+* 
+* @param id  identificador do contato
+* @param dto novos dados do contato
+* @return contato atualizado
+* @throws ResourceNotFoundException se o contato não for encontrado
+*/
+@Operation(summary = &quot;Atualizar contato&quot;, description = &quot;Atualiza todos os dados de um contato existente&quot;)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contato atualizado com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Dados inválidos&quot;),
+    @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+@PutMapping(&quot;/{id}&quot;)
+public ResponseEntity&lt;ContactResponseDTO&gt; updateContact(@PathVariable Long id, @Valid @RequestBody ContactRequestDTO dto) {
+    Contact existingContact = contactRepository.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+
+    modelMapper.map(dto, existingContact);
+    existingContact.getAddresses().forEach(address -&gt; address.setContact(existingContact));
+    Contact updated = contactRepository.save(existingContact);
+    ContactResponseDTO responseDTO = modelMapper.map(updated, ContactResponseDTO.class);
+    return ResponseEntity.ok(responseDTO);
+}
+</code></pre>
+            <p>O método <code>updateContact</code> é responsável por <strong>atualizar completamente</strong> os dados
+                de um contato já existente. Aqui utilizamos a anotação <code>@PutMapping</code>, que, conforme o padrão
+                REST que vimos na Aula 03, indica que a atualização deve substituir <strong>integralmente</strong> o
+                recurso identificado.</p>
+            <p>O processo começa com a tentativa de buscar o contato no banco de dados pelo <code>id</code> informado na
+                URL. Caso o contato não seja encontrado, a exceção personalizada do tipo
+                <code>ResourceNotFoundException</code> é lançada, retornando uma resposta HTTP 404 (Not Found).</p>
+            <p>Se o contato for encontrado, o objeto <code>ContactRequestDTO</code> enviado no corpo da requisição é
+                mapeado para o objeto <code>Contact</code> existente usando o <code>ModelMapper</code>. O mesmo processo
+                que usamos anteriormente 😊</p>
+            <p>Nesse método (<code>updateContact</code>), o mapeamento automático do <code>ModelMapper</code> é usado
+                para substituir os dados antigos pelos novos — com exceção de associações que exigem tratamento
+                especial, como a relação entre <code>Contact</code> e seus <code>Address</code>.</p>
+            <p>Logo após, associamos os endereços ao contato por meio da seguinte operação:</p>
+            <pre><code class="language-java">existingContact.getAddresses().forEach(address -&gt; address.setContact(existingContact));
+</code></pre>
+            <p>Esse trecho percorre a lista de endereços (<code>addresses</code>) associados ao contato e, para
+                <strong>cada um deles</strong>, define explicitamente o <code>Contact</code> pai. Esse <em>bind
+                    reverso</em> é necessário porque, ao mapear o DTO para a entidade, o <code>ModelMapper</code>
+                <strong>não estabelece automaticamente</strong> essa associação de volta. Em outras palavras, os
+                endereços sabem seus próprios dados (rua, cidade, etc.), mas não sabem a quem pertencem — e isso precisa
+                ser explicitado manualmente.</p>
+            <p>Isso acontece porque os objetos <code>Address</code> recebidos via DTO não carregam, por padrão, a
+                referência para o contato pai (<code>Contact</code>). Essa referência é essencial para manter a
+                integridade da relação bidirecional entre as entidades e permitir que o JPA gere corretamente a chave
+                estrangeira na tabela de endereços.</p>
+            <p><strong>Nós poderíamos ter configurado isso criando <code>TypeMaps</code> personalizados</strong>, que
+                permitem instruir o <code>ModelMapper</code> a <strong>ignorar ou tratar de forma específica certos
+                    campos</strong>, como listas aninhadas ou relações bidirecionais. Por exemplo, para <strong>evitar
+                    que o <code>ModelMapper</code> substitua diretamente a lista de endereços sem realizar o vínculo
+                    reverso com o <code>Contact</code></strong>, podemos configurar um <code>TypeMap</code> que
+                <strong>ignore o mapeamento automático do campo <code>addresses</code></strong> e depois fazer o
+                controle manual. Dessa forma, <strong>ganharíamos um pouco mais de clareza e previsibilidade no
+                    mapeamento</strong>, especialmente em estruturas mais complexas com relacionamentos bidirecionais.
+                Isso serve o propósito de evitar possíveis erros de persistência, como violação de integridade
+                referencial, e facilita a manutenção do código, pois o mapeamento torna-se explícito apenas onde
+                realmente é necessário.</p>
+            <p>Novamente: não optamos por essa configuração justamente porque estamos seguindo uma abordagem
+                <strong>evolutiva e pedagógica</strong> no desenvolvimento do projeto — o objetivo é <strong>compreender
+                    passo a passo os motivos por trás de cada decisão</strong>, construindo conhecimento sólido antes de
+                introduzir abstrações mais avançadas.</p>
+            <p>Após esse ajuste, o contato é salvo novamente no repositório (persistido no banco de dados), e a entidade
+                atualizada é convertida para <code>ContactResponseDTO</code>, que será retornado ao cliente com uma
+                resposta <code>200 OK</code>.</p>
+            <h3>🔎 Método 5: <code>updateContactPartial(Long id, ContactPatchDTO dto)</code></h3>
+            <pre><code class="language-java">/**
+* Atualiza parcialmente um contato existente.
+* 
+* @param id  identificador do contato
+* @param dto dados a serem atualizados
+* @return contato atualizado
+* @throws ResourceNotFoundException se o contato não for encontrado
+*/
+@Operation(summary = &quot;Atualizar contato parcialmente&quot;, description = &quot;Atualiza apenas os campos especificados de um contato existente&quot;)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Contato atualizado com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+@PatchMapping(&quot;/{id}&quot;)
+public ResponseEntity&lt;ContactResponseDTO&gt; updateContactPartial(@PathVariable Long id, @RequestBody ContactPatchDTO dto) {
+    Contact existingContact = contactRepository.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+    dto.getNome().ifPresent(existingContact::setNome);
+    dto.getEmail().ifPresent(existingContact::setEmail);
+    dto.getTelefone().ifPresent(existingContact::setTelefone);
+    Contact saved = contactRepository.save(existingContact);
+    ContactResponseDTO responseDTO = modelMapper.map(saved, ContactResponseDTO.class);
+    return ResponseEntity.ok(responseDTO);
+}
+</code></pre>
+            <p>O método <code>updateContactPartial</code> tem como objetivo realizar a <strong>atualização
+                    parcial</strong> de um contato existente no sistema, utilizando o padrão HTTP
+                <strong>PATCH</strong>. Esse padrão indica que apenas parte dos dados de um recurso será modificada, ao
+                contrário do PUT, que exige a substituição completa. Lembrem-se que abordamos esse conceito nas aulas
+                anteriores. 🤓</p>
+            <p>Ao receber uma requisição com o identificador (<code>id</code>) do contato e um corpo contendo apenas os
+                campos que devem ser atualizados, o método começa realizando uma busca pelo contato correspondente no
+                repositório. Caso não exista, uma exceção do tipo <code>ResourceNotFoundException</code> é lançada,
+                resultando em uma resposta HTTP 404 (Not Found).</p>
+            <p>O DTO utilizado neste método é o <code>ContactPatchDTO</code>, cuja principal característica é que seus
+                atributos são declarados como <code>Optional&lt;String&gt;</code>. Essa escolha é intencional e permite
+                diferenciar com clareza se um campo foi de fato enviado na requisição ou não. Por exemplo,
+                <code>Optional.empty()</code> indica que o campo não foi enviado, enquanto
+                <code>Optional.of(&quot;valor&quot;)</code> indica que o campo foi fornecido e deve ser processado.</p>
+            <p>A lógica do método utiliza o método <code>ifPresent</code> de cada <code>Optional</code> para atualizar
+                apenas os campos que estão presentes. Veja o trecho:</p>
+            <pre><code class="language-java">dto.getNome().ifPresent(existingContact::setNome);
+dto.getEmail().ifPresent(existingContact::setEmail);
+dto.getTelefone().ifPresent(existingContact::setTelefone);
+</code></pre>
+            <p>Cada chamada acima verifica se o campo está presente no DTO. Se estiver, o valor é passado ao método
+                <code>set</code> correspondente do objeto <code>Contact</code> existente. Caso não esteja, o campo
+                permanece inalterado.</p>
+            <p><strong>🤔 E essa sintaxe com uso de <code>::</code>?</strong></p>
+            <p>A expressão <code>existingContact::setNome</code> (bem como as demais) representa uma <strong>referência
+                    de método</strong> (ou <em>method reference</em>), uma funcionalidade introduzida no Java 8 que
+                permite passar métodos como argumentos de forma mais concisa e legível. No contexto do código
+                <code>dto.getNome().ifPresent(existingContact::setNome);</code>, essa referência está sendo usada para
+                aplicar uma função ao valor presente em um <code>Optional</code>.</p>
+            <p>Mais especificamente, <code>existingContact::setNome</code> é uma forma simplificada de escrever uma
+                <em>lambda expression</em> como <code>nome -&gt; existingContact.setNome(nome)</code>. Ambas executam a
+                mesma operação, mas a versão com <code>::</code> torna o código mais enxuto e elegante. O método
+                <code>ifPresent</code> da classe <code>Optional</code> aceita um argumento do tipo
+                <code>Consumer&lt;T&gt;</code>, ou seja, uma função que recebe um parâmetro e retorna <code>void</code>.
+                Como <code>setNome(String nome)</code> satisfaz essa exigência — recebe uma <code>String</code> e não
+                retorna nada — ele pode ser referenciado diretamente com a sintaxe
+                <code>existingContact::setNome</code>.</p>
+            <p>Mesmo que o método <code>setNome</code> não esteja declarado explicitamente na classe
+                <code>Contact</code>, o uso do Lombok (através de anotações como <code>@Data</code>,
+                <code>@Setter</code>, ou <code>@Builder</code>) garante que esse método seja gerado em tempo de
+                compilação. Isso significa que o compilador reconhece e permite o uso da referência ao método, mesmo que
+                ele não esteja visível no código-fonte.</p>
+            <p>Ou seja, há duas formas possíveis de aplicar o valor de <code>dto.getNome()</code> ao objeto
+                <code>existingContact</code>:</p>
+            <p><strong>Com lambda:</strong></p>
+            <pre><code class="language-java">dto.getNome().ifPresent(nome -&gt; existingContact.setNome(nome));
+</code></pre>
+            <p><strong>Com method reference (forma preferida):</strong></p>
+            <pre><code class="language-java">dto.getNome().ifPresent(existingContact::setNome);
+</code></pre>
+            <p>A segunda forma é preferida quando possível, pois reduz o boilerplate, melhora a clareza e facilita a
+                leitura do código. Esse tipo de recurso é especialmente útil em operações com <code>Optional</code>,
+                <code>Stream</code>, ou qualquer outra API funcional introduzida no Java 8.</p>
+            <p>Capisci? 🤌</p>
+            <p>Voltando ao fluxo de execução do nosso método, após aplicar as alterações o objeto atualizado é salvo no
+                banco de dados com <code>contactRepository.save(existingContact)</code>. Em seguida, o objeto persistido
+                é convertido em um DTO de resposta (<code>ContactResponseDTO</code>) por meio do
+                <code>ModelMapper</code>, e retornado ao cliente com o status HTTP 200 (OK).</p>
+            <h3>🔎 Método 6: <code>deleteContact(Long id)</code></h3>
+            <pre><code class="language-java">/**
+ * * Exclui um contato.
+* 
+* @param id identificador do contato
+* @return resposta sem conteúdo
+* @throws ResourceNotFoundException se o contato não for encontrado
+*/
+@Operation(summary = &quot;Excluir contato&quot;, description = &quot;Remove permanentemente um contato do sistema&quot;)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Contato excluído com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Contato não encontrado&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+@DeleteMapping(&quot;/{id}&quot;)
+public ResponseEntity&lt;Void&gt; deleteContact(@PathVariable Long id) {
+    if (!contactRepository.existsById(id)) {
+        throw new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id);
+    }
+    contactRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
+}
+</code></pre>
+            <p>Outro método que já vimos na seção anterior, mas só para reforçar: este método exclui um contato com base
+                no <code>id</code>. A anotação <code>@DeleteMapping</code> indica uma operação de deleção. Antes da
+                exclusão, é verificado se o contato realmente existe com <code>existsById</code>. Se não existir, uma
+                exceção é lançada. </p>
+            <p>Se a exclusão ocorrer com sucesso, o retorno é <code>ResponseEntity.noContent().build()</code> com o
+                código de status HTTP 204, que indica sucesso sem conteúdo: <code>.noContent()</code> é um método
+                estático da classe ResponseEntity que retorna um <code>ResponseEntity.BodyBuilder</code> com o código de
+                status HTTP 204 já configurado e <code>.build()</code> é o método que finaliza a construção da resposta
+                sem corpo (ou seja, com null no body).</p>
+            <h3>🔎 Método 7: <code>searchContactsByName(String name, Pageable pageable)</code></h3>
+            <pre><code class="language-java">/**
+* * Busca contatos pelo nome.
+*
+* @param name     nome ou parte do nome a ser pesquisado
+* @param pageable informações de paginação
+* @return lista paginada de contatos que correspondem ao critério de busca
+*/
+@Operation(summary = &quot;Buscar contatos por nome&quot;, description = &quot;Retorna uma lista paginada de contatos cujo nome contém o termo pesquisado&quot;)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Busca realizada com sucesso&quot;),
+    @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Acesso negado&quot;, content = @Content)
+})
+@GetMapping(&quot;/search&quot;)
+public ResponseEntity&lt;Page&lt;ContactResponseDTO&gt;&gt; searchContactsByName(@RequestParam String name, Pageable pageable) {
+    Page&lt;Contact&gt; contacts = contactRepository.findByNomeContainingIgnoreCase(name, pageable);
+    Page&lt;ContactResponseDTO&gt; responseDTO = contacts
+        .map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
+    return ResponseEntity.ok(responseDTO);
+}
+</code></pre>
+            <p>O método <code>searchContactsByName</code> é responsável por realizar uma busca paginada de contatos cujo
+                nome contenha determinada substring informada como parâmetro da requisição. O endpoint está mapeado para
+                o caminho <code>/api/contacts/search</code> e responde a requisições HTTP GET.</p>
+            <p>Novamente, todos os conceitos abordados abaixo já foram vistos, mas vamos reforçá-los mesmo assim. 😌</p>
+            <p>A busca funciona a partir do uso da anotação <code>@RequestParam String name</code>, que indica que o
+                parâmetro <code>name</code> será recebido por meio da <strong>query string</strong> da requisição. Por
+                exemplo, uma chamada à URL <code>/api/contacts/search?name=ana</code> resultará em uma busca por todos
+                os contatos cujo nome contenha o texto &quot;ana&quot;, independentemente de letras maiúsculas ou
+                minúsculas, graças ao uso do método <code>findByNomeContainingIgnoreCase</code> no repositório (visto na
+                aula anterior!).</p>
+            <p>O segundo parâmetro do método é um objeto <code>Pageable</code>, que é injetado automaticamente pelo
+                Spring com base nos parâmetros da requisição. Mais uma vez: a interface <code>Pageable</code> encapsula
+                informações sobre a <strong>página atual</strong>, o <strong>tamanho da página</strong> e o
+                <strong>critério de ordenação</strong>, todos fornecidos via query string (ex:
+                <code>?page=0&amp;size=10&amp;sort=nome,asc</code>). O Spring cuida de interpretar esses valores e
+                construir um objeto <code>Pageable</code> correspondente.</p>
+            <p>Com o <code>Pageable</code> em mãos, o método consulta o repositório usando
+                <code>findByNomeContainingIgnoreCase</code>, que retorna um objeto <code>Page&lt;Contact&gt;</code>.
+                Essa interface representa não apenas os dados, mas também metadados da consulta, como o número total de
+                páginas, o número da página atual, e o número total de elementos. Isso é extremamente útil em APIs REST
+                que precisam fornecer paginação para o cliente de forma eficiente e padronizada.</p>
+            <p>Em seguida, cada objeto <code>Contact</code> retornado pela consulta é convertido em um
+                <code>ContactResponseDTO</code>. No caso, usamos uma <strong>expressão lambda</strong> com o
+                <code>ModelMapper</code> para realizar essa conversão:
+                <code>contact -&gt; modelMapper.map(contact, ContactResponseDTO.class)</code>.</p>
+            <p>Por fim, o resultado — agora representado como <code>Page&lt;ContactResponseDTO&gt;</code> — é
+                encapsulado em um <code>ResponseEntity</code> com código de status 200 (OK), utilizando
+                <code>ResponseEntity.ok(...)</code>. O corpo da resposta inclui os dados paginados dos contatos, além de
+                informações úteis para o frontend, como a quantidade total de elementos, total de páginas, tamanho da
+                página, e indicadores se é a primeira ou última página.</p>
+            <p>Essa abordagem oferece uma implementação aderente aos princípios REST. Além disso, é flexível o
+                suficiente para permitir futuras evoluções, como o uso de HATEOAS (com <code>PagedModel</code>) ou a
+                personalização de ordenações e filtros.</p>
+            <hr>
+            <h3>🧠 Considerações Finais sobre a classe <code>ContactController</code></h3>
+            <p>A classe <code>ContactController</code>, agora refatorada, apresenta uma estrutura alinhada com as boas
+                práticas do desenvolvimento de APIs REST com Spring Boot. O uso de <code>Pageable</code> como parâmetro
+                nos métodos permite o controle eficiente sobre a paginação e ordenação dos dados, tornando a API mais
+                escalável e flexível diante de grandes volumes de registros. O retorno como <code>Page</code> carrega,
+                além dos dados em si, informações úteis como número total de elementos, total de páginas, número da
+                página atual, e indicadores de primeira ou última página, facilitando bastante a implementação de
+                interfaces paginadas no cliente.</p>
+            <p>Outro ponto positivo é a adoção do <code>ModelMapper</code>, que fizemos na última aula, evitando
+                mapeamentos manuais repetitivos entre entidades e DTOs, reduzindo o boilerplate e aumentando a
+                legibilidade do código. Ainda assim, a flexibilidade oferecida pelo <code>ModelMapper</code> permite
+                ajustes e personalizações pontuais, como no caso da relação entre <code>Contact</code> e
+                <code>Address</code>, em que foi necessário realizar o “bind reverso” para manter a integridade
+                relacional.</p>
+            <p>O uso do <code>ResponseEntity</code> em todos os métodos também é um ponto de destaque. Essa abordagem
+                confere à API mais controle e clareza, permitindo especificar de forma explícita o código de status
+                HTTP, cabeçalhos adicionais e o corpo da resposta — o que é essencial em cenários mais complexos, como
+                tratamento de erros, redirecionamentos ou retornos com metadados.</p>
+            <p>A classe também está documentada com o uso de anotações da especificação OpenAPI, como
+                <code>@Operation</code> e <code>@ApiResponses</code>. Isso facilita a geração de documentação interativa
+                via Swagger UI, tornando a API mais acessível para desenvolvedores e stakeholders.</p>
+            <p>No entanto, apesar da clareza da implementação atual, ainda há <strong>melhorias que podem ser
+                    introduzidas</strong> para fortalecer ainda mais a arquitetura da aplicação. A principal delas é a
+                <strong>separação da lógica de negócio para uma camada de serviço (<code>@Service</code>)</strong>, o
+                que promoveria uma melhor organização e reutilização do código. Atualmente, o controller executa
+                operações como a verificação de existência de recursos, salvamento de entidades e manipulação direta de
+                objetos de domínio. Com a introdução de uma camada de serviço, o controller se tornaria mais enxuto e
+                focado apenas na orquestração das requisições e respostas HTTP, enquanto as regras de negócio passariam
+                a ser encapsuladas de forma reutilizável e testável. Para evitar tomar mais tempo nesse projeto, visto
+                que temos ainda que introduzir conceitos de testes e segurança, faremos essa separação de camadas em um
+                projeto posterior.</p>
+            <p>Além disso, a aplicação pode evoluir para usar <strong>Spring HATEOAS</strong> (Hypermedia as the Engine
+                of Application State), permitindo que as respostas incluam links de navegação e ações relacionadas ao
+                recurso (como &quot;próxima página&quot;, &quot;editar&quot;, &quot;excluir&quot;). Essa abordagem
+                melhora a <strong>descoberta de recursos</strong> pela API e oferece um ganho significativo na
+                usabilidade e autoexplicação da interface REST. Além disso, há também a possibilidade de definir
+                <strong>DTOs específicos para retorno paginado</strong>, ao invés de expor diretamente a estrutura do
+                <code>Page&lt;T&gt;</code>. Essa abordagem melhora a clareza da documentação e permite adicionar
+                informações extras ao corpo da resposta, como mensagens personalizadas ou estatísticas agregadas. Além
+                disso, isso garantiria que nossas respostas estivessem desacopladas da estrutura interna da
+                implementação do <code>Page&lt;T&gt;</code>. Ou seja: mesmo que a estrutura do Spring mude, nossa
+                resposta permanece a mesma, garantindo que não quebraríamos nossos clientes.</p>
+            <p>Por fim, na nossa <code>AddressController</code> é necessário aplicar as mesmas melhorias que fizemos na
+                <code>ContactController</code>. Para fins pedagógicos, não mostrarei a implementação! Portanto, sua
+                tarefa agora é <strong>fazer as modificações e testar as refatorações na
+                    <code>AddressController</code>!</strong></p>
+            <p>Dito isso, vamos verificar agora como podemos implementar testes na nossa aplicação!</p>
+            <hr>
+            <h2>3. 🧪 Testes Automatizados: Unitários e Funcionais</h2>
+            <p>Os testes automatizados são uma prática importante no desenvolvimento de software. Eles garantem que o
+                sistema funcione conforme o esperado, facilitando a identificação precoce de falhas e permitindo maior
+                confiança durante manutenções e evoluções da aplicação. Nesta fase do projeto, vamos explorar dois tipos
+                de testes amplamente utilizados: <strong>testes unitários</strong> e <strong>testes funcionais</strong>,
+                entendendo suas diferenças, suas aplicações e seus benefícios.</p>
+            <p>Os <strong>testes unitários</strong> têm como objetivo verificar o comportamento de uma <strong>unidade
+                    isolada de código</strong>, geralmente um método ou classe. Em nosso caso, aplicaremos esse tipo de
+                teste aos controladores, validando se, por exemplo, o método <code>getContactById()</code> retorna o DTO
+                correto diante de um <code>Contact</code> válido retornado pelo repositório. Para isso, simulamos as
+                dependências (como repositórios e mapeadores) com o uso de <em>mocks</em> via bibliotecas como Mockito,
+                e utilizamos a anotação <code>@WebMvcTest</code> para carregar apenas o contexto necessário do Spring.
+            </p>
+            <p>Já os <strong>testes funcionais</strong> (também conhecidos como testes de ponta a ponta ou de integração
+                de alto nível) verificam o <strong>comportamento da aplicação como um todo</strong>, a partir da
+                perspectiva do cliente. Simulam requisições HTTP reais e validam a resposta completa da API — status,
+                corpo, headers — utilizando ferramentas como o <code>MockMvc</code> ou <code>TestRestTemplate</code>
+                combinadas com <code>@SpringBootTest</code>. Isso garante que todas as camadas (controller, service,
+                repository) estejam funcionando de forma integrada.</p>
+            <p>A grande diferença entre os dois tipos de teste é justamente o <strong>nível de isolamento</strong>:
+                enquanto o teste unitário verifica uma peça de código individual em um ambiente controlado, o teste
+                funcional executa um fluxo real do sistema em execução. Ambos são importantes e se complementam: o
+                primeiro nos dá precisão, o segundo, confiança.</p>
+            <p>Um dos principais benefícios dos testes automatizados está na <strong>refatoração segura do
+                    código</strong>. Quando queremos melhorar ou modificar uma implementação — seja otimizando um
+                algoritmo, movendo uma lógica para outro serviço ou alterando um mapeamento de DTO — os testes servem
+                como uma <strong>rede de segurança</strong>. Se todos continuarem passando após a refatoração, sabemos
+                que mantivemos o comportamento original intacto. Isso é ainda mais importante em projetos de médio e
+                grande porte, onde mudanças podem impactar múltiplos pontos do sistema. Lembrem-se das aulas de
+                Engenharia de Software, particularmente onde falamos sobre as práticas de Refatoração de Código Limpo!
+            </p>
+            <p>Além disso, os testes são cruciais para a <strong>manutenibilidade do software</strong>. Um sistema com
+                testes bem escritos se torna mais confiável e fácil de evoluir, pois a equipe consegue validar
+                rapidamente o impacto de novas funcionalidades ou correções. Eles também atuam como uma forma de
+                documentação viva, pois expressam de maneira clara e executável o comportamento esperado de cada
+                componente. Dessa forma seu custo de manutenção ao longo do ciclo de vida tende a ser bastante
+                controlado em relação aos códigos legados que não possuem testes.</p>
+            <p>Por isso, nesta etapa do projeto, investiremos tempo para introduzir a implementação de testes — tanto
+                unitários quanto funcionais — cobrindo os cenários positivos e negativos da aplicação. Isso</p>
+            <p>O objetivo é garantir que os comportamentos esperados da aplicação estejam sempre funcionando
+                corretamente, mesmo diante de futuras alterações no código.</p>
+            <p>Podemos sintetizar isso da seguinte forma:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo de Teste</th>
+                        <th>Foco</th>
+                        <th>Exemplo prático</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Teste Unitário</td>
+                        <td>Testar uma unidade isolada</td>
+                        <td>Um método de um controller ou serviço</td>
+                    </tr>
+                    <tr>
+                        <td>Teste Funcional</td>
+                        <td>Testar a aplicação como um todo</td>
+                        <td>Uma chamada HTTP que testa o fluxo completo da API</td>
+                    </tr>
+                    <tr>
+                        <td>Teste de Integração</td>
+                        <td>Testar integração entre módulos</td>
+                        <td>O repositório conversando com o banco de dados</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Para essa aula, focaremos em:</p>
+            <ul>
+                <li><strong>Testes unitários</strong> dos <em>controllers</em></li>
+                <li><strong>Testes funcionais</strong> da API, simulando chamadas HTTP</li>
+            </ul>
+            <p>Esses testes nos ajudarão a validar os endpoints, as regras de negócio, o comportamento dos DTOs e as
+                interações com o banco de dados de forma mais robusta.</p>
+            <h3>🤔 O que são <strong>mocks?</strong></h3>
+            <p>Mocks são como <strong>atores substitutos</strong> em uma peça de teatro: eles imitam o comportamento de
+                outros personagens para que a cena possa ser ensaiada, mesmo quando os atores principais não estão
+                presentes. Em testes de software, mocks são <strong>objetos falsos</strong> usados para simular o
+                comportamento de componentes reais (como um banco de dados, um serviço externo ou um repositório) sem
+                realmente executar suas funcionalidades.</p>
+            <p>Por exemplo, imagine que você está testando uma classe <code>ContactController</code>, que depende de um
+                <code>ContactRepository</code> para buscar contatos no banco. Em vez de acessar um banco de dados real,
+                você cria um <strong>mock do repositório</strong> que diz: “quando alguém me perguntar pelo contato com
+                ID 1, vou fingir que existe e devolver esse objeto aqui”. Assim, o foco do teste fica apenas no
+                comportamento do controller — e <strong>não no banco</strong>.</p>
+            <p>Mocks ajudam a deixar os testes <strong>mais rápidos, previsíveis e isolados</strong>, como se
+                estivéssemos testando uma peça do motor sem precisar ligar o carro todo. Eles são especialmente úteis em
+                <strong>testes unitários</strong>, onde queremos validar uma classe específica sem depender de todo o
+                resto da aplicação. Para criar esses “atores substitutos” em Java, usamos ferramentas como o
+                <strong>Mockito</strong>, que permite dizer exatamente o que o mock deve fazer em cada situação.</p>
+            <p>Usar mocks é uma forma inteligente de garantir que estamos testando <strong>apenas o que
+                    importa</strong>, sem efeitos colaterais e sem depender de estruturas externas.</p>
+            <h3>Como estruturar nossos testes? 😱</h3>
+            <p>Uma das formas mais comuns de estruturarmos nossos testes é por meio da utilização da <strong>estrutura
+                    Given-When-Then</strong>.</p>
+            <p>Essa estrutura é um padrão comum para organizar testes de forma clara e legível, inspirado na técnica
+                <strong>Behavior-Driven Development (BDD)</strong>. Ela ajuda a separar as fases do teste para que
+                qualquer pessoa (inclusive quem não é desenvolvedor) entenda o que está sendo testado. Vamos entender
+                cada parte:</p>
+            <ul>
+                <li>
+                    <p><strong>Given</strong> (<em>Dado...</em>) → representa o <strong>contexto</strong> inicial do
+                        teste. É onde preparamos o cenário: criamos objetos, configuramos mocks, definimos entradas etc.
+                    </p>
+                </li>
+                <li>
+                    <p><strong>When</strong> (<em>Quando...</em>) → descreve a <strong>ação</strong> que está sendo
+                        testada. Geralmente é a chamada de um método, envio de uma requisição ou invocação de uma
+                        operação.</p>
+                </li>
+                <li>
+                    <p><strong>Then</strong> (<em>Então...</em>) → especifica os <strong>resultados esperados</strong>.
+                        Aqui usamos <em>assertions</em> para verificar se o comportamento do código foi o correto.</p>
+                </li>
+            </ul>
+            <pre><code class="language-java">@Test
+void deveRetornarUmContatoQuandoIdForValido() {
+    // Given
+    Long id = 1L;
+    Contact contact = new Contact(&quot;João&quot;, &quot;joao@email.com&quot;, &quot;11999999999&quot;);
+    ReflectionTestUtils.setField(contact, &quot;id&quot;, id);
+
+    // When
+    when(contactRepository.findById(id)).thenReturn(Optional.of(contact));
+    ResponseEntity&lt;ContactResponseDTO&gt; response = contactController.getContactById(id);
+
+    // Then
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(id, response.getBody().getId());
+}
+</code></pre>
+            <p>Perceba que ao final dos testes usaremos Assertions para verificar os resultados.</p>
+            <h3>🧪 <strong>O que são Assertions</strong></h3>
+            <p><strong>Assertions</strong> (ou <strong>afirmações</strong>) são instruções que verificam se o resultado
+                de um teste está <strong>de acordo com o esperado</strong>. Elas são a parte mais importante do
+                <em>Then</em> e dizem: “Isso que aconteceu é o que eu esperava?”</p>
+            <p>Alguns exemplos com <code>JUnit</code>:</p>
+            <pre><code class="language-java">assertEquals(2, resultado); // Verifica se o valor é 2
+assertTrue(lista.isEmpty()); // Verifica se a lista está vazia
+assertThrows(IllegalArgumentException.class, () -&gt; metodoQueDeveFalhar()); // Verifica se uma exceção foi lançada
+</code></pre>
+            <p>Se uma asserção falhar, o teste <strong>falha</strong>, o que indica, portanto, que o código não está se
+                comportando como deveria.</p>
+            <h3>Testes como ferramenta de qualidade de entrega contínua? ♻️</h3>
+            <p>Quando falamos sobre testes, eles são normalmente executados em:</p>
+            <ul>
+                <li>
+                    <p>Ambiente local, durante o desenvolvimento</p>
+                </li>
+                <li>
+                    <p>Pipelines de integração contínua (CI), como GitHub Actions, GitLab CI, Jenkins etc., garantindo
+                        que o sistema esteja estável antes de realizar deploys</p>
+                </li>
+            </ul>
+            <p>Isso reforça o papel dos testes não só como ferramenta de desenvolvimento, mas também de qualidade de
+                entrega contínua.</p>
+            <p>Por hora vamos utilizar os testes apenas em ambiente local, mas futuramente abordaremos o uso dele em
+                pipelines de integração contínua.</p>
+            <h3>É só isso que preciso saber sobre testes? 🥳</h3>
+            <p>Não. Na verdade ainda temos muito a falar: importância da cobertura de testes, inserção de mutantes para
+                QA, organização do código de testes e uso de anotações para evitar duplicação em nossa base de testes.
+            </p>
+            <p>De forma geral, o importante é entender que nossa base de testes também precisa estar limpa, assim como
+                nossa base de código de produção. Dessa forma, ao alterarmos nossa base de código para introduzir novas
+                features ou modificar features existentes, temos a possibilidade de alterar o código de teste de forma
+                menos trabalhosa. </p>
+            <p>Mais adiante na disciplina abordaremos novamente essas questões. Feitas essas considerações, passemos à
+                implementação dos testes!</p>
+            <h3>Estrutura de diretórios do nosso projeto 📂</h3>
+            <p>Quando concluirmos a implementação de nossos testes (ao término dessa seção), nossa estrutura de
+                diretórios ficará da maneira vista a seguir:</p>
+            <pre><code>├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── br
+│   │   │       └── ifsp
+│   │   │           └── contacts
+│   │   │               ├── config
+│   │   │               │   └── MapperConfig.java
+│   │   │               ├── controller
+│   │   │               │   ├── AddressController.java
+│   │   │               │   └── ContactController.java
+│   │   │               ├── dto
+│   │   │               │   ├── address
+│   │   │               │   │   ├── AddressRequestDTO.java
+│   │   │               │   │   └── AddressResponseDTO.java
+│   │   │               │   └── contact
+│   │   │               │       ├── ContactPatchDTO.java
+│   │   │               │       ├── ContactRequestDTO.java
+│   │   │               │       └── ContactResponseDTO.java
+│   │   │               ├── exception
+│   │   │               │   ├── GlobalExceptionHandler.java
+│   │   │               │   └── ResourceNotFoundException.java
+│   │   │               ├── model
+│   │   │               │   ├── Address.java
+│   │   │               │   └── Contact.java
+│   │   │               ├── repository
+│   │   │               │   ├── AddressRepository.java
+│   │   │               │   └── ContactRepository.java
+│   │   │               └── ContactsApiApplication.java
+│   │   └── resources
+│   │       ├── application.properties
+│   │       └── application-test.properties
+│   └── test
+│       ├── java
+│       │   └── br
+│       │       └── ifsp
+│       │           └── contacts
+│       │               ├── ContactController
+│       │               │   ├── ContactControllerFunctionalTest.java
+│       │               │   └── ContactControllerUnitTest.java
+│       │               └── ContactsApiApplicationTests.java
+│       └── resources
+│           └── schema.sql
+</code></pre>
+            <p>Antes de começar, entretanto, certifique-se de que seu <code>pom.xml</code> tem as dependências de teste
+                (que o Spring Boot já inclui por padrão):</p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+            <h3>Entendendo os arquivos <code>schema.sql</code> e <code>application-test.properties</code></h3>
+            <p>A introdução dos arquivos <code>schema.sql</code> e <code>application-test.properties</code> na estrutura
+                do projeto, como visto acima, tem como principal objetivo configurar um ambiente de testes isolado,
+                confiável e controlado — essencial para a execução adequada dos testes funcionais e de integração.</p>
+            <p>O arquivo <code>schema.sql</code> é utilizado para definir explicitamente a estrutura das tabelas do
+                banco de dados durante os testes. Ele contém os comandos SQL responsáveis por criar as tabelas
+                necessárias (como <code>CONTACT</code> e <code>ADDRESS</code>) com suas colunas, tipos e
+                relacionamentos. Quando usamos o banco H2 em memória, o Spring precisa de instruções claras sobre como
+                construir esse esquema, especialmente quando a configuração <code>spring.jpa.hibernate.ddl-auto</code>
+                está desativada. Sem esse arquivo, a aplicação pode lançar erros como “table not found” ou apresentar
+                falhas de mapeamento JPA ao executar testes que dependem do acesso ao banco. Para garantir que nossos
+                testes funcionem, vamos criá-lo. </p>
+            <p>Já o <code>application-test.properties</code> é o arquivo de configuração específico para o ambiente de
+                testes. Ele permite sobrescrever as configurações padrão da aplicação e adaptar o ambiente
+                exclusivamente para os testes automatizados. Nele, por exemplo, definimos o uso de um banco H2 em
+                memória, um driver JDBC específico (<code>org.h2.Driver</code>), e evitamos que o Hibernate tente criar
+                ou modificar o banco automaticamente (<code>spring.jpa.hibernate.ddl-auto=none</code>). Também indicamos
+                que o Spring deve utilizar o <code>schema.sql</code> como base para criar o banco de dados ao iniciar os
+                testes. Com isso, garantimos que o ambiente seja inicializado sempre da mesma maneira, sem depender de
+                configurações locais ou de acesso a bancos reais como MySQL ou PostgreSQL - tenha em mente que
+                <strong>nunca, sob hipótese alguma, devemos executar nossos testes no banco de dados real de
+                    produção</strong>.</p>
+            <p>Em conjunto, <code>schema.sql</code> e <code>application-test.properties</code> asseguram que os testes
+                rodem de forma independente, previsível e livre de efeitos colaterais. Isso é fundamental para garantir
+                que os testes automatizados sejam confiáveis, principalmente em processos de integração contínua
+                (CI/CD), onde testes precisam rodar automaticamente a cada nova entrega de código. Se desejarmos, ainda
+                é possível complementar esse ambiente adicionando um arquivo <code>data.sql</code> para popular o banco
+                com dados iniciais e facilitar os testes em cenários reais! Por hora, entretanto, vamos seguir com a
+                implementação maios simples.</p>
+            <h3>Código do <code>schema.sql</code></h3>
+            <pre><code class="language-sql">CREATE TABLE contact (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    telefone VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE address (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    rua VARCHAR(255) NOT NULL,
+    cidade VARCHAR(255) NOT NULL,
+    estado VARCHAR(2) NOT NULL,
+    cep VARCHAR(9) NOT NULL,
+    contact_id BIGINT NOT NULL,
+    CONSTRAINT fk_address_contact FOREIGN KEY (contact_id) REFERENCES contact(id) ON DELETE CASCADE
+);
+</code></pre>
+            <h3>Código do <code>application-test.properties</code></h3>
+            <pre><code class="language-properties">spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.sql.init.mode=always
+spring.sql.init.schema-locations=classpath:schema.sql
+spring.jpa.hibernate.ddl-auto=none
+</code></pre>
+            <h3>🎯 Testando o ContactController com Testes Unitários: Classe <code>ContactControllerUnitTest.java</code>
+            </h3>
+            <pre><code class="language-java">package br.ifsp.contacts.ContactController;
+
+@ExtendWith(MockitoExtension.class)
+public class ContactControllerUnitTest {
+
+    @Mock
+    private ContactRepository contactRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
+    private ContactController contactController;
+
+    @Test
+    void testGetContactById_ReturnsContact() {
+            Long id = 1L;      
+            Contact contact = new Contact(&quot;João&quot;, &quot;joao@email.com&quot;, &quot;11999999999&quot;);
+            Address address = new Address();
+            address.setRua(&quot;Rua A&quot;);
+            address.setCidade(&quot;Cidade A&quot;);
+            address.setEstado(&quot;SP&quot;);
+            address.setCep(&quot;00000-000&quot;);
+            List&lt;Address&gt; addresses = List.of(address);            
+            contact.setAddresses(addresses);
+            ReflectionTestUtils.setField(contact, &quot;id&quot;, id); // ID via reflexão
+        
+            ContactResponseDTO dto = new ContactResponseDTO();
+            dto.setId(id);
+            dto.setNome(&quot;João&quot;);
+            dto.setEmail(&quot;joao@email.com&quot;);
+            dto.setTelefone(&quot;11999999999&quot;);
+        
+            when(contactRepository.findById(id)).thenReturn(Optional.of(contact));
+            when(modelMapper.map(contact, ContactResponseDTO.class)).thenReturn(dto);
+        
+            ResponseEntity&lt;ContactResponseDTO&gt; response = contactController.getContactById(id);
+        
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(id, response.getBody().getId());
+    }
+
+    @Test
+    void testGetContactById_NotFound() {
+        Long id = 999L;
+        when(contactRepository.findById(id)).thenReturn(Optional.empty());
+        
+        assertThrows(ResourceNotFoundException.class, () -&gt; contactController.getContactById(id));
+    }
+}
+</code></pre>
+            <p>Nossa classe <code>ContactControllerUnitTest</code> é responsável por realizar <strong>testes
+                    unitários</strong> no controlador <code>ContactController</code>, utilizando a biblioteca
+                <strong>Mockito</strong> para simular as dependências externas, como o repositório de dados
+                (<code>ContactRepository</code>) e o <code>ModelMapper</code>. O objetivo aqui é testar o comportamento
+                do método <code>getContactById()</code> em dois cenários distintos: quando o contato existe e quando ele
+                não é encontrado. Esse tipo de teste isola a lógica da unidade sob teste — no caso, o método do
+                controller — sem depender de banco de dados real, servidor web ou quaisquer outras partes externas da
+                aplicação. Perceba que estamos testando APENAS o método <code>getContactById()</code>. Em uma aplicação
+                real testaríamos todos os métodos. Aqui, contudo, para fins de brevidade o teste de um método é
+                suficiente para exemplificarmos a ideia geral.</p>
+            <p>A classe está anotada com <code>@ExtendWith(MockitoExtension.class)</code>, que ativa o suporte do
+                Mockito no JUnit 5, permitindo que as anotações <code>@Mock</code> e <code>@InjectMocks</code> funcionem
+                corretamente. A anotação <code>@Mock</code> indica que os objetos <code>contactRepository</code> e
+                <code>modelMapper</code> são <strong>mocks</strong>, ou seja, substituições falsas dos objetos reais. É
+                importante ressaltar que os <code>mocks</code> são usados no <code>ContactRepository</code> e no
+                <code>ModelMapper</code> para simular o comportamento dessas dependências externas ao ContactController
+                durante os testes unitários. Isso permite que testar o controller <strong>isoladamente</strong>, sem
+                depender da lógica real do repositório nem do mapeamento entre entidades e DTOs. A anotação
+                <code>@InjectMocks</code> diz ao Mockito para criar uma instância real de
+                <code>ContactController</code>, injetando nela os mocks criados. Dessa forma, podemos testar a lógica do
+                controller com dependências controladas.</p>
+            <p>Vamos entender isso melhor separadamente:</p>
+            <h4>🗄️ <code>ContactRepository</code> como Mock</h4>
+            <p>O <code>ContactRepository</code> é a interface responsável por acessar o banco de dados. No teste
+                unitário, <strong>não queremos acessar o banco real</strong>, pois:</p>
+            <ul>
+                <li>Tornaria os testes <strong>mais lentos</strong>;</li>
+                <li>Os testes poderiam <strong>falhar por motivos externos</strong> (banco fora do ar, sem dados, etc);
+                </li>
+                <li>Estaríamos testando o banco, e não a lógica do controller.</li>
+            </ul>
+            <p>Ao usar <code>@Mock</code>, você diz: </p>
+            <blockquote>
+                <p>“Eu vou controlar manualmente o que esse repositório retorna quando o método <code>findById()</code>
+                    for chamado.”</p>
+            </blockquote>
+            <p>Exemplo:</p>
+            <pre><code class="language-java">when(contactRepository.findById(1L)).thenReturn(Optional.of(contact));
+</code></pre>
+            <p>Com isso, o teste <strong>não consulta o banco</strong>. Ele apenas simula que, ao buscar o ID 1, o
+                repositório retornaria um contato já definido no teste.</p>
+            <h4>🔄 <code>ModelMapper</code> como Mock</h4>
+            <p>O <code>ModelMapper</code> faz a conversão entre a entidade <code>Contact</code> e o DTO
+                <code>ContactResponseDTO</code>. Embora o mapeamento não dependa de banco, ele pode envolver regras
+                específicas ou lançar exceções se houver erros.</p>
+            <p>No teste unitário, não queremos verificar <strong>se o mapeamento funciona corretamente</strong> — isso
+                seria papel de um teste separado (ou já é garantido por testes da própria lib).</p>
+            <p>Ao usar <code>@Mock</code>, você evita que o <code>ModelMapper</code> execute a lógica real e garante
+                previsibilidade:</p>
+            <pre><code class="language-java">when(modelMapper.map(contact, ContactResponseDTO.class)).thenReturn(dto);
+</code></pre>
+            <p>Assim, você controla diretamente <strong>qual DTO será retornado</strong>, sem depender da configuração
+                do mapper.</p>
+            <h3>✅ Benefícios de Usar Mocks Aqui</h3>
+            <ol>
+                <li><strong>Isolamento</strong>: O teste foca exclusivamente no comportamento do controller.</li>
+                <li><strong>Velocidade</strong>: Sem conexão com banco ou execução de lógica de mapeamento.</li>
+                <li><strong>Controle</strong>: Você define exatamente o que acontece quando métodos do mock são
+                    chamados.</li>
+                <li><strong>Confiabilidade</strong>: O teste não falha por problemas em outras partes do sistema.</li>
+            </ol>
+            <p>Entendido isso, passemos à análise de cada um dos métodos dessa classe.</p>
+            <h3>Método <code>testGetContactById_ReturnsContact()</code></h3>
+            <p>Esse método testa o cenário em que o contato <strong>existe</strong> no repositório. Vamos destrinchar as
+                etapas do teste:</p>
+            <ol>
+                <li>
+                    <p><strong>Given (cenário)</strong>:</p>
+                    <ul>
+                        <li>É criado um <code>Contact</code> com nome, e-mail e telefone.</li>
+                        <li>Um <code>Address</code> é criado e associado a esse contato.</li>
+                        <li>O ID do contato é definido com a ajuda do <code>ReflectionTestUtils.setField()</code>, já
+                            que o campo <code>id</code> é privado e não tem <code>setId()</code>.</li>
+                        <li>Um <code>ContactResponseDTO</code> (o objeto que deve ser retornado ao cliente) também é
+                            configurado com os mesmos dados.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>When (ação)</strong>:</p>
+                    <ul>
+                        <li>É feito um <code>when().thenReturn()</code> para simular que, ao chamar
+                            <code>findById(1L)</code> no repositório, será retornado o <code>Contact</code> criado.</li>
+                        <li>Também se configura que, ao mapear esse <code>Contact</code> com o <code>modelMapper</code>,
+                            será retornado o <code>dto</code>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Then (verificação)</strong>:</p>
+                    <ul>
+                        <li>É chamado <code>getContactById(1L)</code> no controller.</li>
+                        <li>O teste verifica se o status HTTP retornado é 200 OK e se o <code>id</code> retornado no
+                            corpo da resposta é igual ao esperado.</li>
+                    </ul>
+                </li>
+            </ol>
+            <p>Esse teste assegura que, <strong>dado um contato existente</strong>, o controller irá corretamente
+                buscar, mapear e retornar o DTO correspondente.</p>
+            <h3>Método <code>testGetContactById_NotFound()</code></h3>
+            <p>Esse teste cobre o cenário oposto: quando o contato <strong>não existe</strong>.</p>
+            <ol>
+                <li>
+                    <p><strong>Given</strong>:</p>
+                    <ul>
+                        <li>Define-se um ID inválido, por exemplo <code>999L</code>.</li>
+                        <li>Configura-se o repositório para retornar <code>Optional.empty()</code> quando
+                            <code>findById(999L)</code> for chamado.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>When/Then</strong>:</p>
+                    <ul>
+                        <li>Usa-se <code>assertThrows()</code> para verificar se a chamada
+                            <code>contactController.getContactById(id)</code> lança uma exceção
+                            <code>ResourceNotFoundException</code>.</li>
+                    </ul>
+                </li>
+            </ol>
+            <p>Este teste garante que o controller está corretamente tratando casos em que o recurso buscado não existe,
+                retornando a exceção apropriada, o que no contexto da API equivale a um HTTP 404.</p>
+            <h3>Em resumo... ✍️</h3>
+            <p>Esses dois testes são exemplos claros de <strong>testes unitários com uso de mocks</strong>. Eles validam
+                o comportamento da classe <code>ContactController</code> <strong>sem depender de banco de dados ou do
+                    funcionamento real do ModelMapper</strong>. Isso torna os testes rápidos, previsíveis e focados
+                exclusivamente na lógica do controller. Por fim, o uso da estrutura <em>Given-When-Then</em> torna o
+                teste mais legível e alinhado às boas práticas de desenvolvimento orientado por testes (TDD ou BDD).</p>
+            <h3>🎯 Testando o ContactController com Testes Funcionais: Classe
+                <code>ContactControllerFunctionalTest.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.contacts.ContactController;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles(&quot;test&quot;)
+public class ContactControllerFunctionalTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void shouldCreateContactSuccessfully() throws Exception {
+        String json = &quot;&quot;&quot;
+                    {
+                        &quot;nome&quot;: &quot;Maria Oliveira&quot;,
+                        &quot;email&quot;: &quot;maria@example.com&quot;,
+                        &quot;telefone&quot;: &quot;11988887777&quot;,
+                        &quot;addresses&quot;: [
+                            {
+                                &quot;rua&quot;: &quot;Rua das Rosas&quot;,
+                                &quot;cidade&quot;: &quot;Campinas&quot;,
+                                &quot;estado&quot;: &quot;SP&quot;,
+                                &quot;cep&quot;: &quot;13000-000&quot;
+                            }
+                        ]
+                    }
+                &quot;&quot;&quot;;
+
+        mockMvc.perform(post(&quot;/api/contacts&quot;)
+                .contentType(&quot;application/json&quot;)
+                .content(json))
+                .andDo(print()) // &lt;-- aqui exibe a resposta no console
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath(&quot;$.nome&quot;).value(&quot;Maria Oliveira&quot;))
+                .andExpect(jsonPath(&quot;$.email&quot;).value(&quot;maria@example.com&quot;));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenContactDoesNotExist() throws Exception {
+        mockMvc.perform(get(&quot;/api/contacts/9999&quot;))
+                .andExpect(status().isNotFound());
+    }
+}
+</code></pre>
+            <p>Nossa classe <code>ContactControllerFunctionalTest</code> é um exemplo de <strong>teste
+                    funcional</strong> construído para validar o comportamento real da API exposta pelo
+                <code>ContactController</code>, simulando chamadas HTTP reais como um cliente faria. Esse tipo de teste
+                é necessário para garantir que o sistema funcione corretamente quando todas as camadas estão integradas
+                (controller, service, repository e persistência de dados). Essa classe utiliza a anotação
+                <code>@SpringBootTest</code> para carregar o contexto completo da aplicação, incluindo o banco de dados
+                em memória (no perfil <code>test</code>), os beans reais e as configurações reais de mapeamento.</p>
+            <p>O propósito desses testes, portanto, são bem diferentes dos testes unitários que vimos anteriormente:
+                trata-se de validar a <strong>experiência de uso real da API REST</strong> do sistema, com foco no
+                comportamento dos endpoints quando executados de ponta a ponta. Diferente dos testes unitários, aqui não
+                usamos mocks das dependências: o banco é real (embora em memória), o mapeamento via
+                <code>ModelMapper</code> está em funcionamento e todas as camadas são exercitadas juntas.</p>
+            <p>Esses testes são valiosos para detectar falhas de integração, como problemas de mapeamento de DTOs, erros
+                na persistência ou retornos inconsistentes. Quando executados em conjunto com os testes unitários,
+                ajudam a garantir a robustez e confiabilidade do sistema. </p>
+            <p>Em relação ao seu funcionamento, a anotação <code>@AutoConfigureMockMvc</code> permite que o Spring
+                injete um objeto <code>MockMvc</code>, que simula requisições HTTP à aplicação sem a necessidade de
+                subir um servidor real. A anotação <code>@ActiveProfiles(&quot;test&quot;)</code> ativa o perfil de
+                teste, garantindo que as configurações do <code>application-test.properties</code> (como uso de banco H2
+                em memória) sejam utilizadas durante a execução dos testes.</p>
+            <h3>Método <code>shouldCreateContactSuccessfully</code></h3>
+            <p>Este método testa o <strong>caso positivo de criação de um novo contato via HTTP POST</strong>. Ele
+                constrói uma requisição com JSON contendo os campos <code>nome</code>, <code>email</code>,
+                <code>telefone</code> e uma lista de endereços. A string JSON é enviada ao endpoint
+                <code>/api/contacts</code> utilizando o método <code>post</code>, e o conteúdo da requisição é definido
+                como <code>application/json</code>.</p>
+            <p>O método então executa a requisição com <code>mockMvc.perform(...)</code> e aplica as seguintes
+                validações:</p>
+            <ul>
+                <li><code>andDo(print())</code>: exibe o conteúdo da requisição e da resposta no console (útil para
+                    depuração);</li>
+                <li><code>andExpect(status().isCreated())</code>: verifica se o status de resposta HTTP é 201 (Created);
+                </li>
+                <li><code>andExpect(jsonPath(&quot;$.nome&quot;).value(&quot;Maria Oliveira&quot;))</code>: verifica se
+                    o campo <code>nome</code> no corpo da resposta corresponde ao valor enviado;</li>
+                <li><code>andExpect(jsonPath(&quot;$.email&quot;).value(&quot;maria@example.com&quot;))</code>: faz a
+                    mesma verificação para o campo <code>email</code>.</li>
+            </ul>
+            <p>Esse teste garante que, quando uma requisição válida é enviada para criar um contato, o sistema responde
+                corretamente com status 201 e os dados retornados são coerentes com os enviados.</p>
+            <h3>Método <code>shouldReturnNotFoundWhenContactDoesNotExist</code></h3>
+            <p>Este método verifica o <strong>comportamento do sistema ao tentar buscar um contato inexistente</strong>.
+                Ele simula uma chamada HTTP GET para o endpoint <code>/api/contacts/9999</code>, onde o ID 9999 é um
+                número arbitrário assumidamente não existente no banco de dados.</p>
+            <p>O teste espera que o sistema retorne o status <code>404 Not Found</code>, indicando que o recurso não foi
+                encontrado. Isso confirma que o tratamento de exceções com <code>ResourceNotFoundException</code> está
+                funcionando como esperado.</p>
+            <h3>🧠 Testes Unitários + Funcionais!</h3>
+            <p>Nesta etapa, vimos alguns testes automatizados para o <code>ContactController</code>, cobrindo tanto os
+                casos esperados quanto os de erro. Com isso, nossa API começa a se aproximar de um projeto profissional:
+                funcional, testável e documentada.</p>
+            <p>É importante ressaltar, entretanto, que estamos loooonge de completar todos os testes da aplicação. Por
+                isso é importante não negligenciar o desenvolvimento dos testes ao implementarmos nossas features. 🤓
+            </p>
+            <hr>
+            <h2>4. 📚 Conclusões da Aula</h2>
+            <p>Ao longo da Aula demos mais um passo importante na construção de nossa API REST com Spring Boot, focando
+                na <strong>refatoração da arquitetura dos controllers</strong>, <strong>melhoria do mapeamento entre
+                    entidades e DTOs</strong>, e na <strong>implementação de testes automatizados</strong> para garantir
+                a qualidade e previsibilidade do sistema.</p>
+            <p>Vamos recapitular os principais pontos abordados:</p>
+            <p>Iniciamos a aula realizando a <strong>refatoração completa dos controllers</strong> para que passassem a
+                retornar objetos do tipo <code>ResponseEntity</code>. Essa mudança, embora sutil, trouxe vantagens para
+                nossa aplicação:</p>
+            <ul>
+                <li>Permitiu o controle mais facilitado sobre o código de status HTTP retornado ao cliente
+                    (<code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code>,
+                    <code>404 Not Found</code>, etc);</li>
+                <li>Facilitou o envio de <strong>headers customizados</strong>, <strong>mensagens
+                        personalizadas</strong> e <strong>respostas sem corpo</strong> quando necessário;</li>
+                <li>Deixou o código mais legível e alinhado às boas práticas RESTful modernas;</li>
+                <li>Preparou o terreno para futuras melhorias, como a adição de mensagens de erro customizadas, headers
+                    de paginação, etc.</li>
+            </ul>
+            <p>Essa padronização com <code>ResponseEntity</code> ajuda a manter a <strong>consistência na comunicação
+                    com o cliente</strong>, facilitando tanto o consumo da API por sistemas externos quanto a manutenção
+                da própria aplicação ao longo do tempo.</p>
+            <p>Além disso, melhoramos o mapeamento das entidades e DTOs via <code>ModelMapper</code> em nosso
+                <code>ContactController</code>. Isso fez com que nosso código ficasse menos verboso e mais claro.</p>
+            <p>Por fim, encerramos a aula com a criação de <strong>testes automatizados</strong> — tanto
+                <strong>unitários</strong> quanto <strong>funcionais</strong> — que garantem o bom funcionamento e a
+                estabilidade dos principais endpoints da API.</p>
+            <p>Realizamos os seguintes testes:</p>
+            <ul>
+                <li><strong>Testes unitários com MockMvc</strong> para simular requisições HTTP aos controllers,
+                    verificando status de resposta, conteúdo retornado, e integração com os DTOs;</li>
+                <li><strong>Testes de caminho feliz</strong>, simulando casos em que os recursos e chamadas são corretas
+                    e espera-se resposta de sucesso de nossa API;</li>
+                <li><strong>Testes de exceção</strong>, simulando casos em que recursos não são encontrados e garantindo
+                    que o comportamento da aplicação siga o contrato esperado;</li>
+            </ul>
+            <p>Esses testes aumentam a <strong>confiança no sistema</strong>, facilitam futuras refatorações e reduzem o
+                risco de regressões.</p>
+            <h3>📌 Considerações Finais</h3>
+            <p>Desenvolver APIs RESTful robustas não é apenas uma questão de fazer os endpoints funcionarem. É sobre
+                projetar aplicações com <strong>qualidade técnica, clareza conceitual e boas práticas
+                    consolidadas</strong>. Nesta aula, vimos que uma pequena refatoração pode ter impacto na
+                manutenibilidade e evolução de um sistema.</p>
+            <p>O código limpo, os testes bem escritos e a separação de responsabilidades não são luxo — são
+                <strong>necessidades</strong> em projetos de vida longa. À medida que as aplicações crescem, esses
+                fundamentos se tornam cada vez mais valiosos.</p>
+            <p>Continue investindo nesses princípios. Eles são o que diferencia um sistema improvisado de um sistema
+                profissional. E são o que diferencia um programador iniciante de um bom engenheiro de software.</p>
+            <hr>
+            <h2>🚀 Exercício para a próxima aula</h2>
+            <p>Vimos muitos conceitos até agora. É hora de solidificá-los antes de darmos continuidade na disciplina.
+                Para isso, vamos fazer um exercício prático! Leia o enunciado abaixo e elabore, em duplas, o exercício.
+            </p>
+            <h3>API de Gerenciamento de Tarefas 👨‍🏭</h3>
+            <p>Você foi contratado para desenvolver uma <strong>API REST para gerenciamento de tarefas pessoais</strong>
+                (to-do list), permitindo que usuários criem, atualizem, consultem e excluam suas tarefas. A API deve ser
+                construída seguindo os princípios RESTful, utilizar verbos HTTP adequadamente, e implementar
+                <strong>paginação</strong>, <strong>validações</strong>, <strong>tratamento de exceções</strong>, e
+                <strong>testes automatizados</strong> (unitários e funcionais).</p>
+            <h3>📌 Regras de Negócio</h3>
+            <ol>
+                <li>
+                    <p>Cada <strong>tarefa</strong> deve conter:</p>
+                    <ul>
+                        <li><code>id</code>: identificador único (gerado automaticamente).</li>
+                        <li><code>titulo</code>: texto curto e obrigatório.</li>
+                        <li><code>descricao</code>: texto opcional.</li>
+                        <li><code>prioridade</code>: deve ser <code>BAIXA</code>, <code>MEDIA</code> ou
+                            <code>ALTA</code>.</li>
+                        <li><code>dataLimite</code>: data final para conclusão da tarefa.</li>
+                        <li><code>concluida</code>: <code>true</code> ou <code>false</code>, indicando se a tarefa já
+                            foi finalizada.</li>
+                        <li><code>categoria</code>: campo textual obrigatório (ex: “trabalho”, “estudo”, “pessoal”).
+                        </li>
+                        <li><code>criadaEm</code>: data de criação (preenchida automaticamente).</li>
+                    </ul>
+                </li>
+                <li>
+                    <p>Não é permitido criar tarefas com <strong>dataLimite anterior à data atual</strong>.</p>
+                </li>
+                <li>
+                    <p>Tarefas concluídas <strong>não podem ser editadas ou apagadas</strong> — nesse caso, deve ser
+                        lançada uma exceção com status <strong>409 (Conflict)</strong>.</p>
+                </li>
+            </ol>
+            <h3>📥 Funcionalidades obrigatórias</h3>
+            <p>Implemente os seguintes endpoints com seus respectivos verbos HTTP:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Verbo</th>
+                        <th>Caminho</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>POST</td>
+                        <td><code>/api/tasks</code></td>
+                        <td>Criação de nova tarefa</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td><code>/api/tasks</code></td>
+                        <td>Listar tarefas com paginação</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td><code>/api/tasks/{id}</code></td>
+                        <td>Buscar tarefa por ID</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td><code>/api/tasks/search</code></td>
+                        <td>Buscar tarefas por categoria (<code>?categoria=...</code>)</td>
+                    </tr>
+                    <tr>
+                        <td>PATCH</td>
+                        <td><code>/api/tasks/{id}/concluir</code></td>
+                        <td>Marcar tarefa como concluída</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td><code>/api/tasks/{id}</code></td>
+                        <td>Atualização completa da tarefa</td>
+                    </tr>
+                    <tr>
+                        <td>DELETE</td>
+                        <td><code>/api/tasks/{id}</code></td>
+                        <td>Remover tarefa (se ainda não estiver concluída)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>❌ Tratamento de Exceções</h3>
+            <p>Você deverá implementar uma classe <code>GlobalExceptionHandler</code> para capturar e retornar respostas
+                adequadas para:</p>
+            <ul>
+                <li><code>ResourceNotFoundException</code>: retorna 404.</li>
+                <li><code>InvalidTaskStateException</code>: retorna 409 quando há tentativa de modificar tarefas
+                    concluídas.</li>
+                <li><code>ValidationException</code>: retorna 400 com mensagens amigáveis.</li>
+            </ul>
+            <h3>📃 Validações</h3>
+            <p>Use anotações de Bean Validation para validar os campos da entidade e dos DTOs. Exemplo:</p>
+            <ul>
+                <li><code>titulo</code> e <code>categoria</code> devem ser obrigatórios.</li>
+                <li><code>prioridade</code> deve ser um dos valores definidos.</li>
+            </ul>
+            <h3>📄 Paginação</h3>
+            <p>O endpoint <code>GET /api/tasks</code> deverá usar o <code>Pageable</code> do Spring e retornar tarefas
+                com suporte a:</p>
+            <ul>
+                <li>número da página</li>
+                <li>tamanho da página</li>
+                <li>ordenação por prioridade ou dataLimite</li>
+            </ul>
+            <h3>✅ Testes Automatizados</h3>
+            <p>Implemente <strong>testes unitários</strong> e <strong>testes funcionais</strong> para pelo menos os
+                seguintes cenários:</p>
+            <ul>
+                <li>Criar uma tarefa com dados válidos.</li>
+                <li>Tentar criar uma tarefa com <code>dataLimite</code> inválida.</li>
+                <li>Buscar tarefa existente por ID.</li>
+                <li>Tentar excluir uma tarefa concluída (e receber erro 409).</li>
+                <li>Listar tarefas com paginação.</li>
+                <li>Buscar tarefas por categoria.</li>
+            </ul>
+            <p>Use <code>Mockito</code> e <code>MockMvc</code> (ou <code>TestRestTemplate</code>) conforme o tipo de
+                teste.</p>
+            <h3>💡 Dicas</h3>
+            <ul>
+                <li>Use <code>ModelMapper</code> para conversão entre DTOs e entidades.</li>
+                <li>Mapeie corretamente as enums (<code>@Enumerated</code>).</li>
+                <li>Bônus: mantenha a lógica de negócio isolada em uma <strong>camada de serviço</strong>
+                    (<code>TaskService</code>).</li>
+            </ul>
+            <h3>🎯 Objetivos do exercício</h3>
+            <p>Este exercício tem como finalidade consolidar os seguintes conceitos:</p>
+            <ul>
+                <li>Implementação de API REST com boas práticas.</li>
+                <li>Criação e uso de DTOs.</li>
+                <li>Manipulação de exceções e mensagens amigáveis.</li>
+                <li>Validação de dados com Bean Validation.</li>
+                <li>Paginação e ordenação de dados.</li>
+                <li>Cobertura de testes unitários e funcionais.</li>
+            </ul>
+            <h2><strong>Bom trabalho e mãos à obra! 🛠️</strong></h2>
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus
+                    Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>

@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="css/estilo.css">
     <link rel="stylesheet" href="css/prism.css">
 
-    <title>APIs e Microsserviços - Aula 01 - Revisão de Análise e Programação Orientada a Objetos</title>
+    <title>APIs e Microsserviços - Aula 05 - REST III</title>
 </head>
 
 <body>
@@ -42,7 +42,7 @@
                     <a href="Aula05.html"><span class="mr-0"></span>05 - REST III</a>
                 </li>
                 <li>
-                    <a href="#"><span class="mr-0"></span>06 - REST IV</a>
+                    <a href="Aula06.html"><span class="mr-0"></span>06 - REST IV</a>
                 </li>
                 <li>
                     <a href="#"><span class="mr-0"></span>07 - Exercício I</a>
@@ -1266,7 +1266,12 @@
             
                 @Operation(summary = &quot;Buscar todos os contatos paginados&quot;)
                 @GetMapping
-                public Page&lt;ContactResponseDTO&gt; getAllContacts(Pageable pageable) {
+                public Page&lt;ContactResponseDTO&gt; getAllContacts(
+                        @RequestParam(defaultValue = &quot;0&quot;) int page,
+                        @RequestParam(defaultValue = &quot;10&quot;) int size,
+                        @RequestParam(defaultValue = &quot;nome&quot;) String sort) {
+            
+                    Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
                     Page&lt;Contact&gt; contacts = contactRepository.findAll(pageable);
                     return contacts.map(contact -&gt; modelMapper.map(contact, ContactResponseDTO.class));
                 }
