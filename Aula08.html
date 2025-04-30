@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 08 - Autenticação com JWT</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="Aula04.html"><span class="mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="Aula05.html"><span class="mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="Aula06.html"><span class="mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="Aula07.html"><span class="mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li class="active">
+                    <a href="Aula08.html"><span class="mr-0"></span>08 - REST V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>09 - Docker</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>10 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>11 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VI</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+            <h1>Aula 08 – Segurança em APIs REST com JWT e Spring Security</h1>
+            <p>Na Aula 08, construímos uma API REST de gerenciamento de tarefas (To-Do List) com uma arquitetura em
+                camadas, separação de responsabilidades, validação, tratamento de exceções e testes automatizados.
+                Agora, vamos dar mais um passo importante rumo a uma aplicação robusta e pronta para produção: <strong>a
+                    implementação de segurança</strong>!</p>
+            <p>Imagine agora as seguintes situações de uso da aplicação:</p>
+            <ul>
+                <li>Como usuário, eu quero me cadastrar e fazer login na aplicação.</li>
+                <li>Como usuário autenticado, eu quero criar tarefas e garantir que <strong>apenas eu</strong> possa
+                    visualizá-las, editá-las ou excluí-las.</li>
+                <li>Como administrador, eu preciso visualizar <strong>todas as tarefas de todos os usuários</strong>, a
+                    fim de gerar relatórios ou fazer auditorias.</li>
+            </ul>
+            <p>Para atender esses requisitos, precisaremos evoluir nossa API incluindo:</p>
+            <ul>
+                <li>Cadastro de usuários com senha criptografada.</li>
+                <li>Autenticação com <strong>JWT (JSON Web Token)</strong>.</li>
+                <li>Proteção de endpoints com <strong>Spring Security</strong>, exigindo token válido para acesso.</li>
+                <li>Associação de tarefas a usuários autenticados.</li>
+                <li>Definição de <strong>roles</strong> (USER e ADMIN), permitindo controle de acesso baseado em
+                    permissões.</li>
+            </ul>
+            <p>Com isso, nossa aplicação deixará de ser uma API pública e passará a oferecer funcionalidades
+                <strong>autenticadas</strong> e <strong>autorizadas</strong>, respeitando o contexto de segurança de
+                cada operação!</p>
+            <h2>1. Introdução à Segurança em APIs REST</h2>
+            <p>A segurança de APIs RESTful é um aspecto essencial no desenvolvimento de aplicações modernas,
+                principalmente diante da crescente adoção de arquiteturas distribuídas. Uma abordagem bastante adotada
+                para esse fim é o uso de JSON Web Tokens (JWT), padrão aberto (RFC 7519) que permite a representação
+                segura de informações entre duas partes. O Spring Security oferece suporte nativo à autenticação baseada
+                em JWT, dispensando a necessidade de bibliotecas externas e implementações manuais complexas. Esse
+                suporte é viabilizado por meio do módulo OAuth2 Resource Server, que integra de forma transparente com o
+                ecossistema Spring Boot. Antes de abordarmos a implementação do JWT com Spring Boot, entretanto, vamos
+                entender um pouco dos fundamentos dessa tecnologia.</p>
+            <h3>1.1. JSON Web Token (JWT): características e aplicações</h3>
+            <p>O JSON Web Token (JWT) é um padrão aberto (RFC 7519) que define uma forma <strong>compacta e
+                    auto-contida</strong> de transmitir informações seguras entre partes como um objeto JSON (<a
+                    href="https://jwt.io/introduction#:~:text=JSON%20Web%20Token%20,pair%20using%20RSA%20or%20ECDSA">JSON
+                    Web Token Introduction - jwt.io</a>). Internamente, um JWT (tipicamente no formato JWS – JSON Web
+                Signature) é composto por três segmentos codificados em Base64URL, separados por pontos: um
+                <strong>cabeçalho</strong> (header), um <strong>payload</strong> (carga útil) e uma
+                <strong>assinatura</strong> (<a
+                    href="https://auth0.com/blog/stateless-auth-for-stateful-minds/#:~:text=,validated%20against%20tampering%20using%20this">Stateless
+                    Sessions for Stateful Minds: JWTs Explained and How You Can Make The Switch</a>). O cabeçalho contém
+                metadados sobre o token (por exemplo,
+                <code>{ &quot;alg&quot;:&quot;HS256&quot;, &quot;typ&quot;:&quot;JWT&quot;}</code>), enquanto o payload
+                guarda declarações (“claims”) sobre a entidade (usuário) ou o token (como identificador de usuário,
+                papéis, escopos, data de emissão/expiração, etc.) (<a
+                    href="https://developer.okta.com/blog/2020/12/21/beginners-guide-to-jwt#:~:text=A%20JWT%20is%20a%20structured,are%20two%20types%20of%20JWTs">A
+                    Beginner&#39;s Guide to JWTs | Okta Developer</a>). A assinatura criptográfica, calculada sobre o
+                cabeçalho e o payload, garante que o token não foi alterado e que foi emitido por uma fonte confiável
+                (<a href="https://jwt.io/introduction#:~:text=JSON%20Web%20Token%20,pair%20using%20RSA%20or%20ECDSA">JSON
+                    Web Token Introduction - jwt.io</a>). Opcionalmente, além de assinar (JWS), um JWT pode ser
+                criptografado (JWE – JSON Web Encryption) para ocultar seu conteúdo de terceiros; porém, seu uso mais
+                comum é na forma assinada, em que o payload permanece visível para quem possui o token. </p>
+            <p>Para assinar e verificar JWT há dois modelos principais de algoritmos: simétricos e assimétricos.</p>
+            <p>Em <strong>algoritmos simétricos</strong> (ex.: HS256 – HMAC com SHA-256), há apenas uma chave secreta
+                compartilhada entre as partes: o emissor do token usa esse segredo para assinar, e o destinatário usa o
+                mesmo segredo para verificar a assinatura (<a
+                    href="https://auth0.com/docs/get-started/applications/signing-algorithms#:~:text=%2A%20HS256%20%28HMAC%20with%20SHA,This">Signing
+                    Algorithms</a>).</p>
+            <p>Por outro lado, em <strong>algoritmos assimétricos</strong> (ex.: RS256 – assinatura RSA com SHA-256, ou
+                algoritmos ECDSA), existe um par de chaves: o emissor mantém a chave <em>privada</em> para assinar o
+                JWT, e os demais usam a chave <em>pública</em> correspondente para validar o token. A vantagem do RSA
+                (ou ECDSA) é que apenas o detentor da chave privada pode emitir tokens válidos, enquanto qualquer
+                serviço com a chave pública pode conferir a assinatura sem conhecer segredos compartilhados. Por essa
+                razão, é geralmente recomendado usar RS256 em produção: se a chave privada for comprometida, ela pode
+                ser rotacionada facilmente sem precisar redeploy dos serviços consumidores do token. Algoritmos
+                simétricos (HMAC) são mais simples de implementar, mas exigem cuidado adicional para não vazar o segredo
+                usado em múltiplas aplicações. Note-se também que JWTs suportam tanto apenas a assinatura (JWS) quanto
+                também a criptografia de conteúdo (JWE) quando é necessário manter os dados ocultos, mas o mecanismo de
+                assinatura é o que garante a <strong>integridade</strong> do token.</p>
+            <p>As principais motivações para adotar JWT decorrem de sua natureza <strong>sem estado</strong>
+                (“stateless”) e padronização ampla. Como cada JWT é auto-suficiente, contendo todas as informações de
+                autenticação/autorização necessárias, o servidor destinatário pode validar o token
+                <strong>localmente</strong> (checando a assinatura) sem precisar consultar um banco de dados central a
+                cada requisição. Isso facilita a escalabilidade horizontal de sistemas distribuídos: por não haver
+                sessões armazenadas no servidor, vários serviços podem operar de forma independente e em paralelo,
+                bastando compartilhar a chave de verificação. Em uma arquitetura de APIs REST, isso significa que a API
+                receptor não precisa fazer round-trips ao provedor de identidade para checar o token, o que reduz
+                latência e melhora desempenho. Por exemplo, provedores OAuth 2.0/OIDC costumam emitir <em>access
+                    tokens</em> no formato JWT exatamente para esse fim: o serviço de recursos (API) recebe o JWT e o
+                valida localmente via assinatura, sem nova chamada à autoridade de autenticação. Além disso, o JWT pode
+                carregar dados adicionais como o ID do usuário, papéis e escopos de acesso. Isso elimina várias
+                consultas ao banco de dados na hora de autorizar ações, pois o serviço pode extrair essas informações
+                diretamente do payload. Em outras palavras, ao embutir informações (como “claims” de autorização) no
+                token, reduz-se a quantidade de “conversa” (chattiness) necessária no backend.</p>
+            <p>Outra motivação é a simplicidade para casos de <em>Single Sign-On</em> (SSO) e cenários
+                <em>cross-domain</em>. O JWT é leve, baseado em JSON e independente de linguagem, de modo que pode ser
+                transmitido entre domínios ou sistemas heterogêneos facilmente. Por exemplo, em fluxos SSO modernos um
+                usuário pode autenticar em um domínio (ou aplicação) e então receber um JWT, que é enviado a outro
+                domínio para comprovar a identidade sem nova entrada de credenciais. De fato, o padrão é usado
+                amplamente em SSO devido ao seu pequeno overhead e capacidade de ser usado entre diferentes domínios.
+                Dessa forma, JWT atende bem a casos onde múltiplos serviços ou aplicações em nuvem precisam compartilhar
+                um mecanismo comum de autenticação sem depender de sessões centralizadas.</p>
+            <p>No dia a dia, o JWT aparece principalmente em autenticação de <strong>APIs web</strong> e
+                <strong>microsserviços</strong>. É comum que APIs REST requeiram um token JWT no cabeçalho HTTP
+                <code>Authorization: Bearer &lt;token&gt;</code> para liberar acesso a recursos protegidos. Nessas
+                aplicações, o token indica quem é o usuário ou serviço requisitante e que permissões ele tem, e é
+                validado em cada chamada sem criar estado no servidor. Em arquiteturas de microsserviços, o JWT facilita
+                a <strong>propagação de identidade</strong> pelo sistema: um serviço que recebeu o token pode ler dele o
+                ID do usuário ou outros dados de contexto e repassá-los a serviços downstream, sem precisar rediscutir
+                autenticação a cada salto. Isto é útil tanto para autorizações internas entre microserviços quanto para
+                cenários máquina-a-máquina (service-to-service), em que sistemas trocam JWTs para provar identidade e
+                escopos de acesso. Igualmente, em fluxos OAuth/OIDC, o JWT pode aparecer tanto como access token quanto
+                como ID token, dando suporte a logins federados em aplicações mobile, SPAs ou qualquer cliente web.</p>
+            <p>Fora do contexto de APIs, JWT também é usado em trocas de informações seguras entre servidores,
+                aplicações móveis e bibliotecas de integração. Por exemplo, um cliente autenticado pode usar um JWT para
+                fazer login em um sistema externo sem reenvio de senha (o token carrega a prova da autenticação prévia).
+                Sua portabilidade e o fato de ser baseado em um padrão aberto o tornam também opção natural em soluções
+                que exigem interoperabilidade entre diferentes empresas ou provedores de identidade.</p>
+            <h3>1.2 Comparação com outras soluções de autenticação/autorização</h3>
+            <p>Em aplicações web tradicionais, costuma-se usar <strong>autenticação baseada em sessão</strong> com
+                cookies HTTP. Neste modelo stateful, o servidor gera um <em>session ID</em> (geralmente opaco) após o
+                login, armazena os dados da sessão (ou um link a eles) internamente e envia o ID ao cliente via cookie.
+                A cada requisição, o servidor consulta seu banco de sessões para carregar o contexto do usuário. Esse
+                modelo permite revogar sessões instantaneamente (por exemplo, apagando a sessão no servidor) e utilizar
+                proteções nativas de cookies (HttpOnly, SameSite, etc.), mas exige manter estado no servidor, o que pode
+                dificultar o escalonamento horizontal. Em contraste, a autenticação baseada em tokens (como JWT) não
+                requer armazenamento de sessão: cada requisição carrega o token autônomo, tornando o sistema
+                <strong>stateless</strong>. Isso facilita a escalabilidade e a resiliência dos serviços, mas tem o custo
+                de tornar a <strong>revogação de sessão mais complexa</strong>, pois o servidor não “lembra” quais
+                tokens já emitiu – ele só valida a assinatura.</p>
+            <p>Outra comparação importante é entre <strong>tokens JWT e tokens opacos</strong> (como aqueles usados em
+                algumas implementações OAuth2). Um token opaco é apenas um identificador aleatório vinculado a uma
+                entrada no servidor de autorização; para verificar um token desse tipo é preciso fazer uma chamada de
+                <em>introspecção</em> ao servidor que o emitiu. Em contrapartida, um JWT é <em>interpretável</em>:
+                contém dados (claims) codificados em JSON e uma assinatura que qualquer parte confiável pode verificar
+                localmente. Ou seja, o servidor de recursos não precisa chamar ninguém para validar um JWT – ele confia
+                na assinatura. Como dito, isso torna a validação do JWT muito rápida (basta computar a assinatura
+                localmente, sem acesso à rede), enquanto tokens opacos requerem um round-trip a um banco de dados ou
+                endpoint de introspecção, o que adiciona latência. Em compensação, tokens opacos têm vantagem na
+                revogação: basta removê-los do banco de dados e ficam inválidos imediatamente. Já para tokens JWT a
+                revogação só ocorre quando o token expira (a menos que se crie uma lista de bloqueio), o que pode levar
+                a atrasos indesejados . De forma resumida: JWT é <strong>stateless e auto-contido</strong>, facilitando
+                autenticação distribuída sem estado compartilhado, enquanto soluções baseadas em sessão ou tokens opacos
+                delegam a verificação a um servidor central e permitem revogação imediata em troca de maior acoplamento
+                com esse servidor.</p>
+            <h3>1.3 Limitações e desvantagens do JWT</h3>
+            <p>Apesar das vantagens, o uso de JWT traz desvantagens importantes que devem ser consideradas. Em primeiro
+                lugar, há a questão da <strong>revogação e invalidação</strong>. Como o JWT é validado apenas pela
+                assinatura local, o servidor não sabe se o token foi tornado inválido antes de seu vencimento natural.
+                Assim, se um token for vazado ou se o usuário tiver privilégios revogados, o JWT ainda poderá ser aceito
+                até expirar, a não ser que se adote algum mecanismo extra (como listas negras de identificadores ou
+                tempos de vida muito curtos). Isso torna a segurança mais frágil comparado a sessões que podem ser
+                finalizadas pelo servidor a qualquer momento.</p>
+            <p>Além disso, os tokens JWT podem crescer de tamanho. Como carregam claims em JSON, cada requisição
+                transporta esse peso extra. Se o payload incluir muitos dados (por exemplo, papéis extensos ou outros
+                atributos), o tráfego de rede aumenta, podendo degradar o desempenho geral se usado de forma excessiva.
+                Em arquiteturas de alto tráfego, isso deve ser balanceado: embora os tokens evitem ida constante ao
+                banco de dados, tokens muito grandes podem virar gargalo de banda.</p>
+            <p>Do ponto de vista de segurança, a especificação JWT exige atenção especial. A validação de um token JWT
+                corretamente é mais complexa do que parece – há muitas armadilhas e casos de borda. Por exemplo, já
+                foram exploradas brechas relacionadas ao uso indevido do algoritmo <code>none</code>, que desabilita a
+                verificação da assinatura. Portanto, recomenda-se usar bibliotecas maduras e configurá-las para aceitar
+                apenas algoritmos esperados. Além disso, os dados no payload de um JWT assinado <strong>não são
+                    criptografados</strong> – qualquer servidor ou atacante que obtenha o token pode ler seu conteúdo.
+                Assim, não se deve colocar informações sensíveis sem encriptá-las (caso se queira confidencialidade).
+            </p>
+            <p>Também existem riscos no armazenamento dos tokens. Se um JWT for enviado ao cliente (como em uma
+                aplicação web), armazená-lo em <em>localStorage</em> ou em JavaScript pode expor o token a ataques XSS.
+                Por outro lado, armazenar o JWT em cookie HttpOnly evita acesso via script mas pode reintroduzir
+                vulnerabilidade a CSRF caso não sejam adotadas contramedidas (como SameSite). Em resumo, o uso de JWT
+                envolve um <strong>trade-off entre segurança e desempenho</strong>: ao facilitar operações sem estado e
+                reduzir chamadas backend, abre espaço para novas formas de ataque se não for bem protegido. Boas
+                práticas, como usar tokens de curta duração, algoritmos fortes, validação cuidadosa de claims (issuer,
+                audience, expiração) e armazenamento seguro, são essenciais para mitigar esses riscos. </p>
+            <h3>1.4 JWT (JWS) vs JWE: assinatura e confidencialidade</h3>
+            <p>Um JSON Web Token (JWT) padrão é apenas <strong>assinado</strong> (JWS) e codificado em Base64, mas
+                <strong>não criptografado</strong>. Isso significa que qualquer um com o token pode ver seu conteúdo
+                legível (claims) mas não pode alterá-lo sem invalidar a assinatura. Ou seja, um JWT pode ser assinado
+                (JWS) ou encriptado (JWE). A assinatura (JWS) garante integridade, mas não oculta as informações. Para
+                confidencialidade, existe o padrão JWE (JSON Web Encryption): cifrando o token inteiro, apenas o emissor
+                e o destino podem ler as claims. Em outras palavras, “faz sentido criptografar um JWS se você quiser
+                manter informações sensíveis ocultas do <em>bearer</em> (cliente) ou terceiros”. </p>
+            <p>Contudo, o uso de JWE depende da necessidade de privacidade e do suporte dos componentes da aplicação
+                (clientes e serviços consumidores) para decodificá-lo. Se o ambiente de consumo só suporta JWS, não há
+                como usar JWE sem grande refatoração. Para ilustrar, o <strong>RFC 7519</strong> (especificação do JWT)
+                recomenda que, caso o token contenha informações <strong>privacidade-sensíveis</strong>, deve-se tomar
+                medidas para evitar vazamento: usar um JWT encriptado (JWE) <em>e</em> autenticar o destinatário,
+                <strong>ou</strong> garantir que o JWT em texto claro só seja transmitido por canais seguros
+                (HTTPS/TLS), <strong>ou</strong> simplesmente omitir esses dados sensíveis.</p>
+            <p>Nesse sentido, a criptografia de um claim de identificação (como, por exemplo, o ID do usuário) traria
+                principalmente <strong>confidencialidade</strong>. Se a aplicação considera o ID do usuário como dado
+                sensível ou pessoal (por exemplo, por regras de privacidade ou GDPR), o JWE impediria que qualquer
+                interceptor lesse esse valor. Em um <em>ambiente de microserviços</em>, isso poderia evitar que serviços
+                intermediários ou logs exponham o ID em texto claro. Além disso, JWE combinado com assinatura dupla
+                (assinar-depois-encriptar) garante ao mesmo tempo integridade e confidencialidade dos claims. Ou seja, a
+                vantagem é proteger <strong>segredos ou PII</strong> que se consideraria arriscado deixar no token, já
+                que sem criptografia o payload é público. Como destacam fontes oficiais e especialistas, “se você não se
+                sente confortável em expor até mesmo o ID/email do usuário (dados que podem ser considerados pessoais),
+                alguns clientes podem optar por proteger até isso”. </p>
+            <p>Por outro lado, a <strong>criptografia de JWT acarreta custos significativos</strong>. A operação de
+                cifrar/descriptografar token consome mais CPU e é mais complexa de implementar corretamente. Estudos e
+                guias de mercado apontam que manter um mecanismo de criptografia robusto é difícil: é preciso gerenciar
+                chaves de forma segura, usar algoritmos modernos (e.g. AES-GCM) e evitar ataques (padding-oracle etc.)
+                (<a
+                    href="https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html#:~:text=">JSON
+                    Web Token for Java - OWASP Cheat Sheet Series</a>). Em aplicações de alto tráfego, portanto, isso
+                pode se tornar gargalo de desempenho. Além disso, todos os consumidores do token (serviços backend,
+                APIs, etc.) precisam suportar JWE e ter as chaves para decifrar, o que complica a arquitetura de
+                microsserviços.</p>
+            <p>Outro ponto: <strong>criptografar não impede todos os ataques comuns</strong>. Por exemplo, se um token
+                for roubado via XSS ou através de um canal inseguro, o invasor ganha tanto o token cifrado quanto a
+                capacidade de usá-lo como <em>bearer</em> – a criptografia só esconde o conteúdo, mas o token continua
+                válido (a não ser que se implemente PoP ou lista de revogação). Em muitos casos, basta proteger o token
+                em trânsito (TLS) e em repouso (cookie seguro ou armazenamento do dispositivo) para mitigar esses
+                riscos. O próprio OWASP alerta que o payload de um JWT “não costuma ser criptografado, então deve-se
+                revisar se há dados sensíveis incluídos” (<a
+                    href="https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_JSON_Web_Tokens#:~:text=The%20payload%20is%20it%20not,inappropriate%20data%20included%20within%20it">WSTG
+                    - Latest | OWASP Foundation</a>). Ou seja, a abordagem recomendada é <strong>limitar o que vai no
+                    token</strong>, evitando expor segredos, em vez de cifrá-lo simplesmente por precaução.</p>
+            <p>Em síntese, as <strong>vantagens da criptografia</strong> do claim de usuário são: </p>
+            <ul>
+                <li><em>Confidencialidade adicional</em>: somente partes autorizadas leem o ID (útil para dados pessoais
+                    sensíveis)</li>
+                <li><em>Poder incluir mais informação</em>: permite adicionar dados extras ao token sem medo de vazá-los
+                    (sob responsabilidade do JWE). </li>
+                <li><em>Suporte oficial</em>: JWE é padrão oficial (RFC 7516) e algumas plataformas (Auth0, Okta, etc.)
+                    oferecem suporte a ele.</li>
+            </ul>
+            <p>Já as <strong>desvantagens</strong> são: </p>
+            <ul>
+                <li><em>Complexidade e desempenho</em>: criptografia torna o sistema mais complexo de configurar
+                    (chaves, algoritmos) e lento para criptografar/descriptografar a cada request.</li>
+                <li><em>Sobrecarga de infra</em>: todos os microsserviços/APIs devem gastar ciclos para decifrar, e
+                    precisam de um mecanismo seguro de distribuição de chaves. </li>
+                <li><em>Limita uso no cliente</em>: em aplicações SPA ou mobile, o cliente raramente precisa ler o
+                    conteúdo do token (só envia no header). Mas se você criptografar, o cliente não consegue decodificar
+                    o token, o que talvez exija alterar fluxo (por exemplo, o token só é usado no backend). Na prática,
+                    um SPA não ganharia muito com isso, já que o próprio usuário sabe seu ID. </li>
+                <li><em>Não resolve ameaças reais</em>: criptografia não impede token roubado de ser usado (bearer) nem
+                    evita XSS; e mesmo criptografado, o token deve seguir os cuidados padrões (TLS, expirations).</li>
+            </ul>
+            <p>Considerando isso, em <strong>produção</strong>, a prática comum é <strong>não criptografar</strong> o
+                JWT apenas para proteger a informação de identificação do usuário. Em vez disso, recomenda-se seguir
+                boas práticas de segurança: usar <strong>assinatura forte</strong> (p. ex. RSA ou ECDSA em vez de HS256
+                quando possível), transmitir sempre via HTTPS e usar short-lived tokens com <code>exp</code> curto. Em
+                geral, coloque <strong>somente o mínimo necessário</strong> de dados no token – o ID do usuário no claim
+                <code>sub</code> e talvez roles/permissões – e considere a comunicação com um backend seguro para obter
+                qualquer outra informação.</p>
+            <p>Como ensina o guia da Curity, se houver necessidade de dados sensíveis, é mais seguro mantê-los fora do
+                token (chamando, por exemplo, um endpoint de <em>userinfo</em>) do que cifrar o token inteiro (<a
+                    href="https://curity.io/resources/learn/jwt-best-practices/#:~:text=When%20it%20comes%20to%20access,directly%20in%20the%20ID%20token">JWT
+                    Security Best Practices | Curity</a>).</p>
+            <p>Se ainda quiser confidencialidade maior sem criptografar o JWT, há <strong>alternativas mais seguras ou
+                    eficientes</strong>:</p>
+            <ul>
+                <li>
+                    <p><strong>Tokens opacos + introspecção</strong>: em vez de um JWT auto-contido, emita um token
+                        opaco (string aleatória) e armazene seus dados no servidor (ou use OAuth2 introspection). Assim,
+                        o token em si não revela nada ao cliente, e o servidor recupera o ID do usuário (e dados
+                        sensíveis) quando necessário. Essa abordagem requer manter estado no auth server, mas evita
+                        exposição de claims no cliente. </p>
+                </li>
+                <li>
+                    <p><strong>BFF ou proxy de autenticação</strong>: use um <em>backend for frontend</em> ou API
+                        gateway que gerencie o token. O cliente lida com um token leve, o gateway adiciona ou troca por
+                        tokens com mais privilégios para os microsserviços. O BFF também pode manter informações
+                        sensíveis no servidor, nunca expondo-as ao cliente.</p>
+                </li>
+                <li>
+                    <p><strong>Criptografia apenas de campos específicos</strong>: em casos extremos, você poderia
+                        cifrar apenas certos valores dentro do JSON antes de colocar no JWT (não padronizado, arriscado)
+                        e deixar o JWT como JWS normal. Mas isso usualmente traz complexidade similar ao JWE sem todos
+                        os benefícios. </p>
+                </li>
+                <li>
+                    <p><strong>Usuários autenticados</strong>: lembre-se que, em um SPA ou app mobile, o próprio usuário
+                        já “conhece” seu ID (ele fez login) – logo, esconder o ID dele do próprio usuário geralmente não
+                        faz sentido. Se for preciso verificar algo no backend, o JWT assinado já garante que ele não foi
+                        adulterado.</p>
+                </li>
+            </ul>
+            <p>Em resumo, <strong>criptografar o ID do usuário num JWT não é normalmente necessário</strong>. A solução
+                mais indicada é usar um JWT assinado (JWS) com claims mínimas, transportado via TLS, e tratar qualquer
+                dado sensível fora do token. Se seu caso de uso realmente exige confidencialidade extra (por exemplo,
+                jurisdições com regulações estritas de privacidade), considere JWE, mas avalie bem o custo. A maioria
+                das fontes oficiais (JWT RFC, OWASP, Auth0) enfatiza: <em>não inclua dados sensíveis em tokens não
+                    criptografados</em>, e prefira soluções como canais seguros e design de token enxuto em vez de
+                cifrar o JWT completo. 😊</p>
+            <h3>1.5 JWT Com Spring Boot</h3>
+            <p>A arquitetura de autenticação com JWT funciona da seguinte maneira: o cliente realiza uma requisição
+                autenticada (geralmente via HTTP Basic) ao endpoint de emissão de tokens, como <code>/token</code>. Uma
+                vez validada a autenticação, o servidor emite um JWT assinado digitalmente. Esse token é então enviado
+                pelo cliente nas requisições subsequentes, por meio do cabeçalho
+                <code>Authorization: Bearer &lt;token&gt;</code>. O servidor, por sua vez, valida o token recebido antes
+                de permitir o acesso ao recurso protegido.</p>
+            <p>Como vimos, os tokens JWT são compostos por três partes codificadas em Base64 URL-safe e separadas por
+                pontos: o header, que define o algoritmo de assinatura (como RS256); o payload, que contém os dados
+                (claims) como nome de usuário e escopo de permissões; e a assinatura criptográfica, gerada com uma chave
+                secreta ou privada. No contexto da nossa aplicação, optaremos por usar criptografia assimétrica, com
+                chaves RSA, por ser considerada uma abordagem mais segura e escalável: a chave privada permanece
+                protegida no servidor, enquanto a chave pública é usada para validar tokens.</p>
+            <p>No Spring Boot, configuramos essa abordagem por meio da anotação <code>@EnableWebSecurity</code> e da
+                definição de um <code>SecurityFilterChain</code>, que configura a aplicação como um Resource Server.
+                Dentro dessa cadeia, desativamos o CSRF (por se tratar de uma API stateless), exigimos autenticação para
+                qualquer requisição e configuramos o sistema como sem estado (stateless), ou seja, sem uso de sessão
+                HTTP. Para habilitar o suporte a JWTs, utilizamos o método <code>oauth2ResourceServer().jwt()</code>.
+                Essa configuração requer um <code>JwtDecoder</code>, que pode ser definido como um bean utilizando a
+                biblioteca <code>NimbusJwtDecoder</code>, passando a chave pública RSA obtida a partir de um arquivo
+                <code>.pem</code> ou semelhante.</p>
+            <p>É importante ressaltar que o <strong>SecurityFilterChain</strong> do Spring Security é implementado via
+                <em>Servlet Filters</em>, não via interceptores do Spring MVC. Internamente, o Spring registra um único
+                <code>FilterChainProxy</code> (geralmente via <code>DelegatingFilterProxy</code>) no container web. O
+                <code>FilterChainProxy</code> atua como um <em>middleware</em> que engloba várias cadeias de filtros de
+                segurança configuradas na aplicação (<a
+                    href="https://docs.spring.io/spring-security/reference/servlet/architecture.html#:~:text=Spring%20Security%E2%80%99s%20Servlet%20support%20is,typically%20wrapped%20in%20a%20DelegatingFilterProxy">Architecture
+                    :: Spring Security</a>). Cada <em>SecurityFilterChain</em> define uma lista ordenada de filtros de
+                segurança (beans) a serem aplicados a certas requisições (por exemplo, filtrando por padrão de URL ou
+                outro <code>RequestMatcher</code>). A cada requisição HTTP recebida, o <code>FilterChainProxy</code>
+                escolhe a primeira <em>SecurityFilterChain</em> cujo critério de correspondência
+                (<code>RequestMatcher</code>) bate com a requisição, e então invoca sequencialmente os filtros dessa
+                cadeia. Em outras palavras, para cada requisição o Spring percorre suas cadeias de segurança
+                configuradas e executa os filtros da cadeia correspondente.</p>
+            <p>Em termos de padrão de projeto, o <strong>SecurityFilterChain</strong> funciona como uma cadeia de
+                responsabilidade (<em>Chain of Responsibility</em> similar a “middleware”): é executado <em>antes</em>
+                que o Spring MVC despache a requisição para os controladores, interceptando todas as requisições no
+                nível do servlet. Assim, a cadeia de filtros de segurança do Spring Security age <strong>globalmente e
+                    antes</strong> dos interceptores de MVC, controlando autenticação, autorização e outras proteções.
+                Essa abordagem baseado em filtros permite, por exemplo, aplicar regras de segurança dinâmicas por
+                requisição (não apenas por URL estática), pois o <code>FilterChainProxy</code> pode usar qualquer
+                detalhe da requisição (via <code>RequestMatcher</code>) para decidir quais filtros executar. Ou seja,
+                temos muita flexibilidade ao configurar a segurança de nossa aplicação. 👨‍🏭</p>
+            <p>A geração dos tokens ocorre, por exemplo, em uma classe que implemente um <code>TokenService</code>, que
+                utiliza o <code>JwtEncoder</code> (também baseado em RSA) para assinar os tokens. Os claims do token
+                podem incluir informações como o emissor (<code>issuer</code>), momento da emissão
+                (<code>issuedAt</code>), tempo de expiração (<code>expiresAt</code>) e o nome do usuário
+                (<code>subject</code>), além de um escopo de permissões que pode ser derivado das roles do usuário
+                autenticado. O token gerado é então retornado por um controlador, como um <code>AuthController</code>,
+                que deve ser responsável por lidar com a autenticação e emissão do JWT.</p>
+            <p>Essa abordagem elimina a necessidade de um servidor de autorização dedicado, o que é suficiente para
+                aplicações monolíticas ou sistemas pequenos. No entanto, conforme o sistema evolui e se torna
+                distribuído, é recomendável adotar um Authorization Server (como o Spring Authorization Server ou
+                serviços como Auth0, Keycloak e Okta), especialmente em cenários que exigem tokens de atualização
+                (refresh tokens), isolamento de responsabilidades ou múltiplos serviços independentes. Veremos isso
+                posteriormente ao lidarmos com Microsserviços. 🤠</p>
+            <p>Para realizar testes, pode-se utilizar ferramentas como o Postman. Basta realizar uma requisição POST ao
+                endpoint que implementa a autenticação para obter o token JWT, e então usá-lo como Bearer Token nas
+                requisições subsequentes. </p>
+            <p>Quando expomos uma API REST para o mundo, precisamos garantir que <strong>apenas usuários
+                    autorizados</strong> possam acessá-la — especialmente se a API manipula dados sensíveis ou pessoais,
+                como no nosso caso. Para isso, é comum aplicar camadas de segurança que validam quem está fazendo a
+                requisição (autenticação) e se essa pessoa tem permissão para executá-la (autorização).</p>
+            <p>A imagem abaixo sintetiza o fluxo que acabamos de descrever ✍️</p>
+            <p><img src="diagrama_sequencia_jwt.png"
+                    alt="Diagrama de Sequência - Fluxo de uma requisição em uma Aplicação Spring Boot com uso de JWT">
+            </p>
+            <hr>
+            <h2>2. Estrutura do Projeto</h2>
+            <p>Vamos dar continuidade, como mencionamos inicialmente, à aplicação de To-do List. Nossa aplicação ganhará
+                novas classes e pastas relacionadas à segurança, conforme o projeto evolui. A seguir, apresentaremos
+                passo a passo os principais arquivos e explicações, mantendo a mesma organização e estilo da Aula 07.
+            </p>
+            <p>Após a implementação, a estrutura do projeto ficará como mostrado a seguir:</p>
+            <pre><code>.
+├── src/
+│   └── main/
+│       └── java/
+│           └── br/ifsp/edu/todo/
+│               ├── config/
+│               │   ├── ModelMapperConfig.java
+│               │   └── SecurityConfig.java
+│               ├── controller/
+│               │   ├── AuthenticationController.java
+│               │   ├── TaskController.java
+│               │   └── UserController.java
+│               ├── dto/
+│               │   ├── authentication/
+│               │   │   ├── AuthenticationDTO.java
+│               │   │   └── UserRegistrationDTO.java
+│               │   ├── page/
+│               │   │   └── PagedResponse.java
+│               │   └── task/
+│               │       ├── TaskRequestDTO.java
+│               │       └── TaskResponseDTO.java
+│               ├── exception/
+│               │   ├── ErrorResponse.java
+│               │   ├── GlobalExceptionHandler.java
+│               │   ├── InvalidTaskStateException.java
+│               │   ├── ResourceNotFoundException.java
+│               │   └── UserAlreadyExistsException.java
+│               ├── mapper/
+│               │   └── PagedResponseMapper.java
+│               ├── model/
+│               │   ├── enumerations/
+│               │   │   ├── Category.java
+│               │   │   ├── ERole.java
+│               │   │   └── Priority.java
+│               │   ├── Role.java
+│               │   ├── Task.java
+│               │   ├── User.java
+│               │   └── UserAuthenticated.java
+│               ├── repository/
+│               ├── security/
+│               │   └── CustomJwtAuthenticationConverter.java
+│               ├── service/
+│               │   ├── AuthenticationService.java
+│               │   ├── JwtService.java
+│               │   ├── TaskService.java
+│               │   ├── UserDetailService.java
+│               │   ├── UserService.java
+│               │   └── TodoApplication.java
+│   └── resources/
+│       ├── db/migration/
+│       │   ├── V1_CreateTables.sql
+│       │   ├── V2_InsertDefaultRoles.sql
+│       │   └── V3_InsertDefaultUsers.sql
+│       ├── static/
+│       ├── templates/
+│       ├── app.key
+│       ├── app.pub
+│       └── application.properties
+├── test/
+│   └── java/
+│       └── br/ifsp/edu/todo/
+│           └── task/
+│               ├── TaskControllerTest.java
+│               ├── TaskServiceTest.java
+│           └── TodoApplicationTests.java
+</code></pre>
+            <p>Vamos começar explorando as configurações de segurança com JWT, a estrutura de autenticação e o novo
+                fluxo de controle de acesso!</p>
+            <hr>
+            <h2>3. Códigos-fontes 🧑‍💻</h2>
+            <p>Feita essa introdução aos conceitos envolvidos na segurança da aplicação, vamos agora ver o código-fonte
+                envolvido na implementação do JWT!</p>
+            <h3>3.1. <code>SecurityConfig.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.edu.todo.config;
+
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+
+import br.ifsp.edu.todo.security.CustomJwtAuthenticationConverter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Value(&quot;${jwt.public.key}&quot;)
+    private RSAPublicKey key;
+    @Value(&quot;${jwt.private.key}&quot;)
+    private RSAPrivateKey priv;
+    
+    @Bean
+    public CustomJwtAuthenticationConverter customJwtAuthenticationConverter() {
+        return new CustomJwtAuthenticationConverter();
+    }
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+            CustomJwtAuthenticationConverter customJwtAuthenticationConverter) throws Exception {
+        http.csrf(csrf -&gt; csrf.disable())
+                .authorizeHttpRequests(auth -&gt; auth.requestMatchers(&quot;/api/auth/**&quot;).permitAll()
+                        .requestMatchers(&quot;/api/users/register&quot;).permitAll().anyRequest().authenticated())
+                .oauth2ResourceServer(
+                        conf -&gt; conf.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter)))
+                .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
+    
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(this.key).build();
+    }
+    
+    @Bean
+    JwtEncoder jwtEncoder() {
+        var jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
+        var jwks = new ImmutableJWKSet&lt;&gt;(new JWKSet(jwk));
+        return new NimbusJwtEncoder(jwks);
+    }
+}
+</code></pre>
+            <p>A classe <code>SecurityConfig</code> é responsável por configurar as regras de segurança da aplicação,
+                definindo como as requisições HTTP serão protegidas e como os tokens JWT serão gerados, validados e
+                utilizados para autenticação. Essa configuração estabelece a aplicação como um Resource Server OAuth2,
+                utilizando criptografia assimétrica com chaves RSA para assinar e validar tokens, e especifica o
+                comportamento de autenticação, autorização e controle de sessão nas rotas expostas pela API.</p>
+            <p>Essa classe é responsável por:</p>
+            <ul>
+                <li>Gerar e validar tokens JWT com criptografia assimétrica (RSA).</li>
+                <li>Configurar o Spring Security como um Resource Server com proteção de endpoints.</li>
+                <li>Integrar uma conversão personalizada das claims JWT.</li>
+                <li>Garantir segurança com senhas encriptadas usando BCrypt.</li>
+            </ul>
+            <p>Vamos entendê-la passo-a-passo! 🤓</p>
+            <h4>📦 <strong>Anotações e Estrutura Geral</strong></h4>
+            <ul>
+                <li><code>@Configuration</code>: Indica que esta classe contém definições de beans para o contexto do
+                    Spring.</li>
+                <li><code>@EnableWebSecurity</code>: Ativa o suporte à segurança via Spring Security para aplicações web
+                    (Servlet).</li>
+            </ul>
+            <h4>🔑 <strong>Injeção de Chaves RSA</strong></h4>
+            <pre><code class="language-java">@Value(&quot;${jwt.public.key}&quot;)
+private RSAPublicKey key;
+
+@Value(&quot;${jwt.private.key}&quot;)
+private RSAPrivateKey priv;
+</code></pre>
+            <ul>
+                <li>As chaves <strong>RSA pública e privada</strong> são injetadas a partir do
+                    <code>application.properties</code>.</li>
+                <li>A <strong>chave pública</strong> é usada para <strong>validar</strong> tokens recebidos (no
+                    <code>JwtDecoder</code>).</li>
+                <li>A <strong>chave privada</strong> é usada para <strong>assinar</strong> tokens JWT (no
+                    <code>JwtEncoder</code>).</li>
+            </ul>
+            <p>⚠️ No momento nossa chave pública está sendo meramente adicionada ao projeto, tendo sido &quot;copiada e
+                colada&quot; (<code>app.pub</code> e <code>app.key</code>). </p>
+            <p>Nosso <code>app.key</code></p>
+            <pre><code>-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDcWWomvlNGyQhA
+iB0TcN3sP2VuhZ1xNRPxr58lHswC9Cbtdc2hiSbe/sxAvU1i0O8vaXwICdzRZ1JM
+g1TohG9zkqqjZDhyw1f1Ic6YR/OhE6NCpqERy97WMFeW6gJd1i5inHj/W19GAbqK
+LhSHGHqIjyo0wlBf58t+qFt9h/EFBVE/LAGQBsg/jHUQCxsLoVI2aSELGIw2oSDF
+oiljwLaQl0n9khX5ZbiegN3OkqodzCYHwWyu6aVVj8M1W9RIMiKmKr09s/gf31Nc
+3WjvjqhFo1rTuurWGgKAxJLL7zlJqAKjGWbIT4P6h/1Kwxjw6X23St3OmhsG6HIn
++jl1++MrAgMBAAECggEBAMf820wop3pyUOwI3aLcaH7YFx5VZMzvqJdNlvpg1jbE
+E2Sn66b1zPLNfOIxLcBG8x8r9Ody1Bi2Vsqc0/5o3KKfdgHvnxAB3Z3dPh2WCDek
+lCOVClEVoLzziTuuTdGO5/CWJXdWHcVzIjPxmK34eJXioiLaTYqN3XKqKMdpD0ZG
+mtNTGvGf+9fQ4i94t0WqIxpMpGt7NM4RHy3+Onggev0zLiDANC23mWrTsUgect/7
+62TYg8g1bKwLAb9wCBT+BiOuCc2wrArRLOJgUkj/F4/gtrR9ima34SvWUyoUaKA0
+bi4YBX9l8oJwFGHbU9uFGEMnH0T/V0KtIB7qetReywkCgYEA9cFyfBIQrYISV/OA
++Z0bo3vh2aL0QgKrSXZ924cLt7itQAHNZ2ya+e3JRlTczi5mnWfjPWZ6eJB/8MlH
+Gpn12o/POEkU+XjZZSPe1RWGt5g0S3lWqyx9toCS9ACXcN9tGbaqcFSVI73zVTRA
+8J9grR0fbGn7jaTlTX2tnlOTQ60CgYEA5YjYpEq4L8UUMFkuj+BsS3u0oEBnzuHd
+I9LEHmN+CMPosvabQu5wkJXLuqo2TxRnAznsA8R3pCLkdPGoWMCiWRAsCn979TdY
+QbqO2qvBAD2Q19GtY7lIu6C35/enQWzJUMQE3WW0OvjLzZ0l/9mA2FBRR+3F9A1d
+rBdnmv0c3TcCgYEAi2i+ggVZcqPbtgrLOk5WVGo9F1GqUBvlgNn30WWNTx4zIaEk
+HSxtyaOLTxtq2odV7Kr3LGiKxwPpn/T+Ief+oIp92YcTn+VfJVGw4Z3BezqbR8lA
+Uf/+HF5ZfpMrVXtZD4Igs3I33Duv4sCuqhEvLWTc44pHifVloozNxYfRfU0CgYBN
+HXa7a6cJ1Yp829l62QlJKtx6Ymj95oAnQu5Ez2ROiZMqXRO4nucOjGUP55Orac1a
+FiGm+mC/skFS0MWgW8evaHGDbWU180wheQ35hW6oKAb7myRHtr4q20ouEtQMdQIF
+snV39G1iyqeeAsf7dxWElydXpRi2b68i3BIgzhzebQKBgQCdUQuTsqV9y/JFpu6H
+c5TVvhG/ubfBspI5DhQqIGijnVBzFT//UfIYMSKJo75qqBEyP2EJSmCsunWsAFsM
+TszuiGTkrKcZy9G0wJqPztZZl2F2+bJgnA6nBEV7g5PA4Af+QSmaIhRwqGDAuROR
+47jndeyIaMTNETEmOnms+as17g==
+-----END PRIVATE KEY-----
+</code></pre>
+            <p>E abaixo nosso <code>app.pub</code></p>
+            <pre><code>-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3FlqJr5TRskIQIgdE3Dd
+7D9lboWdcTUT8a+fJR7MAvQm7XXNoYkm3v7MQL1NYtDvL2l8CAnc0WdSTINU6IRv
+c5Kqo2Q4csNX9SHOmEfzoROjQqahEcve1jBXluoCXdYuYpx4/1tfRgG6ii4Uhxh6
+iI8qNMJQX+fLfqhbfYfxBQVRPywBkAbIP4x1EAsbC6FSNmkhCxiMNqEgxaIpY8C2
+kJdJ/ZIV+WW4noDdzpKqHcwmB8FsrumlVY/DNVvUSDIipiq9PbP4H99TXN1o746o
+RaNa07rq1hoCgMSSy+85SagCoxlmyE+D+of9SsMY8Ol9t0rdzpobBuhyJ/o5dfvj
+KwIDAQAB
+-----END PUBLIC KEY-----
+</code></pre>
+            <p>ATENÇÃO! <strong>NUNCA USEM ESSA COMBINAÇÃO DE CHAVE PÚBLICA/PRIVADA EM QUALQUER APLICAÇÃO EM
+                    PRODUÇÃO!</strong>. Para aplicações reais, gere a chave por meios seguros e nunca disponibilize sua
+                chave privada, que deve ficar fora do repositório de sua aplicação.</p>
+            <h4>🔐 <strong>PasswordEncoder com BCrypt</strong></h4>
+            <pre><code class="language-java">@Bean
+PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+</code></pre>
+            <ul>
+                <li>Define o algoritmo BCrypt para encriptar senhas dos usuários.</li>
+                <li>É uma boa prática recomendada pela Spring Security, por ser resistente a ataques de força bruta.
+                </li>
+            </ul>
+            <h4>🔒 <strong>JwtDecoder e JwtEncoder</strong></h4>
+            <pre><code class="language-java">@Bean
+JwtDecoder jwtDecoder() {
+    return NimbusJwtDecoder.withPublicKey(this.key).build();
+}
+
+@Bean
+JwtEncoder jwtEncoder() {
+    var jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
+    var jwks = new ImmutableJWKSet&lt;&gt;(new JWKSet(jwk));
+    return new NimbusJwtEncoder(jwks);
+}
+</code></pre>
+            <ul>
+                <li>Usa a biblioteca <strong>Nimbus JOSE + JWT</strong>, integrada ao Spring Security por meio do pacote
+                    <code>spring-security-oauth2-jose</code>.</li>
+                <li><code>JwtDecoder</code>: valida a assinatura do token recebido usando a <strong>chave
+                        pública</strong>.</li>
+                <li><code>JwtEncoder</code>: assina o token com a <strong>chave privada</strong>, gerando o JWT para o
+                    cliente.</li>
+                <li><code>JWKSet</code>: conjunto de chaves (aqui, com uma única RSAKey contendo pública e privada).
+                </li>
+            </ul>
+            <h4>🔄 <strong>SecurityFilterChain: o Coração da Configuração</strong></h4>
+            <pre><code class="language-java">@Bean
+public SecurityFilterChain filterChain(HttpSecurity http,
+        CustomJwtAuthenticationConverter customJwtAuthenticationConverter) throws Exception {
+    http.csrf(csrf -&gt; csrf.disable())
+        .authorizeHttpRequests(auth -&gt; auth
+            .requestMatchers(&quot;/api/auth/**&quot;).permitAll()
+            .requestMatchers(&quot;/api/users/register&quot;).permitAll()
+            .anyRequest().authenticated())
+        .oauth2ResourceServer(conf -&gt; conf
+            .jwt(jwt -&gt; jwt.jwtAuthenticationConverter(customJwtAuthenticationConverter)))
+        .sessionManagement(session -&gt; session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    return http.build();
+}
+</code></pre>
+            <p>✅ Explicações por partes:</p>
+            <ol>
+                <li>
+                    <p><strong><code>csrf.disable()</code></strong>:</p>
+                    <ul>
+                        <li>Desativa a proteção contra CSRF (Cross-Site Request Forgery).</li>
+                        <li>Justificável porque a aplicação é <strong>stateless</strong> (sem sessão) e expõe apenas
+                            APIs REST.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong><code>authorizeHttpRequests(...)</code></strong>:</p>
+                    <ul>
+                        <li>Define as regras de autorização por padrão de URL:<ul>
+                                <li>Libera <code>/api/auth/**</code> (login, emissão de tokens).</li>
+                                <li>Libera <code>/api/users/register</code> (registro de novos usuários).</li>
+                                <li>Todas as demais rotas exigem autenticação JWT.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong><code>oauth2ResourceServer(...).jwt(...)</code></strong>:</p>
+                    <ul>
+                        <li>Configura o projeto como um <strong>Resource Server</strong> OAuth2.</li>
+                        <li>Habilita o suporte a tokens JWT para autenticação de requisições.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong><code>jwtAuthenticationConverter(...)</code></strong>:</p>
+                    <ul>
+                        <li>Usa o bean <code>CustomJwtAuthenticationConverter</code> para converter as claims do JWT em
+                            uma <code>Authentication</code> do Spring (geralmente contendo authorities/roles). Logo mais
+                            veremos como foi implementado nosso conversor custom.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong><code>sessionManagement(...).stateless</code></strong>:</p>
+                    <ul>
+                        <li>Garante que <strong>nenhuma sessão HTTP</strong> será criada ou usada.</li>
+                        <li>Alinha-se ao paradigma REST, que deve ser <strong>stateless</strong> por definição.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h3>3.2. Classe <code>CustomJwtAuthenticationConverter.java</code></h3>
+            <p>A classe CustomJwtAuthenticationConverter é responsável por transformar um token JWT válido em uma
+                instância de AbstractAuthenticationToken, objeto utilizado pelo Spring Security para representar o
+                usuário autenticado em uma requisição. Essa conversão é fundamental para que o framework consiga aplicar
+                corretamente as regras de autorização com base nas informações contidas no token.</p>
+            <pre><code class="language-java">package br.ifsp.edu.todo.security;
+
+import br.ifsp.edu.todo.model.User;
+import br.ifsp.edu.todo.model.UserAuthenticated;
+import br.ifsp.edu.todo.repository.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.List;
+
+public class CustomJwtAuthenticationConverter implements Converter&lt;Jwt, AbstractAuthenticationToken&gt; {
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Override
+    public AbstractAuthenticationToken convert(Jwt jwt) {
+        UserAuthenticated userAuthenticated = extractUser(jwt);
+        List&lt;GrantedAuthority&gt; authorities = List.copyOf(userAuthenticated.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userAuthenticated, null, authorities);
+    }
+    
+    private UserAuthenticated extractUser(Jwt jwt) {
+        Long userId = jwt.getClaim(&quot;userId&quot;);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -&gt; new UsernameNotFoundException(&quot;User not found with id: &quot; + userId));
+        return new UserAuthenticated(user);
+    }
+}
+</code></pre>
+            <p>Implementando a interface <code>Converter&lt;Jwt, AbstractAuthenticationToken&gt;</code>, a classe define
+                o método <code>convert(Jwt jwt)</code>, que será chamado automaticamente toda vez que o Spring Security
+                receber uma requisição autenticada com um JWT válido. O método inicia extraindo o <code>userId</code> da
+                claim presente no token, utilizando a função <code>extractUser()</code>. Esse método lê o valor da claim
+                <code>&quot;userId&quot;</code>, consulta o banco de dados por meio do <code>UserRepository</code> e
+                busca a entidade <code>User</code> correspondente. Caso o usuário não seja encontrado, uma exceção do
+                tipo <code>UsernameNotFoundException</code> é lançada, impedindo o acesso.</p>
+            <p>Uma vez recuperado o usuário, o método encapsula esse objeto em uma instância de
+                <code>UserAuthenticated</code>, que implementa <code>UserDetails</code>. Em seguida, o método
+                <code>convert()</code> copia as permissões (authorities) do usuário e retorna uma instância de
+                <code>UsernamePasswordAuthenticationToken</code>. O segundo parâmetro dessa instância — que normalmente
+                representa as credenciais (como a senha) — é definido como <code>null</code>, uma vez que as credenciais
+                já foram verificadas no momento da autenticação e não precisam ser armazenadas ou reutilizadas durante o
+                ciclo da requisição.</p>
+            <p>Essa abordagem promove a separação de responsabilidades entre autenticação e autorização. O token JWT
+                carrega apenas o identificador do usuário, garantindo que os dados sensíveis permaneçam sob controle do
+                servidor. A resolução do usuário no banco, a partir do ID fornecido, permite associar informações
+                atualizadas e aplicar políticas de segurança mais precisas. Dessa forma, a classe
+                <code>CustomJwtAuthenticationConverter</code> atua como um elo entre o token JWT e o contexto de
+                segurança do Spring, permitindo que a autenticação seja concluída de forma segura e controlada.</p>
+            <p>Percebam que essa implementação <strong>NÃO É</strong> a mais performática possível, já que cada
+                requisição gera uma consulta no banco. Estamos adotando-a apenas por fins de simplicidade e para mostrar
+                que podemos configurar nosso processo de autenticação e autorização livremente. A forma mais correta
+                seria fazer uso de cache (com uso de Redis, por exemplo) e/ou embeddar as claims completas no Token (e
+                confiar nelas!).</p>
+            <h3>3.3. Classe <code>UserAuthenticated.java</code></h3>
+            <p>A classe <code>UserAuthenticated</code> atua como um adaptador entre a entidade <code>User</code> da
+                aplicação e a interface <code>UserDetails</code> do Spring Security, permitindo que o mecanismo de
+                autenticação do Spring reconheça os dados do usuário. Ela encapsula um objeto do tipo <code>User</code>,
+                armazenando as informações necessárias para autenticação e autorização.</p>
+            <pre><code class="language-java">package br.ifsp.edu.todo.model;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import java.util.Collection;
+import java.util.List;
+
+public class UserAuthenticated implements UserDetails {
+
+    private final User user;
+
+    public UserAuthenticated(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    @Override
+    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() {
+        return user.getRoles().stream()
+                .map(role -&gt; (GrantedAuthority) () -&gt; role.getRoleName().name())
+                .toList();
+    }
+
+    @Override
+    public String getPassword() {
+        return user.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return user.getUsername();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+}
+</code></pre>
+            <p>Ao implementar <code>UserDetails</code>, a classe fornece métodos obrigatórios como
+                <code>getUsername()</code>, <code>getPassword()</code> e <code>getAuthorities()</code>. O método
+                <code>getAuthorities()</code> converte os papéis (roles) associados ao usuário em objetos do tipo
+                <code>GrantedAuthority</code>, os quais são utilizados pelo Spring Security para aplicar regras de
+                autorização. Os métodos booleanos <code>isAccountNonExpired()</code>, <code>isAccountNonLocked()</code>,
+                <code>isCredentialsNonExpired()</code> e <code>isEnabled()</code> estão todos configurados para retornar
+                <code>true</code>, assumindo que todas as contas estão ativas, não expiradas e válidas — embora, em uma
+                aplicação mais robusta, esses valores possam ser derivados de campos da própria entidade
+                <code>User</code>.</p>
+            <p>Por enquanto estamos deixando tudo como <code>true</code>, mas evidentemente em uma aplicação real temos
+                que configurar todas essas propriedades. 😊</p>
+            <p>Além dos métodos da interface <code>UserDetails</code>, a classe fornece um método adicional
+                <code>getUser()</code>, que permite acessar diretamente o objeto encapsulado <code>User</code>. Isso é
+                útil, por exemplo, em controladores que utilizam a anotação <code>@AuthenticationPrincipal</code>,
+                permitindo que a aplicação acesse o usuário autenticado de forma prática e segura.</p>
+            <p>Essa abordagem é comum em projetos que utilizam Spring Security e desejam manter a separação entre as
+                responsabilidades da camada de segurança e as entidades de domínio da aplicação. Ao transformar
+                <code>User</code> em <code>UserAuthenticated</code>, o Spring Security consegue tratar os dados do
+                usuário conforme suas necessidades internas, sem impor restrições diretas à modelagem da entidade
+                principal.</p>
+            <h3>3.4. Classe <code>JwtService.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.edu.todo.service;
+
+import java.time.Instant;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
+
+import br.ifsp.edu.todo.model.User;
+
+@Service
+public class JwtService {
+    private final JwtEncoder jwtEncoder;
+    
+    public JwtService(JwtEncoder encoder) {
+        this.jwtEncoder = encoder;
+    }
+    
+    public String generateToken(User user) {
+        Instant now = Instant.now();
+        long expire = 3600L;
+    
+        var claims = JwtClaimsSet.builder()
+                .issuer(&quot;spring-security&quot;)
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expire))
+                .subject(user.getUsername())
+                .claim(&quot;userId&quot;, user.getId())
+                .build();
+    
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+    
+}
+</code></pre>
+            <p>A classe <code>JwtService</code> é responsável por gerar tokens JWT válidos a partir das informações de
+                um usuário autenticado. Para isso, ela injeta um <code>JwtEncoder</code> (provavelmente o bean
+                <code>NimbusJwtEncoder</code> definido na <code>SecurityConfig</code>) e define um método chamado
+                <code>generateToken(User user)</code>. Dentro desse método, são criadas claims customizadas que
+                representam o conteúdo do token, incluindo o emissor (<code>issuer</code>), o momento da emissão
+                (<code>issuedAt</code>), a data de expiração (<code>expiresAt</code>, configurada para uma hora
+                adiante), o sujeito (<code>subject</code>, representando o <code>username</code> do usuário) e o escopo
+                (<code>scope</code>), que é extraído das roles do usuário. Essas claims são então agrupadas em um
+                <code>JwtClaimsSet</code> e passadas ao encoder, que assina o token com a chave privada. O resultado é
+                uma string JWT que poderá ser utilizada pelo cliente em requisições futuras.</p>
+            <h3>3.5. Classe <code>UserDetailsService.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.edu.todo.service;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import br.ifsp.edu.todo.model.User;
+import br.ifsp.edu.todo.model.UserAuthenticated;
+import br.ifsp.edu.todo.repository.UserRepository;
+
+@Service
+public class UserDetailService implements UserDetailsService {
+    private final UserRepository userRepository;
+
+    private UserDetailService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -&gt; new UsernameNotFoundException(&quot;User not found with username: &quot; + username));
+        return new UserAuthenticated(user);
+    }
+}
+</code></pre>
+            <p>A classe <code>UserDetailService</code> implementa a interface <code>UserDetailsService</code>, que é uma
+                das exigências do Spring Security para carregar os dados de um usuário com base em seu nome de usuário
+                (username). Quando o método <code>loadUserByUsername</code> é chamado (normalmente como parte do fluxo
+                de autenticação), ele consulta o <code>UserRepository</code> para buscar o usuário no banco de dados. Se
+                encontrado, esse usuário é encapsulado na classe <code>UserAuthenticated</code>, que implementa a
+                interface <code>UserDetails</code> e expõe as informações necessárias para a autenticação e autorização
+                (como username, senha e authorities). Caso contrário, uma exceção <code>UsernameNotFoundException</code>
+                é lançada.</p>
+            <h3>3.6. Classe <code>AuthenticationService.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.edu.todo.service;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
+import br.ifsp.edu.todo.model.User;
+import br.ifsp.edu.todo.repository.UserRepository;
+
+@Service
+public class AuthenticationService {
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    
+    public AuthenticationService(JwtService jwtService, UserRepository userRepository) {
+        this.jwtService = jwtService;
+        this.userRepository = userRepository;
+    }
+    
+    public String authenticate(Authentication authentication) {
+        String username = authentication.getName();     
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));
+        return jwtService.generateToken(user);
+    }
+}
+</code></pre>
+            <p>A classe <code>AuthenticationService</code> atua como intermediária entre a autenticação do Spring
+                Security e a geração do JWT. Ela injeta o <code>JwtService</code> e o <code>UserRepository</code>.
+                Quando o método <code>authenticate(Authentication authentication)</code> é chamado, a classe extrai o
+                nome de usuário do objeto <code>Authentication</code>, recupera os dados completos do usuário no
+                repositório, e então invoca o <code>JwtService</code> para gerar e retornar um token JWT. Essa classe,
+                portanto, centraliza a lógica de emissão de tokens com base em um usuário autenticado previamente.</p>
+            <p>É importante notar que essas três classes de serviço se integram no fluxo de login: o
+                <code>UserDetailService</code> fornece os detalhes do usuário para autenticação inicial, o
+                <code>AuthenticationService</code> emite o JWT após a autenticação, e o <code>JwtService</code> realiza
+                a geração do token propriamente dita. É um padrão comum e eficaz em aplicações Spring Boot que adotam
+                autenticação stateless com JWT. 😊</p>
+            <h3>3.7. Classe <code>AuthenticationController.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.edu.todo.controller;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.ifsp.edu.todo.dto.authentication.AuthenticationDTO;
+import br.ifsp.edu.todo.service.AuthenticationService;
+
+@RestController
+@RequestMapping(&quot;/api/auth&quot;)
+public class AuthenticationController {
+    private final AuthenticationService authenticationService;
+
+    public AuthenticationController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    @PostMapping(&quot;authenticate&quot;)
+    public String authenticate(@RequestBody AuthenticationDTO request) {
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                request.getUsername(), request.getPassword());
+        return authenticationService.authenticate(authentication);
+    }
+}
+</code></pre>
+            <p>A classe <code>AuthenticationController</code> define o endpoint responsável por processar as requisições
+                de autenticação de usuários em uma aplicação protegida por JWT. Anotada com <code>@RestController</code>
+                e mapeada com <code>@RequestMapping(&quot;/api/auth&quot;)</code>, ela expõe uma rota HTTP do tipo
+                <code>POST</code> em <code>/api/auth/authenticate</code>, a qual espera receber no corpo da requisição
+                um objeto do tipo <code>AuthenticationDTO</code>. Esse DTO contém os dados de autenticação fornecidos
+                pelo cliente, como nome de usuário e senha.</p>
+            <p>Ao receber a requisição, o método <code>authenticate</code> instancia um objeto
+                <code>UsernamePasswordAuthenticationToken</code>, utilizando os dados extraídos do DTO. Esse token
+                representa uma tentativa de autenticação e é enviado ao serviço <code>AuthenticationService</code>, que
+                cuida da validação do usuário e geração do token JWT. O retorno do serviço é uma <code>String</code> com
+                o JWT, que é devolvida como resposta ao cliente.</p>
+            <p>Portanto, essa classe atua como o ponto de entrada para o processo de autenticação, intermediando a
+                comunicação entre o cliente e a lógica de autenticação definida no serviço, e devolvendo o token JWT a
+                ser usado nas requisições futuras protegidas.</p>
+            <h3>3.8 Classe <code>AuthenticationDTO.java</code></h3>
+            <pre><code class="language-java">package br.ifsp.edu.todo.dto.authentication;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class AuthenticationDTO {
+    @NotBlank(message = &quot;Please, enter your username.&quot;)
+    private String username;
+    @NotBlank(message = &quot;Please, enter your password.&quot;)
+    private String password;
+}
+</code></pre>
+            <p>Essa aqui é bem simples, vamos pular a explicação para evitar da explicação ficar gigante.</p>
+            <hr>
+            <h2>4. Entendendo como tudo isso funciona em conjunto 👆🤓</h2>
+            <p>O fluxo de autenticação começa com a chamada ao endpoint <code>/api/auth/authenticate</code>, que recebe
+                o nome de usuário e a senha por meio de um objeto <code>AuthenticationDTO</code>. O
+                <code>AuthenticationController</code> cria uma instância de
+                <code>UsernamePasswordAuthenticationToken</code> com esses dados e a envia ao
+                <code>AuthenticationService</code>.</p>
+            <p>O <code>AuthenticationService</code>, por sua vez, utiliza o nome de usuário para buscar o usuário
+                correspondente no banco de dados. Caso o usuário exista, ele repassa esse objeto ao
+                <code>JwtService</code>, que gera um token JWT contendo informações como o nome do usuário, o
+                identificador (userId), a data de emissão e a data de expiração. Esse token é assinado com a chave
+                privada RSA e retornado ao cliente.</p>
+            <p>As requisições subsequentes da aplicação cliente devem incluir o JWT no cabeçalho
+                <code>Authorization</code>, no formato <code>Bearer &lt;token&gt;</code>. Quando essas requisições
+                chegam, o Spring Security, por meio da configuração definida na classe <code>SecurityConfig</code>,
+                intercepta os pedidos usando a <code>SecurityFilterChain</code>. O token é então validado com a chave
+                pública, utilizando o <code>JwtDecoder</code>.</p>
+            <p>Durante a validação do token, o Spring utiliza o <code>CustomJwtAuthenticationConverter</code> para
+                extrair a claim <code>userId</code> do JWT. A partir desse valor, a aplicação consulta novamente o banco
+                para obter o objeto <code>User</code> correspondente. Esse usuário é encapsulado em uma instância de
+                <code>UserAuthenticated</code>, que implementa <code>UserDetails</code>, e fornece as authorities
+                necessárias para aplicar as regras de autorização da aplicação.</p>
+            <p>Com base nas regras definidas em <code>SecurityConfig</code>, apenas as rotas públicas (como
+                <code>/api/auth/**</code> e <code>/api/users/register</code>) estão liberadas. Todas as demais requerem
+                um token válido para acesso.</p>
+            <p>Esse ciclo garante que apenas usuários autenticados possam acessar os recursos protegidos, e que a
+                verificação do token seja feita de forma segura e independente de sessão, conforme o padrão stateless
+                adotado na aplicação. O uso de chaves RSA garante a integridade do token e impede que ele seja
+                falsificado sem acesso à chave privada.</p>
+            <hr>
+            <h2>5. É isso? 🙏</h2>
+            <p>Sim, é isso! Chegamos ao final da Aula 08. Essa é, sem dúvidas, a implementação mais complicada que
+                fizemos no Spring (até agora, pelo menos).</p>
+            <p>A partir daqui, nossa API passou a contar com autenticação e autorização baseadas em JWT, o que permite
+                proteger os dados dos usuários e garantir que apenas operações autorizadas sejam permitidas.
+                Implementamos geração e validação de tokens, criptografia com RSA, controle de acesso via roles e
+                configuração completa do Spring Security para funcionar como um Resource Server stateless.</p>
+            <p>A abordagem adotada atende bem ao contexto de uma aplicação monolítica, com autenticação centralizada e
+                controle direto sobre os usuários. Com isso, podemos garantir que cada usuário só possa acessar suas
+                próprias tarefas e que administradores possam ter acesso ampliado. A separação entre os componentes
+                (serviço, controlador, conversor e configuração de segurança) também facilita futuras manutenções ou
+                evoluções.</p>
+            <p>Evidentemente há muito a melhorar se tratando de uma aplicação real, mas essa é uma introdução que
+                balanceia a complexidade inerente dessa implementação com a apresentação dos conceitos envolvidos.</p>
+            <p>A partir daqui, podemos começar a pensar em desafios mais avançados, como:</p>
+            <ul>
+                <li>Controle de acesso baseado em roles por endpoint;</li>
+                <li>Geração de refresh tokens;</li>
+                <li>Integração com OAuth2 e OpenID Connect;</li>
+                <li>Cache de dados do usuário para melhorar performance;</li>
+                <li>E migração para uma arquitetura baseada em microsserviços.</li>
+            </ul>
+            <p>Por enquanto, temos tudo que precisamos para garantir autenticação segura e acesso controlado na nossa
+                API REST.</p>
+            <hr>
+            <h2>6. E agora, José? 🦜</h2>
+            <p>Com a segurança implementada, nossa aplicação já é capaz de autenticar usuários e restringir o acesso a
+                recursos protegidos. A partir daqui, podemos evoluir a API para lidar com novos cenários e boas
+                práticas, como:</p>
+            <ul>
+                <li>Adicionar <strong>refresh tokens</strong>, permitindo sessões mais duradouras sem precisar de login
+                    constante.</li>
+                <li>Integrar com <strong>provedores de identidade externos</strong>, como <strong>Keycloak</strong>,
+                    <strong>Auth0</strong> ou o <strong>Spring Authorization Server</strong>.</li>
+                <li>Implementar <strong>controle de acesso por recurso</strong>, garantindo que um usuário só possa
+                    acessar ou modificar as próprias tarefas.</li>
+                <li>Pensar em soluções de <strong>cache</strong>, como <strong>Redis</strong>, para evitar a consulta ao
+                    banco a cada requisição autenticada.</li>
+                <li>Embutir mais dados diretamente no JWT, reduzindo chamadas desnecessárias ao banco.</li>
+                <li>Preparar a aplicação para uso em <strong>arquiteturas distribuídas</strong>, como em ambientes de
+                    microsserviços.</li>
+            </ul>
+            <p>Apesar dessas possibilidades, nosso foco agora deve ser consolidar a base construída. A autenticação com
+                JWT já está ativa e funcional, e as próximas etapas envolvem aplicar essa segurança ao restante da
+                aplicação.</p>
+            <p>Na próxima aula, vamos introduzir o controle de acesso por roles, diferenciando permissões de usuários
+                comuns e administradores. Também vamos explorar o uso da anotação <code>@AuthenticationPrincipal</code>
+                e aplicar as restrições diretamente nos controllers.</p>
+            <p>Vale destacar que ainda não refatoramos os controladores existentes para aproveitar essa estrutura, e que
+                as <code>migrations</code> incluídas no projeto também não foram detalhadas até aqui. Sabem o que isso
+                significa? Que teremos, como sempre...</p>
+            <hr>
+            <h2>7. Exercícios</h2>
+            <p>Refatore os controladores da aplicação para utilizar a autenticação implementada com JWT. Aplique as
+                regras de negócio descritas no início da aula:</p>
+            <ul>
+                <li>Usuários só podem acessar, editar ou excluir as <strong>próprias tarefas</strong>.</li>
+                <li>Administradores podem visualizar <strong>todas as tarefas</strong>.</li>
+            </ul>
+            <h3>Dicas práticas</h3>
+            <ul>
+                <li>
+                    <p><strong>Inclua o token nas requisições</strong>: ao testar a API no Postman ou outro cliente
+                        HTTP, envie o JWT no cabeçalho:</p>
+                    <pre><code>Authorization: Bearer &lt;token&gt;
+</code></pre>
+                </li>
+                <li>
+                    <p><strong>Acesse o usuário logado com <code>@AuthenticationPrincipal</code></strong>:</p>
+                    <pre><code class="language-java">@GetMapping(&quot;/me/tasks&quot;)
+public List&lt;TaskResponseDTO&gt; listUserTasks(@AuthenticationPrincipal UserAuthenticated authentication) {
+    return taskService.findTasksByUser(authentication.getUser());
+}
+</code></pre>
+                </li>
+                <li>
+                    <p><strong>Associe a tarefa ao usuário autenticado</strong>:</p>
+                    <pre><code class="language-java">@PostMapping(&quot;/tasks&quot;)
+public ResponseEntity&lt;TaskResponseDTO&gt; createTask(@RequestBody TaskRequestDTO dto,
+                                                  @AuthenticationPrincipal UserAuthenticated authentication) {
+    return ResponseEntity.ok(taskService.createTask(dto, authentication.getUser()));
+}
+</code></pre>
+                </li>
+                <li>
+                    <p><strong>Proteja endpoints por role com <code>@PreAuthorize</code></strong>:</p>
+                    <pre><code class="language-java">@PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)
+@GetMapping(&quot;/admin/tasks&quot;)
+public List&lt;TaskResponseDTO&gt; listAllTasks() {
+    return taskService.findAll();
+}
+</code></pre>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus
+                    Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
