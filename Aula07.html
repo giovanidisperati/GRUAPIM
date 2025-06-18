@@ -54,7 +54,7 @@
                     <a href="Aula09.html"><span class="mr-0"></span>09 - Microsserviços I</a>
                 </li>
                 <li>
-                    <a href="#"><span class="mr-0"></span>10 - Microsserviços II</a>
+                    <a href="Aula10.html"><span class="mr-0"></span>10 - Microsserviços II</a>
                 </li>
                 <li>
                     <a href="#"><span class="mr-0"></span>11 - Microsserviços III</a>
@@ -120,7 +120,8 @@
                 ponto de entrada (por exemplo, diferentes <em>endpoints</em> REST ou componentes de UI) tenha de
                 implementar logicamente essas funcionalidades de forma redundante, e (2) <strong>orquestrar as
                     interações</strong> necessárias para cumprir cada caso de uso, possivelmente envolvendo várias
-                operações de dados e regras de negócio em sequência.</p>
+                operações de dados e regras de negócio em sequência.
+            </p>
             <p>Sem uma camada de serviços, diversos componentes da aplicação poderiam precisar repetir operações
                 semelhantes. Fowler observa, por exemplo, que interfaces distintas (interfaces gráficas, carregadores de
                 dados, gateways de integração, etc.) frequentemente precisam realizar interações complexas para
@@ -138,7 +139,8 @@
                     produtos também via Amazon ou Mercado Livre).</li>
             </ul>
             <p>Todos esses canais (Web, Mobile, Integração com marketplaces) precisam realizar uma operação comum:
-                <strong>finalizar um pedido de compra</strong>.</p>
+                <strong>finalizar um pedido de compra</strong>.
+            </p>
             <p>Agora, sem uma camada Service centralizada, cada canal implementaria sua própria versão da lógica para
                 &quot;finalizar pedido&quot;. O que poderia envolver:</p>
             <ol>
@@ -163,7 +165,8 @@
             <p><strong>Com uma camada Service</strong>, o cenário seria muito mais organizado:</p>
             <ul>
                 <li>Criamos uma classe <code>OrderService</code> contendo o método
-                    <code>finalizarPedido(Pedido pedido)</code>.</li>
+                    <code>finalizarPedido(Pedido pedido)</code>.
+                </li>
                 <li>Toda a lógica complexa (validar estoque, calcular descontos, alterar status, debitar estoque, gerar
                     fatura, enviar e-mail) fica <strong>centralizada</strong> no <code>OrderService</code>.</li>
                 <li>A interface Web apenas chama <code>orderService.finalizarPedido(pedido)</code>.</li>
@@ -231,7 +234,8 @@
             <p>Dentro desse contexto, a camada Service que estamos implementando hoje cumpre o papel de
                 <strong>orquestrar os casos de uso</strong>, isolando-os das preocupações de infraestrutura. Ela se
                 torna a linha divisória entre o mundo interno da aplicação (domínio) e o mundo externo (interface, banco
-                de dados, APIs).</p>
+                de dados, APIs).
+            </p>
             <p>Quando evoluirmos nossa arquitetura para <strong>microsserviços</strong>, aplicaremos ainda mais rigor a
                 esse modelo: cada microsserviço será orientado a um <strong>bounded context</strong> do DDD
                 (Domain-Driven Design), no qual a camada Service será responsável por coordenar as operações de um
@@ -265,7 +269,8 @@
                 engenheiro de backend implementando a lógica de negócio nos serviços), graças ao contrato claro que a
                 Service Layer fornece entre o front-end e o domínio. Essa divisão de trabalho melhora a
                 <strong>coesão</strong> de cada parte e diminui o risco de conflitos, contribuindo para a produtividade
-                e qualidade do código.</p>
+                e qualidade do código.
+            </p>
             <p>Outro ponto importante é que a camada Service aumenta a <strong>coerência das regras de negócio</strong>.
                 Como todas as funcionalidades críticas passam por ela, garante-se que as mesmas validações e operações
                 sejam aplicadas independentemente de qual interface acionou a funcionalidade. Por exemplo, se tanto uma
@@ -277,7 +282,8 @@
                     coesão da lógica de negócio</strong>, o que está alinhado com princípios fundamentais como o
                 <em>Single Responsibility Principle</em> de Robert Martin (cada camada tendo responsabilidade única) e o
                 <em>Open/Closed Principle</em> (podemos estender a lógica adicionando novos serviços ou métodos sem
-                modificar controladores já estáveis, por exemplo).</p>
+                modificar controladores já estáveis, por exemplo).
+            </p>
             <p>A discussão a seguir apresenta alguns pontos interessantes nesse sentido: (<a
                     href="https://pt.stackoverflow.com/questions/22403/por-que-separar-camadas-quais-os-benef%C3%ADcios-de-uma-arquitetura-multicamada#:~:text=,parte%20sem%20afetar%20as%20demais">design
                     pattern - Por que separar camadas? Quais os benefícios de uma arquitetura multicamada? - Stack
@@ -295,7 +301,8 @@
                 fácil de testar”, pois podemos testar os controladores separadamente (simulando requisições e
                 verificando se delegam corretamente aos serviços) e testar os repositórios separadamente (interagindo
                 com uma base de dados de teste), enquanto a camada Service é testada em separado verificando a lógica de
-                negócio.</p>
+                negócio.
+            </p>
             <h3>Vantagens Práticas em Projetos Spring Boot (e Similares!)</h3>
             <p>Em frameworks como o <strong>Spring Boot</strong>, o uso de uma camada Service é uma prática consagrada
                 na estruturação de aplicações. O próprio <em>framework</em> fornece estereótipos (@Service) que indicam
@@ -333,7 +340,8 @@
                         onde a lógica de negócio não fica misturada com lógica de protocolo HTTP ou detalhes de JSON,
                         por exemplo. Aqui temos um bom aprofundamento dessa aplicação: <a
                             href="https://medium.com/marmolabs/skinny-models-skinny-controllers-fat-services-e04cfe2d6ae">Skinny
-                            Models, Skinny Controllers, Fat Services - Ryan Rebo</a>.</p>
+                            Models, Skinny Controllers, Fat Services - Ryan Rebo</a>.
+                    </p>
                 </li>
                 <li>
                     <p><strong>Facilidade de injeção de dependências e mockagem:</strong> Ao seguir a convenção de criar
@@ -367,7 +375,8 @@
                 <em>endpoints</em> relacionados (todos podem reutilizar métodos da camada de serviço comum). Em suma,
                 frameworks modernos dão suporte nativo a esse padrão de camadas porque ele provou fornecer um equilíbrio
                 saudável entre <strong>simplicidade na interação</strong> (cada camada trata de um aspecto) e
-                <strong>robustez na implementação</strong> (transações e regras consistentes).</p>
+                <strong>robustez na implementação</strong> (transações e regras consistentes).
+            </p>
             <h3>Possíveis Críticas e Visões Contrárias</h3>
             <p>Apesar das claras vantagens, a introdução de uma camada Service não é isenta de críticas. Alguns
                 especialistas e desenvolvedores argumentam que, em certos contextos, essa camada pode representar uma
@@ -384,7 +393,8 @@
                 Tentar aplicar uma arquitetura pesada “só porque um livro disse que deve fazer isso” é questionável
                 quando <strong>não há uma motivação clara no problema em questão</strong>. Em outras palavras, violaria
                 o princípio YAGNI (“You Aren’t Gonna Need It”), acrescentando trabalho e código para lidar com
-                complexidades que talvez nunca se manifestem naquele sistema específico.</p>
+                complexidades que talvez nunca se manifestem naquele sistema específico.
+            </p>
             <p>Outra crítica técnica relevante diz respeito ao risco de se cair no chamado <strong>Anemic Domain
                     Model</strong> (Modelo de Domínio Anêmico). Esse termo, cunhado por Martin Fowler, descreve uma
                 situação em que as entidades de domínio ficam “anêmicas”, ou seja, sem comportamento algum, atuando
@@ -399,7 +409,8 @@
                 em comportamento.</p>
             <p>É importante notar, entretanto, que <em>criticar o modelo anêmico não significa descartar a camada de
                     serviço</em>. Os próprios defensores de Domain-Driven Design recomendam uma camada de serviços
-                <strong>em conjunto com um domínio rico</strong>, e não em substituição a este!</p>
+                <strong>em conjunto com um domínio rico</strong>, e não em substituição a este!
+            </p>
             <p>Por fim, em arquiteturas altamente desacopladas ou alternativas (como a <strong>arquitetura
                     hexagonal</strong> ou a <strong>Clean Architecture</strong> de Robert C. Martin), a camada Service
                 pode aparecer com outro nome ou forma. Na Clean Architecture, por exemplo, temos a camada de
@@ -414,7 +425,8 @@
                 mesmo em projetos “desacoplados” segundo padrões modernos, existe alguma forma de Service Layer, ainda
                 que os autores enfatizem a inversão total de dependências (interfaces definidas no núcleo e
                 implementações fora). As críticas, portanto, geralmente não defendem eliminar qualquer separação, mas
-                sim <strong>evitar separações desnecessárias</strong> ou mal definidas.</p>
+                sim <strong>evitar separações desnecessárias</strong> ou mal definidas.
+            </p>
             <p>Por exemplo, se fossemos estruturar nosso To-Do List por meio de uma estrutura parecida com a Clean
                 Architecture, teríamos algo tal como:</p>
             <pre><code>src/main/java/br/ifsp/edu/todo/
@@ -492,7 +504,8 @@
                 lógica, permitindo transações abrangentes, isolando regras complexas) e reconhecer quando um design mais
                 simples poderia bastar (em aplicações de escopo restrito e invariável, por exemplo). Como discutimos em
                 aulas anteriores, não basta apenas dominar a implementação técnica — é fundamental compreender o
-                contexto, as motivações e as consequências de cada decisão que tomamos no projeto!</p>
+                contexto, as motivações e as consequências de cada decisão que tomamos no projeto!
+            </p>
             <p>Dito isso e entendendo a importância dessa camada, vamos passar ao código da solução do exercício!</p>
             <hr>
             <h2>2. Estrutura de Pastas e Pacotes</h2>
@@ -533,7 +546,8 @@
             <ul>
                 <li>As entidades possuem anotações do pacote <code>jakarta.persistence</code>, como
                     <code>@Entity</code>, <code>@Id</code>, <code>@GeneratedValue</code>, <code>@Enumerated</code>,
-                    entre outras.</li>
+                    entre outras.
+                </li>
                 <li>O mapeamento segue o padrão ORM (Object-Relational Mapping) para garantir a persistência correta dos
                     dados.</li>
                 <li>Utilizamos enums para representar valores fixos, como as prioridades das tarefas.</li>
@@ -553,7 +567,8 @@
                 <li><code>PagedResponse</code>: padroniza respostas paginadas.</li>
             </ul>
             <p>Todos os DTOs contam com anotações de validação (<code>@NotBlank</code>, <code>@Size</code>,
-                <code>@Future</code>, etc.) para garantir a integridade dos dados no momento da entrada.</p>
+                <code>@Future</code>, etc.) para garantir a integridade dos dados no momento da entrada.
+            </p>
             <p>A camada <code>mapper</code> contém classes utilitárias para conversão entre entidades e DTOs,
                 facilitando a adaptação dos modelos de domínio para exposições externas.</p>
             <ul>
@@ -566,7 +581,8 @@
                     capturar e tratar exceções de forma padronizada.</li>
                 <li>Definimos exceções customizadas para representar erros de domínio, como
                     <code>ResourceNotFoundException</code> (recurso não encontrado) e
-                    <code>InvalidTaskStateException</code> (tentativa de operação inválida em tarefas concluídas).</li>
+                    <code>InvalidTaskStateException</code> (tentativa de operação inválida em tarefas concluídas).
+                </li>
                 <li>As respostas de erro são estruturadas utilizando o DTO <code>ErrorResponse</code>.</li>
             </ul>
             <p>A camada <code>service</code> centraliza a lógica de negócio da aplicação, atuando como uma ponte entre o
@@ -603,7 +619,8 @@
             <p>Vamos começar nossa análise pela <strong>camada de modelo</strong>, onde definimos as
                 <strong>entidades</strong> que representam o núcleo de informação da nossa aplicação. Tudo no sistema —
                 criação de tarefas, atualizações, conclusões, consultas — gira em torno desses modelos. Entender suas
-                estruturas é essencial para compreendermos o comportamento do sistema como um todo.</p>
+                estruturas é essencial para compreendermos o comportamento do sistema como um todo.
+            </p>
             <h4><code>Task.java</code></h4>
             <pre><code class="language-java">package br.ifsp.edu.todo.model;
 
@@ -679,7 +696,8 @@ public enum Category {
             <p>A classe <code>Category</code> define uma enumeração que representa as categorias possíveis para uma
                 tarefa no nosso sistema. As opções incluem valores como <code>STUDY</code>, <code>WORK</code>,
                 <code>LEISURE</code>, <code>HEALTH</code>, entre outros, possibilitando que o usuário classifique melhor
-                suas tarefas de acordo com áreas da vida. </p>
+                suas tarefas de acordo com áreas da vida.
+            </p>
             <p>Além disso, a enumeração implementa o método utilitário <code>fromString(String value)</code>, que
                 permite converter uma string recebida — como em entradas de usuários ou dados de APIs — em um valor
                 válido da enumeração. Esse método percorre todas as categorias existentes e realiza uma comparação
@@ -687,7 +705,8 @@ public enum Category {
                 corresponda a nenhuma categoria conhecida, é lançada uma <code>IllegalArgumentException</code>,
                 garantindo que apenas categorias válidas sejam aceitas. Essa abordagem reforça a robustez da nossa
                 aplicação ao evitar erros silenciosos e inconsistências nos dados. Isso será bastante útil na nossa
-                <code>TaskService</code>, como veremos mais adiante. </p>
+                <code>TaskService</code>, como veremos mais adiante.
+            </p>
             <h4><code>Priority.java</code></h4>
             <pre><code class="language-java">package br.ifsp.edu.todo.model;
 
@@ -710,7 +729,8 @@ public enum Priority {
                 qualquer erro aqui propaga-se para todas as demais camadas. Agora que compreendemos como o núcleo da
                 nossa aplicação — o modelo de domínio — está estruturado, é hora de avançarmos para uma camada
                 igualmente fundamental: a dos DTOs. São eles que estabelecerão a comunicação segura entre o mundo
-                externo e os nossos modelos internos.</p>
+                externo e os nossos modelos internos.
+            </p>
             <h2>3.2. Data Transfer Objects (<code>dto</code>)</h2>
             <p>Agora que conhecemos os modelos de domínio, vamos analisar como estruturamos a comunicação de dados entre
                 o cliente e a nossa aplicação: os <strong>DTOs</strong>. Os DTOs nos permitem expor apenas as
@@ -752,17 +772,20 @@ public class TaskRequestDTO {
                             garantindo que o título seja obrigatório e esteja entre 10 e 100 caracteres.</li>
                         <li><code>@Size(max = 255)</code> para limitar o tamanho da <code>description</code>.</li>
                         <li><code>@NotNull</code> no <code>priority</code>, <code>dueDate</code> e
-                            <code>category</code>, assegurando que esses campos sejam sempre informados.</li>
+                            <code>category</code>, assegurando que esses campos sejam sempre informados.
+                        </li>
                         <li><code>@FutureOrPresent</code> na <code>dueDate</code>, impedindo a criação de tarefas com
                             data limite no passado.</li>
                     </ul>
                 </li>
                 <li><strong>Campos</strong>:<ul>
                         <li><code>title</code>, <code>description</code>, <code>priority</code>, <code>dueDate</code>,
-                            <code>completed</code>, <code>category</code>.</li>
+                            <code>completed</code>, <code>category</code>.
+                        </li>
                         <li>Note que <strong>não há campo <code>id</code> nem <code>createdAt</code></strong> no
                             <code>TaskRequestDTO</code>, pois essas informações são geradas e controladas internamente
-                            pela aplicação e não devem ser manipuladas pelo usuário. 🙂</li>
+                            pela aplicação e não devem ser manipuladas pelo usuário. 🙂
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -822,13 +845,15 @@ public class PagedResponse&lt;T&gt; {
                 API. Dessa forma, conseguimos garantir que todas as respostas paginadas da nossa aplicação sigam um
                 formato consistente, facilitando o consumo por parte de front-ends ou integrações. Em vez de retornarmos
                 diretamente um <code>Page&lt;T&gt;</code>, que é uma estrutura interna do Spring, adaptamos os dados
-                para esse DTO mais controlado e amigável para o cliente.</p>
+                para esse DTO mais controlado e amigável para o cliente.
+            </p>
             <p>Principais características:</p>
             <ul>
                 <li><strong>Campos</strong>:<ul>
                         <li><code>content</code>: lista de elementos da página (do tipo genérico <code>T</code>).</li>
                         <li><code>pageNumber</code>, <code>pageSize</code>, <code>totalElements</code>,
-                            <code>totalPages</code>: metadados sobre a paginação.</li>
+                            <code>totalPages</code>: metadados sobre a paginação.
+                        </li>
                         <li><code>first</code>, <code>last</code>: flags indicando se estamos na primeira ou na última
                             página.</li>
                     </ul>
@@ -845,7 +870,8 @@ public class PagedResponse&lt;T&gt; {
                 <strong>persistência</strong> dessas informações. Para isso, utilizamos os
                 <strong>repositórios</strong>, que fornecem uma abstração poderosa para comunicação com o banco de
                 dados, reduzindo significativamente o esforço necessário para operações CRUD e permitindo métodos de
-                consulta personalizados.</p>
+                consulta personalizados.
+            </p>
             <h4><code>TaskRepository.java</code></h4>
             <pre><code class="language-java">package br.ifsp.edu.todo.repository;
 public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
@@ -858,7 +884,8 @@ public interface TaskRepository extends JpaRepository&lt;Task, Long&gt; {
                 <code>JpaRepository&lt;Task, Long&gt;</code>, o que nos permite herdar diversos métodos prontos para
                 realizar operações CRUD (<code>findAll</code>, <code>save</code>, <code>deleteById</code>,
                 <code>findById</code>, etc.) sem precisar implementá-los manualmente. Lembrem-se que vimos isso nas
-                aulas anteriores!</p>
+                aulas anteriores!
+            </p>
             <p>Além disso, a <code>TaskRepository</code> define um método personalizado:</p>
             <pre><code class="language-java">Page&lt;Task&gt; findByCategory(Category category, Pageable pageable);
 </code></pre>
@@ -973,7 +1000,8 @@ public class TaskService {
             <p>A classe é anotada com <code>@Service</code>, o que faz com que o Spring reconheça automaticamente essa
                 classe como um <em>componente de serviço</em>, permitindo sua injeção em outros pontos do sistema (como
                 nos controllers) de forma automática. Essa anotação é importante porque ajuda a manter a
-                <strong>organização por responsabilidades</strong> dentro do projeto.</p>
+                <strong>organização por responsabilidades</strong> dentro do projeto.
+            </p>
             <p>As dependências (<code>TaskRepository</code>, <code>ModelMapper</code>, <code>PagedResponseMapper</code>)
                 são injetadas via <strong>construtor</strong>. Essa abordagem de injeção por construtor, ao invés do uso
                 de <code>@Autowired</code> nos atributos, traz vários benefícios:</p>
@@ -981,7 +1009,8 @@ public class TaskService {
                 <li>Permite que os campos sejam <code>final</code>, garantindo <strong>imutabilidade</strong> — ou seja,
                     que o serviço não troque de dependência depois de criado.</li>
                 <li>Facilita a <strong>testabilidade</strong> — podemos facilmente criar instâncias da
-                    <code>TaskService</code> passando mocks dessas dependências em testes unitários.</li>
+                    <code>TaskService</code> passando mocks dessas dependências em testes unitários.
+                </li>
                 <li>Deixa a classe mais <strong>autoexplicativa</strong>, pois o construtor mostra claramente quais são
                     suas necessidades para funcionar.</li>
             </ul>
@@ -1044,7 +1073,8 @@ public class TaskService {
                         <li>Busca a tarefa pelo ID.</li>
                         <li>Verifica se a tarefa já está marcada como concluída. Se sim, lança uma
                             <code>InvalidTaskStateException</code> (evitando que a mesma tarefa seja
-                            &quot;reconcluída&quot; várias vezes). </li>
+                            &quot;reconcluída&quot; várias vezes).
+                        </li>
                         <li>Se não estiver concluída, marca como concluída (<code>completed = true</code>) e salva a
                             atualização.</li>
                     </ul>
@@ -1104,7 +1134,8 @@ updatedTask.setCreatedAt(existingTask.getCreatedAt());
                 modelos, DTOs e repositórios em fluxos consistentes de negócio. Com a lógica de negócio centralizada e
                 bem organizada na camada de serviços, resta apenas um elo para completarmos nosso fluxo de aplicação: a
                 exposição dessa lógica para o mundo exterior. Vamos então conhecer a camada de controllers, responsável
-                por receber as requisições dos usuários e orquestrar as operações do sistema.</p>
+                por receber as requisições dos usuários e orquestrar as operações do sistema.
+            </p>
             <h2>3.5. Controladores (<code>controller</code>)</h2>
             <p>Vamos analisar os <strong>controllers</strong>, que são responsáveis por receber as requisições HTTP,
                 validar entradas e delegar as operações para os serviços. Os controllers atuam como <strong>portões de
@@ -1167,11 +1198,13 @@ public class TaskController {
                 define os <strong>endpoints REST</strong> que os clientes podem utilizar para interagir com o sistema,
                 como criar, buscar, atualizar, concluir e excluir tarefas.</p>
             <p>Logo de início, vemos que a classe é anotada com <code>@RestController</code> e
-                <code>@RequestMapping(&quot;/api/tasks&quot;)</code>, o que significa que:</p>
+                <code>@RequestMapping(&quot;/api/tasks&quot;)</code>, o que significa que:
+            </p>
             <ul>
                 <li>Ela será responsável por tratar requisições HTTP.</li>
                 <li>Todos os endpoints definidos aqui terão como prefixo <code>/api/tasks</code> (por exemplo:
-                    <code>/api/tasks/1</code>, <code>/api/tasks/search</code>, etc).</li>
+                    <code>/api/tasks/1</code>, <code>/api/tasks/search</code>, etc).
+                </li>
             </ul>
             <p>Internamente, o <code>TaskController</code> injeta a dependência do <code>TaskService</code> via
                 construtor. Como vimos anteriormente, isso é uma boa prática, pois favorece a imutabilidade dos
@@ -1202,11 +1235,13 @@ public ResponseEntity&lt;PagedResponse&lt;TaskResponseDTO&gt;&gt; getAllTasks(Pa
 </code></pre>
             <ul>
                 <li><strong><code>@GetMapping</code></strong> mapeia este método para requisições HTTP GET em
-                    <code>/api/tasks</code>.</li>
+                    <code>/api/tasks</code>.
+                </li>
                 <li>Utiliza o <code>Pageable</code>, que é injetado automaticamente pelo Spring para suportar paginação
                     e ordenação.</li>
                 <li>Retorna uma resposta padronizada usando nosso <code>PagedResponse</code>, encapsulada com
-                    <code>ResponseEntity.ok()</code> para indicar sucesso.</li>
+                    <code>ResponseEntity.ok()</code> para indicar sucesso.
+                </li>
             </ul>
             <h5>Endpoint de busca por ID</h5>
             <pre><code class="language-java">@GetMapping(&quot;/{id}&quot;)
@@ -1218,7 +1253,8 @@ public ResponseEntity&lt;TaskResponseDTO&gt; getTaskById(@PathVariable Long id) 
                 <li>Busca uma tarefa específica pelo seu identificador (<code>id</code>) passado na URL.</li>
                 <li>Se o ID for encontrado, retorna o DTO da tarefa com <code>200 OK</code>.</li>
                 <li>Se não, o <code>TaskService</code> irá lançar uma exceção que será tratada pelo
-                    <code>GlobalExceptionHandler</code>.</li>
+                    <code>GlobalExceptionHandler</code>.
+                </li>
             </ul>
             <h5>Endpoint de busca por categoria</h5>
             <pre><code class="language-java">@GetMapping(&quot;/search&quot;)
@@ -1229,7 +1265,8 @@ public ResponseEntity&lt;PagedResponse&lt;TaskResponseDTO&gt;&gt; searchByCatego
             <ul>
                 <li>Permite buscar tarefas que pertencem a uma determinada categoria.</li>
                 <li>O parâmetro <code>category</code> é passado pela <strong>query string</strong> (ex:
-                    <code>/api/tasks/search?category=STUDY</code>).</li>
+                    <code>/api/tasks/search?category=STUDY</code>).
+                </li>
                 <li>Também suporta paginação (<code>Pageable</code>).</li>
             </ul>
             <h5>Endpoint para concluir tarefa</h5>
@@ -1257,7 +1294,8 @@ public ResponseEntity&lt;TaskResponseDTO&gt; updateTask(@PathVariable Long id,
                 <li>Permite <strong>atualizar todos os dados</strong> de uma tarefa existente (não apenas um campo
                     específico).</li>
                 <li>Utiliza <code>@PutMapping</code>, que, de acordo com a semântica REST, representa
-                    <strong>substituição integral</strong> do recurso.</li>
+                    <strong>substituição integral</strong> do recurso.
+                </li>
                 <li>O corpo da requisição também é validado automaticamente.</li>
             </ul>
             <h5>Endpoint para excluir tarefa</h5>
@@ -1271,7 +1309,8 @@ public ResponseEntity&lt;Void&gt; deleteTask(@PathVariable Long id) {
                 <li>Exclui uma tarefa com base no ID informado.</li>
                 <li>Utiliza <code>@DeleteMapping</code>, que mapeia para operações de deleção.</li>
                 <li>Retorna um <code>204 No Content</code>, indicando que a operação foi bem-sucedida mas que
-                    <strong>não há corpo na resposta</strong>.</li>
+                    <strong>não há corpo na resposta</strong>.
+                </li>
             </ul>
             <h5>🌟 Considerações Gerais</h5>
             <p>Perceba que nessa implementação seguimos a ideia mencionada ao dissertarmos sobre a importância da camada
@@ -1300,7 +1339,8 @@ public ResponseEntity&lt;Void&gt; deleteTask(@PathVariable Long id) {
                 <strong>DTOs</strong>, <strong>repositórios</strong>, <strong>serviços</strong> e
                 <strong>controllers</strong> — seguindo uma separação de responsabilidades bem definida. No entanto,
                 existem alguns aspectos que, embora não pertençam diretamente a uma única camada, são essenciais para o
-                funcionamento fluido e profissional da aplicação como um todo. </p>
+                funcionamento fluido e profissional da aplicação como um todo.
+            </p>
             <p>Esses aspectos são chamados de <strong>transversais</strong> porque impactam várias partes do sistema
                 simultaneamente, oferecendo suporte e robustez tanto no desenvolvimento quanto na execução da API. São
                 eles:</p>
@@ -1318,7 +1358,8 @@ public ResponseEntity&lt;Void&gt; deleteTask(@PathVariable Long id) {
             <h2>3.6.1. Mapeamento de Entidades</h2>
             <p>A primeira etapa dos nossos aspectos transversais é entender como o projeto realiza a conversão entre
                 objetos de diferentes camadas — <strong>Entidades</strong>, <strong>DTOs de requisição</strong> e
-                <strong>DTOs de resposta</strong>. </p>
+                <strong>DTOs de resposta</strong>.
+            </p>
             <p>Para isso, utilizamos o <strong>ModelMapper</strong>, uma biblioteca que automatiza a tarefa de copiar
                 dados entre objetos de maneira simples e segura.</p>
             <p>Em APIs bem estruturadas, <strong>não expomos entidades JPA diretamente para o cliente</strong> — usamos
@@ -1327,7 +1368,8 @@ public ResponseEntity&lt;Void&gt; deleteTask(@PathVariable Long id) {
                 O <strong>ModelMapperConfig</strong> centraliza essa configuração, permitindo que o mapeamento seja
                 feito de maneira <strong>automática</strong>, <strong>personalizável</strong> e
                 <strong>padronizada</strong> em todo o projeto. De novo: já vimos isso anteriormente, mas nunca é demais
-                relembrar, né?</p>
+                relembrar, né?
+            </p>
             <h4><code>ModelMapperConfig.java</code></h4>
             <pre><code class="language-java">package br.ifsp.edu.todo.config;
 
@@ -1351,9 +1393,11 @@ public class ModelMapperConfig {
             <p>O método <code>modelMapper()</code> está anotado com <code>@Bean</code>, o que significa que a instância
                 retornada será registrada no contexto do Spring Boot. Assim, sempre que uma outra classe precisar de um
                 <code>ModelMapper</code>, ela poderá receber esse bean automaticamente, seja via injeção no construtor
-                ou com <code>@Autowired</code>.</p>
+                ou com <code>@Autowired</code>.
+            </p>
             <p>Dentro do método, configuramos o <code>ModelMapper</code> para usar a estratégia de correspondência
-                <code>MatchingStrategies.STRICT</code>. Essa estratégia define que:</p>
+                <code>MatchingStrategies.STRICT</code>. Essa estratégia define que:
+            </p>
             <ul>
                 <li>Um mapeamento só será considerado válido se <strong>os nomes dos atributos forem exatamente
                         iguais</strong> entre a origem (entidade) e o destino (DTO).</li>
@@ -1366,7 +1410,8 @@ public class ModelMapperConfig {
             <p>Essa é a diferença entre a configuração atual e as configurações anteriores que fizemos. Nós precisamos
                 disso NESSA aplicação? Não, mas a ideia aqui é mostrar que nós podemos configurar o
                 <code>ModelMapper</code> de acordo com as necessidades que possam surgir no projeto, não ficando
-                &quot;travados&quot; em uma única abordagem. 👨‍🏭 </p>
+                &quot;travados&quot; em uma única abordagem. 👨‍🏭
+            </p>
             <h4><code>PagedResponseMapper.java</code></h4>
             <pre><code class="language-java">package br.ifsp.edu.todo.mapper;
 
@@ -1414,12 +1459,14 @@ public class PagedResponseMapper {
                 </li>
             </ul>
             <p>Antes de entrarmos no funcionamento do método, entretanto, vale lembrar que estamos lidando com tipos
-                <strong>genéricos</strong> (<code>S</code> e <code>T</code>).</p>
+                <strong>genéricos</strong> (<code>S</code> e <code>T</code>).
+            </p>
             <p><strong>Generics</strong> permitem que classes, interfaces e métodos no Java sejam <strong>parametrizados
                     por tipos</strong>. Em vez de fixar um tipo específico, como <code>String</code> ou
                 <code>Integer</code>, podemos deixar o tipo como um parâmetro — <code>T</code>, <code>S</code>,
                 <code>U</code>, etc. — tornando o código <strong>mais flexível, reutilizável e seguro</strong> em tempo
-                de compilação.</p>
+                de compilação.
+            </p>
             <p>No caso do nosso método:</p>
             <ul>
                 <li><code>S</code> representa o <strong>tipo de objeto original</strong> retornado pelo repositório (por
@@ -1462,7 +1509,8 @@ public class PagedResponseMapper {
                         <li>Para cada objeto <code>source</code> no fluxo, usamos o <code>modelMapper</code> para
                             transformá-lo de <code>S</code> para <code>T</code>.</li>
                         <li>Essa operação converte, por exemplo, uma entidade <code>Task</code> em um
-                            <code>TaskResponseDTO</code>, respeitando o mapeamento de campos.</li>
+                            <code>TaskResponseDTO</code>, respeitando o mapeamento de campos.
+                        </li>
                     </ul>
                 </li>
                 <li>
@@ -1569,20 +1617,23 @@ public class GlobalExceptionHandler {
                 exceções em nossa aplicação.
                 Ela é anotada com <code>@RestControllerAdvice</code>, uma especialização do
                 <code>@ControllerAdvice</code> combinada com <code>@ResponseBody</code>, que intercepta exceções
-                lançadas em toda a aplicação e gera respostas HTTP amigáveis e padronizadas.</p>
+                lançadas em toda a aplicação e gera respostas HTTP amigáveis e padronizadas.
+            </p>
             <p>Essa classe define métodos como:</p>
             <p>Tratamento de <code>ResourceNotFoundException</code> → retorna HTTP 404.</p>
             <p>Tratamento de <code>InvalidTaskStateException</code> → retorna HTTP 409.</p>
             <p>Tratamento genérico de outras exceções → retorna HTTP 500.</p>
             <p>Cada método constrói um ErrorResponse, define o status correto e retorna uma ResponseEntity
                 <ErrorResponse>. Isso nos permite separar totalmente a lógica de negócio da lógica de tratamento de
-                    erro, promovendo a limpeza e a organização da aplicação.</p>
+                    erro, promovendo a limpeza e a organização da aplicação.
+            </p>
             <p>Além disso, ter uma camada de tratamento global facilita a adição de tratamentos personalizados no
                 futuro, como logs de exceções, métricas de falhas ou alertas de erro.</p>
             <p>Com isso, garantimos que os clientes da nossa API recebam:</p>
             <ul>
                 <li>Códigos de status HTTP adequados (<code>400</code>, <code>404</code>, <code>409</code>,
-                    <code>500</code>, etc.);</li>
+                    <code>500</code>, etc.);
+                </li>
                 <li>Mensagens de erro claras e compreensíveis;</li>
                 <li>Estruturas de resposta consistentes.</li>
             </ul>
@@ -1609,7 +1660,8 @@ public class ResourceNotFoundException extends RuntimeException {
                 (<code>GlobalExceptionHandler</code>) para gerar a resposta HTTP apropriada.</p>
             <p>Essa exceção melhora a legibilidade e a semântica da aplicação, pois ao lançarmos explicitamente uma
                 <code>ResourceNotFoundException</code>, deixamos claro qual é o problema ocorrido, em vez de depender de
-                mensagens genéricas.</p>
+                mensagens genéricas.
+            </p>
             <h4><code>InvalidTaskStateException.java</code></h4>
             <pre><code class="language-java">package br.ifsp.edu.todo.exception;
 
@@ -1825,7 +1877,8 @@ public class TaskServiceTest {
             </ul>
             <p>É importante que façamos algumas considerações: todos os testes isolam a lógica do
                 <code>TaskService</code>, e testamos tanto fluxos positivos quanto negativos (ex: validação de data e
-                deleção de tarefas concluídas).</p>
+                deleção de tarefas concluídas).
+            </p>
             <p>Esse teste não fornece cobertura completa de nossa aplicação, mas consegue já cumprir o proposto no
                 exercício e fazer uso dos conceitos que vimos anteriormente sobre testes.</p>
             <p>Passemos, agora, aos testes funcionais.</p>
@@ -1932,7 +1985,8 @@ public class TaskControllerTest {
 </code></pre>
             <p>Esses testes são <strong>testes de integração funcional</strong>, realizados com
                 <strong><code>MockMvc</code></strong>. Aqui simulamos requisições HTTP reais, sem subir o servidor, mas
-                envolvendo de fato toda a stack Spring Boot configurada.</p>
+                envolvendo de fato toda a stack Spring Boot configurada.
+            </p>
             <ul>
                 <li>
                     <p><strong>Configurações</strong></p>
@@ -1940,7 +1994,8 @@ public class TaskControllerTest {
                         <li><code>@SpringBootTest</code> indica que queremos inicializar o contexto do Spring.</li>
                         <li><code>@AutoConfigureMockMvc</code> habilita o uso do <code>MockMvc</code>.</li>
                         <li><code>@Autowired</code> injeta dependências reais como o <code>MockMvc</code>, o
-                            <code>ObjectMapper</code>, e o <code>TaskRepository</code>.</li>
+                            <code>ObjectMapper</code>, e o <code>TaskRepository</code>.
+                        </li>
                     </ul>
                 </li>
                 <li>
@@ -1997,7 +2052,8 @@ public class TaskControllerTest {
                 serviço → resposta HTTP). Além disso, há uso de um <strong>banco de dados real:</strong> o
                 <code>TaskRepository</code> salva de fato no banco de dados H2 para os testes funcionarem. Por fim,
                 também temos a <strong>validação de respostas:</strong> por meio da utilização do <code>jsonPath</code>
-                para validar atributos específicos da resposta JSON.</p>
+                para validar atributos específicos da resposta JSON.
+            </p>
             <h4>Resumo dos Testes</h4>
             <p>Podemos resumir as características gerais dos nossos testes tal como mostrado a seguir:</p>
             <table>
@@ -2031,7 +2087,8 @@ public class TaskControllerTest {
                 complementares: testes <strong>unitários</strong> na camada de serviço e testes
                 <strong>funcionais</strong> na camada de controle. Essa estratégia permite que tenhamos confiança
                 <strong>tanto no comportamento interno da aplicação quanto no seu comportamento externo</strong> diante
-                dos usuários.</p>
+                dos usuários.
+            </p>
             <p>Ao isolar as responsabilidades (usando mocks nos testes de serviço) e ao validar fluxos reais (simulando
                 requisições HTTP com MockMvc), conseguimos cobrir cenários tanto positivos quanto negativos — desde o
                 simples cadastro de uma nova tarefa até situações de erro como tentativas inválidas de exclusão.</p>
@@ -2041,7 +2098,8 @@ public class TaskControllerTest {
                 entregamos um software com qualidade consistente.</p>
             <p>Por fim, vale lembrar: <strong>testar não é apenas encontrar defeitos</strong>, mas também
                 <strong>documentar o comportamento esperado</strong> do sistema. Nosso conjunto de testes torna
-                explícito — e validável — como cada funcionalidade deve operar! 🚀</p>
+                explícito — e validável — como cada funcionalidade deve operar! 🚀
+            </p>
             <hr>
             <h2>4. Conclusão</h2>
             <p>Chegamos ao final da nossa Aula 07 — e, com ela, estruturamos e implementamos uma <strong>API RESTful
@@ -2113,7 +2171,8 @@ public class TaskControllerTest {
             <ul>
                 <li><strong>Crie roles de usuário</strong>: <code>USER</code> e <code>ADMIN</code>.</li>
                 <li><strong>Permita que apenas ADMINs possam consultar todas as tarefas</strong> (endpoint
-                    <code>/api/tasks</code>).</li>
+                    <code>/api/tasks</code>).
+                </li>
                 <li><strong>Usuários comuns (<code>USER</code>) só devem poder gerenciar suas próprias tarefas</strong>.
                 </li>
             </ul>

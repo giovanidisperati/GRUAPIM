@@ -54,7 +54,7 @@
                     <a href="Aula09.html"><span class="mr-0"></span>09 - Microsserviços I</a>
                 </li>
                 <li>
-                    <a href="#"><span class="mr-0"></span>10 - Microsserviços II</a>
+                    <a href="Aula10.html"><span class="mr-0"></span>10 - Microsserviços II</a>
                 </li>
                 <li>
                     <a href="#"><span class="mr-0"></span>11 - Microsserviços III</a>
@@ -114,7 +114,8 @@
                 você pode enfrentar. Eles são um tipo de <strong>arquitetura orientada a serviços (SOA)</strong>, porém
                 com opiniões bem definidas sobre como os limites dos serviços devem ser desenhados e com a
                 <strong>implantação independente</strong> como característica chave. Uma grande vantagem é que são
-                <strong>agnósticos à tecnologia</strong>.</p>
+                <strong>agnósticos à tecnologia</strong>.
+            </p>
             <p>Do ponto de vista externo, um microsserviço é tratado como uma <strong>caixa preta</strong>. Ele expõe
                 sua funcionalidade de negócio através de um ou mais endpoints de rede (como uma fila de mensagens ou uma
                 API REST, conforme ilustrado na Figura 1-1 do livro). Consumidores, sejam outros microsserviços ou
@@ -159,7 +160,8 @@
             <p>O Gartner Hype Cycle ilustra bem a trajetória da SOA, que passou por um pico de expectativas
                 inflacionadas seguido por um período de desilusão, à medida que as dificuldades práticas se tornavam
                 evidentes. A imagem abaixo ilustra esse conceito.</p>
-            <p><img src="Gartner_Hype_Cycle.png" alt="Gartner Hype Cycle" width="630px" style="display:block;margin:0 auto;"></p>
+            <p><img src="Gartner_Hype_Cycle.png" alt="Gartner Hype Cycle" width="630px"
+                    style="display:block;margin:0 auto;"></p>
             <p>Esses desafios pavimentaram o caminho para a busca por abordagens mais ágeis e descentralizadas e, nesse
                 contexto, a arquitetura de microsserviços começou a se consolidar entre 2011 e 2012, não como uma teoria
                 acadêmica, mas a partir de práticas emergentes em empresas que buscavam maior escalabilidade e
@@ -216,7 +218,8 @@
                 <strong>fracamente acoplados</strong>: devemos ser capazes de mudar um serviço sem ter que mudar mais
                 nada. Isso significa que precisamos de contratos explícitos, bem definidos e estáveis entre os serviços.
                 Algumas escolhas de implementação dificultam isso: compartilhamento de bancos de dados, por exemplo, é
-                especialmente problemático.</p>
+                especialmente problemático.
+            </p>
             <h3>2.2. Modelados em Torno de um Domínio de Negócio Domain-Driven Design (DDD)</h3>
             <p>Técnicas como o <strong>Domain-Driven Design (DDD)</strong> podem permitir que você estruture seu código
                 para representar melhor o domínio do mundo real em que o software opera. Com arquiteturas de
@@ -236,7 +239,8 @@
                 <strong>organizar os serviços como “fatias verticais”</strong>, cada uma encapsulando toda a
                 funcionalidade relacionada a um domínio específico. Assim, priorizamos a <strong>coesão da lógica de
                     negócio</strong> dentro de cada serviço, mesmo que isso implique alguma duplicação técnica entre
-                eles.</p>
+                eles.
+            </p>
             <p>Assim, ao usar DDD e tornar nossos serviços fatias de ponta a ponta da funcionalidade de negócio,
                 garantimos que nossa arquitetura esteja organizada para tornar as alterações na funcionalidade de
                 negócio o mais eficientes possível. Assim, argumenta-se que, com microsserviços, tomamos a decisão de
@@ -256,7 +260,8 @@
                 banco de dados de outro serviço. Dessa forma, o <code>Serviço de Clientes</code> controla o que está
                 sendo exposto e mantém a liberdade de modificar sua estrutura interna (por exemplo, alterar colunas ou
                 regras de negócio) <strong>sem impactar diretamente outros serviços</strong>, desde que mantenha o
-                contrato externo (a API) estável.</p>
+                contrato externo (a API) estável.
+            </p>
             <p>Esse isolamento é importante para que os microsserviços sejam <strong>implantados de forma
                     independente</strong>. Se um serviço compartilha diretamente seus dados com outros, qualquer pequena
                 mudança pode <strong>quebrar funcionalidades</strong> que dependem dele, forçando atualizações em
@@ -272,7 +277,8 @@
                 ser uma fatia completa da funcionalidade de negócio, contendo a interface com o usuário (se necessário),
                 a lógica de negócio e os dados. Isso nos dá <strong>alta coesão</strong> dentro de cada serviço e
                 <strong>baixo acoplamento</strong> entre eles, facilitando tanto a manutenção quanto a evolução do
-                sistema como um todo.</p>
+                sistema como um todo.
+            </p>
             <h3>2.4. Qual o Tamanho Ideal para um microsserviço?</h3>
             <p>&quot;Quão grande deve ser um microsserviço?&quot; é uma das perguntas mais comuns. Considerando que a
                 palavra &quot;micro&quot; está ali no nome, isso não surpreende. No entanto, quando se trata do que faz
@@ -361,17 +367,20 @@
                     negócio</strong>. Só que, na arquitetura em camadas, essa funcionalidade está
                 <strong>espalhada</strong> por todo o sistema: uma parte na UI, outra no backend, outra no banco. Isso
                 aumenta as chances de qualquer mudança pequena gerar impacto em várias partes, exigindo coordenação
-                entre vários times.</p>
+                entre vários times.
+            </p>
             <p>Para resolver isso, é melhor organizarmos nosso código (e nossas equipes) em torno de
                 <strong>funcionalidades de negócio</strong> e não de tecnologias. Isso significa que cada equipe cuida
                 de uma parte específica do domínio da empresa — por exemplo, uma equipe só para o perfil do cliente.
                 Essa equipe teria total autonomia para mudar o que for necessário no cadastro de clientes, incluindo,
-                por exemplo, adicionar o campo de gênero musical favorito.</p>
+                por exemplo, adicionar o campo de gênero musical favorito.
+            </p>
             <p>Essa forma de organização é chamada de <strong>arquitetura vertical por domínio de negócio</strong>. Em
                 vez de separarmos o sistema em camadas horizontais (UI, backend, banco), nós o dividimos em
                 <strong>linhas de negócio verticais</strong>, onde cada time cuida de tudo relacionado a uma parte do
                 sistema. Nesse exemplo, a equipe de perfil do cliente poderia até manter um microsserviço próprio, com a
-                lógica, a UI e o banco de dados necessários apenas para aquilo.</p>
+                lógica, a UI e o banco de dados necessários apenas para aquilo.
+            </p>
             <p>Esse modelo traz mais agilidade e reduz o atrito entre times. O livro <em>Team Topologies</em> chama isso
                 de <strong>equipe alinhada ao fluxo</strong> (stream-aligned team): times focados em um fluxo de
                 trabalho específico, com autonomia para entregar valor ao usuário <strong>de ponta a ponta</strong>, sem
@@ -400,18 +409,21 @@
                 “entrada, processamento, saída”), Parnas defendeu que deveríamos organizar os módulos com base em
                 <strong>decisões que podem mudar no futuro</strong>, ocultando essas decisões dentro dos próprios
                 módulos. Esse princípio ficou conhecido como <strong>ocultamento da informação (information
-                    hiding)</strong>.</p>
+                    hiding)</strong>.
+            </p>
             <p>Dessa forma, ao invés de termos um único bloco de código todo misturado, a aplicação é dividida em
                 <strong>módulos separados</strong> — como se fosse um prédio com vários apartamentos independentes, mas
                 todos ainda fazendo parte do mesmo edifício. Na prática, isso significa que diferentes partes do sistema
                 (por exemplo, módulo de pagamentos, módulo de usuários, módulo de catálogo) são desenvolvidas
                 separadamente, com regras e responsabilidades bem definidas, mas <strong>ainda são empacotadas e
-                    implantadas juntas</strong> como um único sistema.</p>
+                    implantadas juntas</strong> como um único sistema.
+            </p>
             <p>Essa abordagem pode funcionar muito bem para muitas empresas, especialmente as que ainda não têm
                 maturidade ou necessidade de investir na complexidade dos microsserviços. Se os <strong>limites entre os
                     módulos</strong> forem bem definidos e respeitados, é possível que várias equipes trabalhem
                 <strong>em paralelo</strong> em partes diferentes do sistema, sem se atrapalhar, o que traz muitos dos
-                benefícios da modularidade sem os custos operacionais da arquitetura distribuída.</p>
+                benefícios da modularidade sem os custos operacionais da arquitetura distribuída.
+            </p>
             <p>Um bom exemplo é o <strong>Shopify</strong>, que por muito tempo escolheu não adotar microsserviços em
                 larga escala. Em vez disso, estruturou seu sistema como um grande monólito com módulos bem organizados,
                 mantendo a simplicidade na hora de fazer deploys e testes — tudo rodando num único processo, mas com
@@ -436,14 +448,16 @@
                 <strong>todos esses serviços precisam ser implantados juntos</strong>, como se fossem partes
                 inseparáveis de um único sistema. Ou seja, mesmo que você tenha dividido seu código em vários projetos
                 ou repositórios, ainda precisa subir tudo de uma vez — o que elimina boa parte das vantagens da
-                arquitetura distribuída.</p>
+                arquitetura distribuída.
+            </p>
             <p>Esse tipo de sistema costuma surgir quando as equipes tentam migrar de um monólito tradicional para
                 microsserviços, mas <strong>não mudam de fato a forma como os serviços se relacionam</strong>. Por
                 exemplo: imagine um sistema com serviços como <code>PedidoService</code>, <code>EstoqueService</code> e
                 <code>PagamentoService</code>. Em vez de funcionarem de forma independente, eles estão tão interligados
                 que uma pequena alteração no serviço de estoque obriga a reimplantação dos outros dois, porque tudo está
                 sincronizado de forma rígida — talvez com chamadas diretas, bancos de dados compartilhados ou
-                dependências circulares.</p>
+                dependências circulares.
+            </p>
             <p>O resultado é um sistema com <strong>todas as dificuldades de uma arquitetura distribuída</strong> (como
                 complexidade de comunicação, monitoramento, tolerância a falhas) <strong>sem colher os
                     benefícios</strong> (como deploys isolados, escalabilidade independente ou autonomia entre times).
@@ -456,7 +470,8 @@
                 erro. Em vez de facilitar a evolução do sistema, a arquitetura distribuída <strong>passa a gerar medo de
                     mudanças</strong>, tornando o sistema mais lento e difícil de manter.</p>
             <p>Para evitar cair nesse cenário, é importante não apenas dividir o sistema em serviços, mas garantir que
-                <strong>cada serviço seja realmente autônomo</strong>. Isso inclui:</p>
+                <strong>cada serviço seja realmente autônomo</strong>. Isso inclui:
+            </p>
             <ul>
                 <li>Definir claramente o que cada serviço faz.</li>
                 <li>Evitar que serviços compartilhem banco de dados diretamente.</li>
@@ -558,7 +573,8 @@
                 <strong>microsserviços oferecem uma estrutura mais clara de separação entre as partes do
                     sistema</strong>, com limites técnicos e organizacionais bem definidos. Cada equipe pode ser dona de
                 um serviço específico, com mais autonomia para decidir quando e como fazer alterações ou implantar novas
-                versões, sem depender tanto dos outros times.</p>
+                versões, sem depender tanto dos outros times.
+            </p>
             <p>Essa separação ajuda a reduzir a contenção na entrega, pois <strong>limita o número de pessoas que atuam
                     diretamente no mesmo código</strong> e <strong>permite que as equipes operem de forma mais
                     independente</strong>. Em resumo, os microsserviços não eliminam o problema, mas <strong>criam
@@ -570,7 +586,8 @@
                 inicial. Uma das maiores vantagens é a <strong>simplicidade na implantação</strong>: todo o sistema é
                 empacotado e executado como uma única aplicação. Isso evita vários problemas típicos de sistemas
                 distribuídos, como falhas na comunicação entre serviços, necessidade de orquestração ou complexidades no
-                versionamento de APIs internas.</p>
+                versionamento de APIs internas.
+            </p>
             <p>Na prática, isso significa que <strong>o fluxo de trabalho do desenvolvedor pode ser muito mais
                     simples</strong>. Por exemplo, para testar uma nova funcionalidade, o desenvolvedor só precisa rodar
                 um único serviço localmente. Já em uma arquitetura distribuída, ele possivelmente teria que subir
@@ -621,7 +638,8 @@
                     distribuído</strong> — que vão além dos logs e mostram como as requisições fluem entre os serviços.
                 Soluções como <strong>Jaeger</strong> (open source), <strong>Lightstep</strong> e
                 <strong>Honeycomb</strong> oferecem visibilidade detalhada dos tempos de resposta, gargalos e falhas,
-                ajudando você a diagnosticar problemas em tempo real.</p>
+                ajudando você a diagnosticar problemas em tempo real.
+            </p>
             <h3>4.2. Contêineres e Kubernetes</h3>
             <p>Idealmente, cada microsserviço deve rodar <strong>de forma isolada</strong>, para que uma falha em um
                 deles (como alto consumo de CPU ou memória) não comprometa os demais. Contêineres são uma maneira leve e
@@ -692,7 +710,8 @@
             <p>Um dos conceitos centrais em sistemas resilientes é o de <strong>compartimentos estanques</strong> (ou
                 <em>bulkheads</em>), inspirado no design de navios: se um compartimento se rompe, o vazamento não afeta
                 o navio todo. Nos microsserviços, <strong>os próprios serviços funcionam como esses
-                    compartimentos</strong>.</p>
+                    compartimentos</strong>.
+            </p>
             <p>Se um serviço falhar, o restante do sistema pode continuar operando com funcionalidade reduzida. Por
                 exemplo, se o serviço de avaliações de produtos cair, o usuário ainda pode navegar pelo catálogo e
                 concluir compras. Em um monólito, uma falha local muitas vezes derruba o sistema inteiro.</p>
@@ -780,7 +799,8 @@
             <p>Se a sua organização tem foco principal em <strong>redução de custos</strong>, pode ser que os
                 microsserviços tragam mais dor de cabeça do que benefícios. Por outro lado, se o objetivo for
                 <strong>acelerar o crescimento</strong>, atender mais usuários ou liberar funcionalidades em paralelo, a
-                arquitetura distribuída pode ajudar a gerar mais valor — e, assim, mais receita.</p>
+                arquitetura distribuída pode ajudar a gerar mais valor — e, assim, mais receita.
+            </p>
             <h3>6.4. Relatórios</h3>
             <p>Em um monólito, os dados geralmente estão centralizados em um único banco. Isso facilita a geração de
                 relatórios: basta consultar diretamente a base (ou uma réplica de leitura) para gerar dashboards,
@@ -870,7 +890,8 @@
                 <strong>pode ser uma armadilha</strong>. Na prática, você ainda não sabe se o produto será um sucesso,
                 nem como ele vai evoluir. É melhor <strong>validar o produto com uma arquitetura simples</strong> e
                 refatorar mais tarde, se necessário — como fizeram empresas como Uber e Flickr, que começaram de forma
-                muito diferente do que são hoje.</p>
+                muito diferente do que são hoje.
+            </p>
             <p><strong>👩‍💻 Equipes pequenas</strong>
                 Com poucos desenvolvedores, manter microsserviços pode ser <strong>um fardo desnecessário</strong>. Cada
                 serviço exige deploy, monitoramento, testes, integração e operação. Esse &quot;imposto&quot; só se
@@ -895,17 +916,20 @@
                 torna o deploy e a manutenção mais complexos. Microsserviços permitem <strong>atualizar partes do
                     sistema de forma independente</strong>, com menos risco de interrupção. Além disso, permitem
                 <strong>escalar serviços individualmente</strong>, otimizando custos e desempenho conforme o uso de cada
-                módulo.</p>
+                módulo.
+            </p>
             <p><strong>☁️ Integração com a nuvem e uso de múltiplas tecnologias</strong>
                 Microsserviços funcionam muito bem com plataformas de nuvem. Você pode <strong>escolher a tecnologia
                     certa para cada serviço</strong>, aproveitando ao máximo os recursos disponíveis — como executar um
                 serviço em serverless, outro em uma VM e outro em uma plataforma gerenciada. Essa flexibilidade permite
-                <strong>experimentar e evoluir rapidamente</strong>.</p>
+                <strong>experimentar e evoluir rapidamente</strong>.
+            </p>
             <p><strong>📱 Novos canais e transformação digital</strong>
                 Organizações que estão passando por <strong>transformação digital</strong> e precisam expor suas
                 funcionalidades para diferentes canais — web, mobile, APIs públicas, dispositivos IoT — se beneficiam da
                 <strong>composição flexível</strong> dos microsserviços. É mais fácil <strong>reaproveitar partes do
-                    sistema</strong> e entregá-las em formatos diferentes para novos tipos de clientes ou parceiros.</p>
+                    sistema</strong> e entregá-las em formatos diferentes para novos tipos de clientes ou parceiros.
+            </p>
             <p><strong>🔄 Evolução contínua e flexibilidade futura</strong>
                 Microsserviços oferecem um grau alto de <strong>flexibilidade para evoluir o sistema ao longo do
                     tempo</strong>. Você pode refatorar ou substituir um serviço sem mexer no restante, adicionar
@@ -946,7 +970,8 @@
                         <strong>&quot;Bounded Context&quot; (Contexto Delimitado)</strong> do Domain-Driven Design. O
                         foco não é se tornar um especialista, mas entender: O que é um Bounded Context? Por que ele é
                         usado para organizar a complexidade de um software? Como ele ajuda a definir fronteiras lógicas
-                        dentro de um sistema?</p>
+                        dentro de um sistema?
+                    </p>
                 </li>
                 <li>
                     <p><strong>Análise do Domínio do seu Projeto:</strong> Olhem para a API que vocês construíram, mas
@@ -967,7 +992,8 @@
                         microsserviço imediatamente. A extração é um processo estratégico. Escolham <strong>1 ou 2
                             Bounded Contexts</strong> que vocês consideram os candidatos ideais para serem os
                         <strong>primeiros microsserviços</strong> a serem extraídos do seu monólito. Justifiquem a
-                        escolha com base em critérios como:</p>
+                        escolha com base em critérios como:
+                    </p>
                     <ul>
                         <li><strong>Taxa de Mudança:</strong> É uma parte do sistema que muda com muita frequência?</li>
                         <li><strong>Necessidades de Escalabilidade:</strong> Essa funcionalidade exige escalar de forma

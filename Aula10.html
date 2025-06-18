@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 10 - DDD</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="Aula04.html"><span class="mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="Aula05.html"><span class="mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="Aula06.html"><span class="mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="Aula07.html"><span class="mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="Aula08.html"><span class="mr-0"></span>08 - REST V</a>
+                </li>
+                <li>
+                    <a href="Aula09.html"><span class="mr-0"></span>09 - Microsserviços I</a>
+                </li>
+                <li class="active">
+                    <a href="Aula10.html"><span class="mr-0"></span>10 - Microsserviços II</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>11 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços VI</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VII</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+
+
+
+
+            <h1>Aula 10 – Domínio, Subdomínio e Bounded Contexts com DDD</h1>
+            <p>Na Aula anterior vimos os conceitos introdutório de microsserviços.</p>
+            <p>Agora, vamos focar-nos em compreender os <strong>conceitos de domínio, subdomínio, bounded contexts e
+                    mapeamento de contextos</strong> propostos por Eric Evans no <strong>Domain-Driven Design
+                    (DDD)</strong>. Esses conceitos são <strong>fundamentais para o entendimento da arquitetura de
+                    microsserviços</strong>, que será explorada na sequência das próximas aulas.</p>
+            <p>Vamos ver os conceitos que nos ajudam a decompor sistemas complexos de forma lógica e coerente, com base
+                em regras de negócio reais e não apenas em critérios técnicos. Essa base teórica é o que permitirá que a
+                transição para microsserviços seja feita de forma consciente, orientada pelo <strong>modelo de
+                    negócio</strong>, e não apenas por decisões arbitrárias de código.</p>
+            <hr>
+            <h2>1. O que é DDD e por que ele importa?</h2>
+            <p>Antes de entrarmos na arquitetura de microsserviços do ponto de vista prático, é importante compreender o
+                conceito que serve como um dos fundamentos lógicos para esse tipo de arquitetura: o
+                <strong>Domain-Driven Design (DDD)</strong>.
+            </p>
+            <p>Desenvolver aplicações em larga escala exige muito mais do que saber escrever endpoints REST ou persistir
+                dados com JPA. É necessário ter clareza sobre <strong>como organizar o software de forma a refletir o
+                    mundo real que ele pretende modelar</strong>. Quando essa estruturação é feita de maneira confusa ou
+                acidental, surgem sintomas comuns: código duplicado, lógica de negócio espalhada, classes que crescem
+                sem controle, e times que não conseguem evoluir a aplicação sem quebrar funcionalidades existentes.</p>
+            <p>Foi nesse contexto que Eric Evans, em seu livro clássico <em>“Domain-Driven Design: Tackling Complexity
+                    in the Heart of Software”</em> (2003), propôs uma abordagem focada em <strong>colocar o domínio no
+                    centro do desenvolvimento de software</strong>. Em vez de partir da tecnologia, o DDD parte do
+                <strong>modelo de negócio</strong>, da compreensão profunda do problema que estamos tentando resolver,
+                como eixo organizador da arquitetura.
+            </p>
+            <h3>1.1. Motivação: o que o DDD resolve?</h3>
+            <p>Eric Evans percebeu que muitos sistemas “cresciam para os lados”, misturando código técnico (como
+                autenticação, logging, persistência) com regras de negócio importantes (como cálculo de imposto, regras
+                de vencimento, fluxo de aprovação, etc.) sem critério definido. Isso tornava o sistema:</p>
+            <ul>
+                <li>Difícil de <strong>compreender</strong> (a lógica de negócio estava diluída em detalhes técnicos);
+                </li>
+                <li>Difícil de <strong>evoluir</strong> (cada modificação impactava partes imprevisíveis do sistema);
+                </li>
+                <li>Difícil de <strong>testar</strong> (as regras não estavam isoladas de suas dependências);</li>
+                <li>Difícil de <strong>escalar em equipe</strong> (vários desenvolvedores trabalhando sobre a mesma área
+                    com sobreposição de responsabilidades).</li>
+            </ul>
+            <p>O DDD surge como <strong>uma forma de estruturar o sistema para que ele reflita com fidelidade o problema
+                    que está resolvendo</strong>, criando <strong>limites explícitos</strong> entre os diferentes
+                aspectos do negócio. Ao adotar essa abordagem, conseguimos criar um modelo conceitual claro, que guia
+                não apenas o código, mas também a comunicação entre as pessoas envolvidas no projeto.</p>
+            <h3>1.2. O que significa &quot;Dirigido pelo Domínio&quot;?</h3>
+            <p>A palavra <strong>&quot;domínio&quot;</strong> se refere ao conjunto de regras, processos e conhecimento
+                específico de um determinado negócio ou problema que a aplicação resolve. “Design dirigido por domínio”
+                significa organizar o software em torno desse <strong>conhecimento central</strong>. Isso envolve:</p>
+            <ul>
+                <li><strong>Modelar com profundidade os conceitos do negócio</strong>, e não apenas mapear tabelas para
+                    entidades;</li>
+                <li>Trabalhar em estreita colaboração com <strong>especialistas do domínio</strong> (clientes,
+                    analistas, operadores do sistema) para entender o vocabulário e as regras envolvidas;</li>
+                <li>Desenvolver uma <strong>linguagem ubíqua</strong> (ubiquitous language), que seja falada igualmente
+                    por desenvolvedores e especialistas;</li>
+                <li><strong>Isolar diferentes partes do sistema</strong> em <strong>bounded contexts</strong>, evitando
+                    ambiguidade e acoplamento desnecessário entre modelos;</li>
+                <li>E, como consequência, permitir que diferentes partes do sistema <strong>evoluam de forma
+                        independente</strong>, com times focados em subdomínios específicos.</li>
+            </ul>
+            <p>Portanto, o DDD não é um padrão de projeto, nem uma arquitetura pronta. Ele é uma <strong>abordagem
+                    estratégica</strong> que orienta a construção do software a partir daquilo que realmente importa:
+                <strong>o conhecimento sobre o negócio</strong>.
+            </p>
+            <h3>1.3. Quando o domínio não existe, a bagunça domina</h3>
+            <p>Imagine que uma <em>edtech</em> resolve criar um <strong>sistema de gerenciamento de tarefas
+                    colaborativas</strong> para seus instrutores e alunos. Nos primeiros sprints tudo cabe em um único
+                repositório, com poucos endpoints REST. Mas, três meses depois, chegam novas demandas:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nova demanda</th>
+                        <th>Por que apareceu?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Controle de permissões</strong></td>
+                        <td>Cada curso quer regras próprias de quem pode editar ou excluir tarefas.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Atribuição de responsáveis</strong></td>
+                        <td>Tutores precisam delegar tarefas a monitores e acompanhar progresso.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Priorização e categorias</strong></td>
+                        <td>A coordenação quer uma visão rápida de pendências “urgentes” versus “melhoria contínua”.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Notificações multicanal</strong></td>
+                        <td>Alunos pedem aviso no app; instrutores preferem e-mail.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Relatórios gerenciais</strong></td>
+                        <td>A diretoria quer dashboards semanais por curso e equipe.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>1.3.1. <strong>Sem DDD: o &quot;bolovo&quot; que cresce sem parar</strong></h4>
+            <p>O time segue empilhando código nas mesmas camadas genéricas:</p>
+            <pre><code>src/
+ ├─ service/
+ │   ├─ UserService.java
+ │   ├─ TaskService.java
+ │   └─ ReportService.java
+ ├─ controller/
+ │   ├─ TaskController.java
+ │   └─ AuthController.java
+ └─ utils/
+     └─ NotificationUtils.java
+</code></pre>
+            <ol>
+                <li><strong>UserService</strong> agora contém 3 000 linhas, mistura hash de senha com lógica de ACL.
+                </li>
+                <li><strong>TaskService</strong> faz <em>query</em> em três tabelas e ainda dispara e-mails.</li>
+                <li>Quando um estagiário altera <code>NotificationUtils</code>, quebra autorização sem querer, pois tudo
+                    roda na mesma transação.</li>
+            </ol>
+            <p>Refatorar dói, testar dá trabalho, e cada <em>hotfix</em> vira corrida contra o tempo.</p>
+            <h4>1.3.2. <strong>Com DDD: clareza de limites</strong></h4>
+            <p>A partir dessa situação, a alternativa é aplicar o DDD e &quot;quebrar&quot; o código. Os analistas de
+                produto sentam com usuários finais e mapeiam <strong>subdomínios</strong>, que são pedaços do negócio
+                que fazem sentido por si só:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subdomínio (Bounded Context)</th>
+                        <th>Responsabilidade-chave</th>
+                        <th>Exemplos de artefatos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Task Management</strong></td>
+                        <td>Criar, priorizar, atribuir e concluir tarefas</td>
+                        <td><code>Task</code>, <code>Priority</code>, evento <code>TaskAssigned</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Identity &amp; Access</strong></td>
+                        <td>Login, senhas, ACL, tokens</td>
+                        <td><code>User</code>, <code>Role</code>, serviço <code>AuthService</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Notification</strong></td>
+                        <td>Disparar alertas (push, e-mail, SMS)</td>
+                        <td><code>NotificationPreference</code>, evento <code>TaskOverdue</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reporting</strong></td>
+                        <td>Gerar relatórios e KPIs por curso/equipe</td>
+                        <td><code>TaskSnapshot</code>, consulta OLAP</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Cada contexto vira um <strong>módulo isolado</strong> (em um mono-repositório ou em microsserviços) com:
+            </p>
+            <ul>
+                <li><strong>Modelo de domínio próprio</strong> – classes e regras que só fazem sentido ali.</li>
+                <li><strong>API contratada</strong> – troca de dados via eventos ou DTOs, jamais expondo entidades de
+                    outro contexto (Camada <em>Anti-Corruption</em>).</li>
+                <li><strong>Banco dedicado ou esquema lógico separado</strong> – permite versionar sem travar os demais
+                    times.</li>
+            </ul>
+            <blockquote>
+                <p><strong>Decisão tática:</strong> <em>Task Management</em> define <code>Task</code> como Aggregate
+                    Root e só expõe o identificador do usuário (<code>UserId</code>). Quando dispara
+                    <code>TaskAssignedEvent</code>, o módulo <em>Notification</em> decide como alertar o responsável.
+                </p>
+            </blockquote>
+            <p>Em termos de organização prática de código, teríamos algo como:</p>
+            <pre><code>collab-tasks/
+├── pom.xml                        # parent-pom: dependências e plugins comuns
+│
+├── task-management/               # Contexto “Task Management”
+│   ├── pom.xml
+│   └── src/main/java/com/example/taskmgmt/
+│       ├── domain/               # Entidades, Aggregates, VOs
+│       ├── application/          # Use cases, Application Services
+│       ├── infrastructure/       # JPA, Messaging, REST Adapters
+│       └── config/               # Beans, eventos, segurança local
+│
+├── identity-access/               # Contexto “Identity &amp; Access”
+│   └── … (mesma divisão domain/application/infra/config)
+│
+├── notification/                  # Contexto “Notification”
+│   └── … (implementações de e-mail, push, SMS)
+│
+├── reporting/                     # Contexto “Reporting”
+│   └── … (consultas OLAP, exportação CSV/PDF)
+│
+└── build-scripts/                 # CI, Dockerfiles, Compose, Helm charts
+</code></pre>
+            <p>Ou seja, temos:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pasta</th>
+                        <th>Para que serve</th>
+                        <th>Ganho concreto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>domain/</code></td>
+                        <td>Regras de negócio puras, sem framework</td>
+                        <td>Testes rápidos e independentes</td>
+                    </tr>
+                    <tr>
+                        <td><code>application/</code></td>
+                        <td>Orquestra entidades, publica eventos</td>
+                        <td>Fluxo de caso de uso bem localizado</td>
+                    </tr>
+                    <tr>
+                        <td><code>infrastructure/</code></td>
+                        <td>Detalhes técnicos (JPA, REST, Kafka)</td>
+                        <td>Troca de tecnologia sem afetar regras</td>
+                    </tr>
+                    <tr>
+                        <td><code>config/</code></td>
+                        <td>Beans e wiring Spring do contexto</td>
+                        <td>Evita “classe de configuração gigante”</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>E para que seja feita a integração entre esses contextos (domínios), teremos:</p>
+            <ul>
+                <li><strong>Eventos de domínio</strong> (ex.: <code>TaskAssignedEvent</code>) publicados em broker
+                    (<code>Kafka</code>, <code>RabbitMQ</code> ou outbox): elimina dependência direta entre módulos.
+                </li>
+                <li><strong>APIs REST</strong> só quando realmente necessárias; cada módulo define seus próprios DTOs e
+                    nunca exporta entidades!</li>
+            </ul>
+            <p>A partir disso, caso a solução vá para o lado de microserviços separados, basta extrair cada pasta-módulo
+                para um repositório próprio ou manter a raiz apenas como orquestração (Docker Compose, Helm, Terraform).
+                O princípio continua: <strong>dividir por subdomínio antes de dividir por tecnologia!</strong>.</p>
+            <!-- #### 1.3.3. **E como isso apareceria no código?**
+
+```java
+// Task aggregate (Task Management)
+public class Task {
+    private TaskId id;
+    private Title title;
+    private Priority priority;
+    private UserId assignee;        // só o identificador, não a entidade User
+    private TaskStatus status;
+
+    public DomainEvent assignTo(UserId newAssignee) {
+        this.assignee = newAssignee;
+        return new TaskAssignedEvent(this.id, newAssignee);
+    }
+}
+
+// Event handler (Notification)
+public class TaskAssignedListener {
+    @TransactionalEventListener
+    public void on(TaskAssignedEvent event) {
+        var pref = preferenceRepo.findByUserId(event.assignee());
+        notifier.send(pref.channel(), "Você recebeu uma tarefa!");
+    }
+}
+```
+
+* **Claridade de limite** – `Task` não conhece detalhes de notificação.
+* **Baixo acoplamento** – mudar o canal de alerta não obriga *build* de Task Management.
+* **Testabilidade** – cada contexto tem suíte própria de testes unitários e de contrato. -->
+
+            <h4>1.3.3. <strong>Benefícios percebidos em produção</strong></h4>
+            <p>Dentre os benefícios, temos</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Antes</th>
+                        <th>Depois</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Deploy monolítico travava times</td>
+                        <td>Times independentes versionam contextos sem conflito</td>
+                    </tr>
+                    <tr>
+                        <td>Correções em notificação derrubavam login</td>
+                        <td>Falha em Notification não afeta autenticação</td>
+                    </tr>
+                    <tr>
+                        <td>Relatórios lentos competiam com escrita de tarefas</td>
+                        <td>Reporting gera <em>snapshots</em> assíncronos sem bloquear CRUD</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>1.3.4. <strong>E a moral da história...</strong></h4>
+            <p>É que quando ignoramos o <strong>domínio</strong>, o código cresce como um emaranhado único, onde
+                qualquer mudança puxa um fio que pode rasgar o resto. Ao <strong>modelar subdomínios</strong>, damos
+                nomes claros aos problemas, isolamos regras de negócio específicas e criamos um caminho natural para
+                escalar o sistema e o time.</p>
+            <h3>1.4. O DDD como base para Microsserviços</h3>
+            <p>Com a explicação acima deve ter ficado claro: o DDD é frequentemente citado como uma <strong>abordagem
+                    natural para a decomposição de microsserviços</strong>, pois ambos compartilham o mesmo objetivo:
+                <strong>quebrar sistemas grandes e complexos em unidades menores e coesas</strong>.
+            </p>
+            <ul>
+                <li>Microsserviços bem projetados são, na prática, <strong>bounded contexts autônomos</strong>.</li>
+                <li>Subdomínios bem definidos ajudam a <strong>evitar microsserviços arbitrários</strong> (por camada ou
+                    por funcionalidade técnica).</li>
+                <li>A linguagem ubíqua ajuda a <strong>padronizar a comunicação entre times</strong> e entre serviços.
+                </li>
+            </ul>
+            <p>Por isso, antes de sair quebrando seu monólito em dezenas de serviços, é essencial entender quais são os
+                <strong>limites naturais do seu sistema</strong>, e o DDD é a ferramenta certa para fazer isso com
+                segurança e clareza.
+            </p>
+            <hr>
+            <h2>2. Termos-chave do Domain-Driven Design (DDD)</h2>
+            <p>Agora que compreendemos a motivação do DDD e por que ele se torna essencial ao estruturar aplicações
+                complexas, especialmente em cenários de microsserviços, é hora de conhecermos seus <strong>principais
+                    conceitos estruturantes</strong>. Esses conceitos fornecem a base para toda a modelagem orientada ao
+                domínio, e serão indispensáveis nas próximas aulas práticas, quando começarmos a extrair serviços do
+                nosso projeto atual.</p>
+            <h3>2.1. Domínio</h3>
+            <p>O <strong>domínio</strong> é o ponto de partida do DDD. Trata-se do <strong>conjunto de regras,
+                    atividades e conhecimentos específicos</strong> do problema que a aplicação se propõe a resolver. Em
+                outras palavras, o domínio é o <strong>assunto central</strong> do seu sistema.</p>
+            <blockquote>
+                <p>🧠 <strong>Definição:</strong> O domínio representa o “mundo real” que o software está modelando. Ele
+                    inclui os termos, conceitos e regras de negócio relevantes para os usuários e stakeholders da
+                    aplicação.</p>
+            </blockquote>
+            <p>Por exemplo, no caso da nossa aplicação de gerenciamento de tarefas (To-Do List), o domínio inclui
+                conceitos como:</p>
+            <ul>
+                <li>Tarefa (<code>Task</code>)</li>
+                <li>Responsável (<code>Owner</code>)</li>
+                <li>Prioridade (<code>Priority</code>)</li>
+                <li>Categoria (<code>Category</code>)</li>
+                <li>Data de vencimento (<code>DueDate</code>)</li>
+                <li>Conclusão (<code>Completed</code>)</li>
+                <li>Atribuição e regras de modificação</li>
+            </ul>
+            <p>O DDD nos orienta a <strong>modelar o domínio com riqueza e precisão</strong>, para que o sistema reflita
+                fielmente a lógica do negócio, evitando simplificações técnicas que distorçam ou empobreçam o modelo.
+            </p>
+            <h3>2.2. Subdomínio</h3>
+            <p>Em sistemas mais complexos, o domínio principal normalmente se divide em <strong>partes menores com
+                    responsabilidades bem definidas</strong>, chamadas <strong>subdomínios</strong>. Essa separação
+                ajuda a organizar melhor o sistema, atribuindo a cada parte um foco específico.</p>
+            <blockquote>
+                <p>🧠 <strong>Definição:</strong> Subdomínios são divisões internas do domínio principal. Cada
+                    subdomínio representa uma <strong>área funcional coesa</strong>, com seu próprio conjunto de regras,
+                    entidades e operações.</p>
+            </blockquote>
+            <p>O DDD classifica os subdomínios em três categorias:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo de Subdomínio</th>
+                        <th>Descrição</th>
+                        <th>Exemplo na Task API</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Core Domain</strong></td>
+                        <td>Parte central e mais valiosa do sistema — o que diferencia o produto no mercado.</td>
+                        <td>Gestão de Tarefas</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Supporting Subdomain</strong></td>
+                        <td>Apoia o domínio central, mas não é o diferencial principal.</td>
+                        <td>Autenticação, gerenciamento de usuários</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Generic Subdomain</strong></td>
+                        <td>Problemas genéricos e resolvidos por bibliotecas ou padrões prontos.</td>
+                        <td>Envio de e-mails, geração de relatórios, cache</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Essa classificação é <strong>estratégica</strong>: no Core Domain, investimos mais tempo, cuidado e
+                testes, pois é onde a inovação está. Já subdomínios genéricos podem até ser terceirizados ou resolvidos
+                com soluções prontas.</p>
+            <p>No nosso projeto:</p>
+            <ul>
+                <li><strong>Tarefas (Task)</strong> → é o <strong>core domain</strong>: é onde está o diferencial da
+                    aplicação;</li>
+                <li><strong>Usuários e autenticação</strong> → são <strong>supporting</strong>: são necessários, mas não
+                    o foco principal;</li>
+                <li><strong>Notificações</strong> → são <strong>generic</strong>: podem ser reutilizadas por outros
+                    sistemas, inclusive.</li>
+            </ul>
+            <h3>2.3. Bounded Context (Contexto Delimitado)</h3>
+            <p>Muitos desenvolvedores confundem “domínio” com “módulo”. O DDD nos mostra que <strong>um mesmo domínio
+                    pode ter diferentes interpretações, dependendo do contexto</strong>. Para evitar confusões,
+                introduz-se o conceito de <strong>Bounded Context</strong>, talvez o conceito mais fundamental de todos
+                no DDD.</p>
+            <blockquote>
+                <p>🧠 <strong>Definição:</strong> Um <em>bounded context</em> é um <strong>limite explícito onde um
+                        determinado modelo de domínio é válido, coeso e consistente</strong>. Dentro desse limite, os
+                    termos e comportamentos têm significado específico. Fora dele, o mesmo termo pode significar outra
+                    coisa.</p>
+            </blockquote>
+            <p>Por exemplo, pense na palavra <strong>&quot;usuário&quot;</strong>:</p>
+            <ul>
+                <li>No contexto de autenticação, “usuário” significa um login, senha e conjunto de permissões;</li>
+                <li>No contexto de tarefas, “usuário” pode significar um colaborador, com nome, cargo e
+                    responsabilidades.</li>
+            </ul>
+            <p>Se usássemos um único modelo <code>User</code> para todos os contextos, provavelmente ele teria campos
+                como:</p>
+            <pre><code class="language-java">User {
+    id;
+    login;
+    passwordHash;
+    email;
+    role;
+    fullName;
+    profilePicture;
+    list&lt;Task&gt; tasks;
+    ...
+}
+</code></pre>
+            <p>Essa classe acabaria servindo a <strong>vários propósitos ao mesmo tempo</strong>, criando um modelo
+                inconsistente, frágil e de difícil manutenção.</p>
+            <p>O DDD nos ensina a <strong>delimitar contextos com clareza</strong>. Dentro de cada contexto, usamos os
+                termos com significados específicos, e <strong>controlamos com rigor as interações entre eles</strong>.
+            </p>
+            <p>Assim, podemos ter:</p>
+            <ul>
+                <li>No contexto <code>Auth</code>: <code>AuthUser { username, password, role }</code></li>
+                <li>No contexto <code>Task</code>: <code>TaskUser { name, assignedTasks }</code></li>
+            </ul>
+            <p>E as interações entre contextos são feitas <strong>com regras explícitas de tradução</strong>. Por
+                exemplo, através de eventos, APIs, adaptadores ou mapeamentos.</p>
+            <h3>2.4. Linguagem Ubíqua</h3>
+            <p>Um dos conceitos mais revolucionários do DDD é a <strong>linguagem ubíqua (ubiquitous language)</strong>.
+            </p>
+            <blockquote>
+                <p>🧠 <strong>Definição:</strong> A linguagem ubíqua é um <strong>vocabulário comum, compartilhado entre
+                        desenvolvedores e especialistas de negócio</strong>, que reflete os conceitos do domínio. Essa
+                    linguagem deve ser <strong>utilizada no código-fonte, nos testes, na modelagem, na documentação e
+                        nas conversas</strong> do time.</p>
+            </blockquote>
+            <p>Ou seja, não se trata apenas de conversar com o cliente usando termos do negócio, trata-se de
+                <strong>usar esses mesmos termos nas classes, métodos, pacotes, testes e commits do projeto</strong>.
+            </p>
+            <p>Exemplo no nosso projeto de to-do:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conceito de negócio</th>
+                        <th>Implementação correta (linguagem ubíqua)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Concluir tarefa</td>
+                        <td><code>taskService.concludeTask(id)</code></td>
+                    </tr>
+                    <tr>
+                        <td>Data limite</td>
+                        <td><code>dueDate</code> (e não <code>expiration</code>)</td>
+                    </tr>
+                    <tr>
+                        <td>Prioridade</td>
+                        <td>Enum <code>Priority.HIGH</code>, <code>MEDIUM</code>, <code>LOW</code></td>
+                    </tr>
+                    <tr>
+                        <td>Categoria</td>
+                        <td>Enum <code>Category.STUDY</code>, <code>WORK</code>, etc.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Usar a linguagem ubíqua evita ambiguidades e promove clareza. Se a equipe estiver discutindo “o que
+                acontece quando um responsável conclui uma tarefa atrasada?”, todos devem conseguir <strong>visualizar
+                    essa lógica diretamente no código</strong>, com termos familiares ao negócio.</p>
+            <h3>2.5. Domínio vs. Modelo de Dados</h3>
+            <p>É importante entender que o modelo de domínio <strong>não é igual</strong> ao modelo de dados (banco de
+                dados relacional).</p>
+            <ul>
+                <li>O <strong>modelo de domínio</strong> expressa <strong>comportamentos e regras do negócio</strong>,
+                    incluindo entidades ricas, invariantes, agregados e políticas.</li>
+                <li>O <strong>modelo de dados</strong> é focado em <strong>armazenar informações</strong> de forma
+                    eficiente, com tabelas, chaves e normalizações.</li>
+            </ul>
+            <p>O DDD recomenda que o <strong>modelo de domínio seja o centro do design</strong>, e não apenas uma
+                representação da estrutura do banco!</p>
+            <p>Isso é especialmente importante em microsserviços, onde <strong>cada serviço pode ter seu próprio modelo
+                    de dados</strong>, mas precisa manter <strong>coerência com o modelo do seu domínio</strong>.</p>
+            <p>Por exemplo, quando projetamos um microsserviço de “Task Management”, primeiro modelamos a entidade
+                <code>Task</code>, seus estados e eventos (<code>TaskAssigned</code>, <code>TaskCompleted</code>). Só
+                depois decidimos se isso virará uma tabela <code>tasks</code>, um JSON no Mongo ou um documento em
+                DynamoDB. O banco pode mudar sem mexer na lógica de negócio, porque ela vive no modelo de domínio.
+                Assim, cada serviço mantém seu próprio banco do jeito que fizer mais sentido, mas a coerência das regras
+                permanece intacta onde realmente importa: no código que expressa o domínio.
+            </p>
+            <p>Ou seja, no <strong>modelo de domínio</strong>, a classe agregada <code>Task</code> carrega valor
+                semântico e regras:</p>
+            <pre><code class="language-java">public class Task {
+    private final TaskId id;              // Value Object: UUID + validação
+    private Title title;                  // Value Object: ≥ 3 e ≤ 60 caracteres
+    private Priority priority;            // Enum: LOW, MEDIUM, HIGH
+    private UserId assignee;              // Apenas o identificador do usuário
+    private TaskStatus status;            // Enum com regras internas
+    private Deadline deadline;            // Value Object calcula atraso
+    private List&lt;DomainEvent&gt; events = new ArrayList&lt;&gt;();
+
+    public void complete() {
+        if (status != TaskStatus.DONE) {
+            status = TaskStatus.DONE;
+            events.add(new TaskCompletedEvent(id));
+        }
+    }
+}
+</code></pre>
+            <p>Note que <code>Task</code> guarda <strong>comportamento</strong> (<code>complete()</code>),
+                <strong>invariantes</strong> (deadline não nulo) e <strong>tipos ricos</strong> como <code>Title</code>
+                e <code>Deadline</code>. Já no <strong>modelo de dados</strong>, focado em persistir rápido e responder
+                <em>queries</em>, as mesmas informações podem ser decompostas e normalizadas:
+            </p>
+            <pre><code class="language-sql">CREATE TABLE tasks (
+    task_id         CHAR(36)  PRIMARY KEY,
+    title           VARCHAR(60) NOT NULL,
+    priority        SMALLINT      NOT NULL,  -- 0=LOW,1=MEDIUM,2=HIGH
+    assignee_id     CHAR(36)      NULL,
+    status          SMALLINT      NOT NULL,  -- 0=TODO,1=DOING,2=DONE
+    deadline_date   DATE          NULL,
+    created_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_tasks_assignee_status ON tasks (assignee_id, status);
+</code></pre>
+            <p>Ou seja: o banco não precisa saber o que é <code>Deadline</code> como tipo especializado nem guardar
+                eventos; ele apenas armazena <code>deadline_date</code> e um inteiro para <code>priority</code>. Se um
+                dia você mover os dados para MongoDB ou acrescentar uma tabela <code>task_events</code>, a classe
+                <code>Task</code> e suas regras de negócio continuam iguais.
+            </p>
+            <h3>2.6. DDD — Estratégia × Tática</h3>
+            <p>No Domain-Driven Design existe uma <strong>camada estratégica</strong> e uma <strong>camada
+                    tática</strong>. Entender a diferença evita que o time discuta detalhes de classe antes de saber
+                <em>onde</em> cada regra pertence.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Camada</th>
+                        <th>Pergunta que responde</th>
+                        <th>Conceitos principais</th>
+                        <th>Foco</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Estratégica</strong></td>
+                        <td><em>“Quais partes do negócio existem e como se relacionam?”</em></td>
+                        <td>Domínio, Subdomínio (Core / Supporting / Generic), Bounded Context, Context Map, Linguagem
+                            Ubíqua, tipos de relacionamento (ACL, Shared Kernel, Customer-Supplier, etc.)</td>
+                        <td><strong>Desenhar fronteiras</strong> e alinhar times</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tática</strong></td>
+                        <td><em>“Como modelar e implementar as regras dentro de cada fronteira?”</em></td>
+                        <td>Entidade, Value Object, Aggregate Root, Domain Event, Domain Service, Repository, Factory
+                        </td>
+                        <td><strong>Codificar comportamento</strong> de forma coesa e testável</td>
+                    </tr>
+                </tbody>
+            </table>
+            <blockquote>
+                <p><strong>Regra de bolso:</strong> <em>Estratégia define limites; tática preenche conteúdo.</em></p>
+            </blockquote>
+            <ol>
+                <li><strong>Estratégia</strong>: comece mapeando subdomínios, definindo bounded contexts e documentando
+                    as integrações no <em>Context Map</em>. Isso orienta decisões de time-split, versionamento e, no
+                    futuro, microsserviços.</li>
+                <li><strong>Tática</strong>: dentro de cada contexto, crie um modelo rico: entidades com identidade,
+                    objetos-valor imutáveis, agregados que garantem invariantes e eventos que propagam fatos sem
+                    acoplamento.</li>
+            </ol>
+            <p>Com as fronteiras claras, os padrões táticos ganham sentido: um <code>Task</code> só precisa conhecer
+                <code>UserId</code> (e não a entidade <code>User</code>) porque <strong>estrategicamente</strong>
+                decidimos isolar <code>Task Management</code> de <code>Identity &amp; Access</code>.
+            </p>
+            <h3>2.7. Elementos táticos do DDD</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conceito</th>
+                        <th>O que é</th>
+                        <th>Sinal de que precisa dele</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Entidade</strong></td>
+                        <td>Objeto com identidade imutável (ID) e ciclo de vida longo</td>
+                        <td>Precisa rastrear a mesma coisa ao longo do tempo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Value Object</strong></td>
+                        <td>Objeto imutável, comparado por valor, sem identidade própria</td>
+                        <td>Representa uma medida ou descrição - Ex.: <code>Money</code>, <code>Title</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aggregate Root</strong></td>
+                        <td>Entidade que <strong>encapsula</strong> um cluster de objetos e garante invariantes</td>
+                        <td>Vários objetos mudam juntos — ex.: <code>Task</code> controla <code>assignee</code>,
+                            <code>status</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Domain Event</strong></td>
+                        <td>Mensagem que descreve algo <strong>já ocorrido</strong> no domínio</td>
+                        <td>Outros contextos ou camadas precisam reagir a um fato</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>Exemplo na <em>Task API</em></h4>
+            <pre><code class="language-java">// Value Object: título
+public record Title(String value) {
+    public Title {
+        if (value == null || value.length() &lt; 3 || value.length() &gt; 60)
+            throw new IllegalArgumentException(&quot;Título inválido&quot;);
+    }
+}
+
+// Aggregate Root + Entidade
+public class Task {
+    private final TaskId id;           // identidade imutável
+    private Title title;               // VO imutável
+    private Priority priority;         // Enum é VO simples
+    private UserId assignee;           // apenas o identificador
+    private TaskStatus status;
+    private Deadline deadline;         // VO
+    private final List&lt;DomainEvent&gt; events = new ArrayList&lt;&gt;();
+
+    /** Regra de negócio: concluir tarefa */
+    public void complete() {
+        if (status == TaskStatus.DONE) return;
+        status = TaskStatus.DONE;
+        events.add(new TaskCompletedEvent(id));
+    }
+}
+
+// Domain Event
+public record TaskCompletedEvent(TaskId taskId) implements DomainEvent {}
+</code></pre>
+            <ul>
+                <li><strong>Entidade</strong>: <code>Task</code> possui ciclo de vida, seu <code>id</code> não muda.
+                </li>
+                <li><strong>Value Objects</strong>: <code>Title</code> evita títulos vazios; como é imutável, não existe
+                    “estado quebrado”.</li>
+                <li><strong>Aggregate Root</strong>: somente métodos de <code>Task</code> podem modificar seu próprio
+                    estado, garantindo que “tarefa concluída não pode voltar ao status anterior”.</li>
+                <li><strong>Domain Event</strong>: <code>TaskCompletedEvent</code> é disparado após mudança de estado,
+                    permitindo que <strong>Notification</strong> ou <strong>Reporting</strong> reajam sem acoplamento.
+                </li>
+            </ul>
+            <h3>2.8. Elementos <strong>estratégicos</strong> do DDD</h3>
+            <p>A parte estratégica do Domain-Driven Design decide <strong>onde</strong> cada conjunto de regras vive,
+                <strong>quem</strong> é dono de cada parte do negócio e <strong>como</strong> essas partes conversam. Os
+                elementos abaixo formam o alicerce que antecede qualquer diagrama de classes ou script SQL.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Elemento estratégico</th>
+                        <th>Para que serve</th>
+                        <th>Resultado prático no projeto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Domínio</strong></td>
+                        <td>Define <em>qual problema principal</em> o software resolve.</td>
+                        <td>Mantém o time focado no propósito real do sistema.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Subdomínio</strong></td>
+                        <td>Fragmenta o domínio em áreas funcionais coesas. Classifica em <strong>Core</strong>,
+                            <strong>Supporting</strong> e <strong>Generic</strong>.
+                        </td>
+                        <td>Orienta investimento de esforço: core recebe mais atenção; genéricos podem virar bibliotecas
+                            ou serviços prontos.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bounded Context</strong></td>
+                        <td>Delimita o espaço onde um modelo de domínio é consistente e a linguagem tem significado
+                            único.</td>
+                        <td>Evita que “Usuário”, “Pedido” ou “Carga” mudem de sentido conforme atravessam o código.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Context Map</strong></td>
+                        <td>Mostra <em>como</em> e <em>por onde</em> os bounded contexts trocam dados (REST, eventos,
+                            ACL, Shared Kernel…).</td>
+                        <td>Guias claros de integração; reduz surpresa quando um contexto evolui.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tipos de Relacionamento</strong> (ACL, Shared Kernel, Customer–Supplier, Conformist,
+                            Published Language…)</td>
+                        <td>Padronizam as regras de dependência entre contextos.</td>
+                        <td>Deixa explícito quem pode mudar contrato, quem é consumidor passivo e onde é preciso camada
+                            de tradução.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Linguagem Ubíqua</strong></td>
+                        <td>Vocabulário comum entre especialistas e devs, usado em código, testes e conversa diária.
+                        </td>
+                        <td>Código se torna leitura natural para qualquer pessoa do negócio; reduz mal-entendidos.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Visão Organizacional</strong> (Times por Contexto)</td>
+                        <td>Atribui ownership a equipes alinhadas aos bounded contexts.</td>
+                        <td>Facilitam deploys independentes, pipelines separados e metas claras por domínio.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>Como aplicar no dia a dia</h4>
+            <ol>
+                <li><strong>Mapeie o domínio com o negócio</strong> (event storming, entrevistas).</li>
+                <li><strong>Quebre em subdomínios</strong> e classifique: <em>core</em>, <em>supporting</em>,
+                    <em>generic</em>.
+                </li>
+                <li><strong>Desenhe bounded contexts</strong> para cada subdomínio ou grupo de regras que precise de
+                    modelo próprio.</li>
+                <li><strong>Documente o Context Map</strong> com os padrões de relacionamento escolhidos.</li>
+                <li><strong>Aloque times</strong> ou responsáveis por contexto, não por camada técnica.</li>
+                <li><strong>Refatore a linguagem</strong>: renomeie classes, endpoints, testes para refletir exatamente
+                    o vocabulário do contexto.</li>
+            </ol>
+            <blockquote>
+                <p><strong>Resumo:</strong> se a tática preenche o código com entidades ricas e agregados, a estratégia
+                    garante que esses modelos surjam <strong>nos lugares certos</strong>, conversando pelos
+                    <strong>canais certos</strong>, na <strong>língua certa</strong>.
+                </p>
+            </blockquote>
+            <p>Vamos abordar alguns desses principais conceitos mais à fundo, porque entendê-los pode nos auxiliar
+                inclusive em contextos em que não estamos aplicando diretamente o DDD!</p>
+            <hr>
+            <h2>3. Linguagem Ubíqua (Ubiquitous Language)</h2>
+            <p>A <strong>linguagem ubíqua</strong>, como vimos acima, é uma das ideias centrais e mais poderosas do
+                Domain-Driven Design. Introduzida por Eric Evans como uma estratégia para integrar as visões dos
+                especialistas de negócio e dos desenvolvedores, ela atua como um elo entre o mundo real (o problema) e o
+                código-fonte (a solução). Mais do que um artifício retórico, ela é um <strong>instrumento técnico e
+                    estratégico</strong> que molda a própria estrutura do software.</p>
+            <h3>3.1. Um problema comum: nomes genéricos, código obscuro</h3>
+            <p>Em muitos sistemas legados, é comum encontrar nomes de classes e métodos como:</p>
+            <pre><code class="language-java">DataManager, ServiceImpl, ProcessData, Handler, doStuff()
+</code></pre>
+            <p>Esses nomes não revelam nada sobre o que o sistema faz. Eles são <strong>genéricos, imprecisos e não têm
+                    valor semântico</strong>. Pior ainda: muitas vezes a equipe usa termos diferentes para se referir à
+                mesma coisa, o que gera confusão tanto na comunicação entre pessoas quanto na leitura do código.</p>
+            <p>No DDD, esse cenário é combatido de forma ativa. O objetivo é que os desenvolvedores <strong>falem com o
+                    especialista de negócio usando os mesmos termos que aparecem no código</strong>, e que o
+                especialista possa ler trechos do código e entendê-los, mesmo sem formação técnica.</p>
+            <h3>3.2. A linguagem ubíqua como ferramenta de modelagem</h3>
+            <p>A construção da linguagem ubíqua <strong>não é tarefa exclusiva dos desenvolvedores</strong>. Ela deve
+                surgir da <strong>colaboração constante com os especialistas do domínio</strong>, que são aquelas
+                pessoas que realmente conhecem o problema que está sendo resolvido (gerentes, usuários, operadores,
+                analistas de negócio, etc.).</p>
+            <p>Durante sessões de levantamento de requisitos, refinamento ou <em>event storming</em>, o time deve anotar
+                os <strong>termos que surgem com frequência</strong>, como:</p>
+            <ul>
+                <li>“Uma tarefa pode ser atribuída a um responsável”</li>
+                <li>“A data limite precisa ser ajustada caso o projeto atrase”</li>
+                <li>“Um usuário só pode editar tarefas em aberto”</li>
+                <li>“Há categorias fixas: Estudo, Trabalho, Lazer, etc.”</li>
+            </ul>
+            <p>Cada um desses termos pode, e deve, se refletir diretamente em estruturas do código:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Termo do negócio</th>
+                        <th>No código</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tarefa</td>
+                        <td><code>Task</code></td>
+                    </tr>
+                    <tr>
+                        <td>Responsável</td>
+                        <td><code>Owner</code>, <code>assignedTo</code>, <code>User</code></td>
+                    </tr>
+                    <tr>
+                        <td>Data limite</td>
+                        <td><code>dueDate</code></td>
+                    </tr>
+                    <tr>
+                        <td>Concluída</td>
+                        <td><code>completed</code>, <code>isDone()</code></td>
+                    </tr>
+                    <tr>
+                        <td>Categoria</td>
+                        <td><code>Category</code> (enum)</td>
+                    </tr>
+                    <tr>
+                        <td>Atrasada</td>
+                        <td><code>isOverdue()</code></td>
+                    </tr>
+                    <tr>
+                        <td>Projeto</td>
+                        <td><code>Project</code></td>
+                    </tr>
+                    <tr>
+                        <td>Permissão de edição</td>
+                        <td><code>canEdit()</code> ou regra de domínio no serviço</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Isso transforma o código-fonte em <strong>uma extensão natural da linguagem de negócio</strong>.</p>
+            <h3>3.3. Exemplo no nosso projeto: Task API</h3>
+            <p>Vamos ilustrar com um exemplo real do nosso projeto de API de tarefas.</p>
+            <h4>Cenário:</h4>
+            <blockquote>
+                <p>&quot;Usuários podem criar tarefas, que possuem título, descrição, prioridade, categoria e data
+                    limite. Tarefas podem ser marcadas como concluídas. Só o dono da tarefa pode editá-la.&quot;</p>
+            </blockquote>
+            <h4>Código com linguagem genérica e técnica:</h4>
+            <pre><code class="language-java">public class DataEntity {
+    private String field1;
+    private String field2;
+    private boolean flag;
+}
+</code></pre>
+            <h4>Código com linguagem ubíqua:</h4>
+            <pre><code class="language-java">public class Task {
+    private String title;
+    private String description;
+    private Priority priority;
+    private Category category;
+    private LocalDateTime dueDate;
+    private boolean completed;
+    private User owner;
+
+    public boolean isOverdue() {
+        return !completed &amp;&amp; LocalDateTime.now().isAfter(dueDate);
+    }
+
+    public boolean canBeEditedBy(User user) {
+        return this.owner.equals(user) &amp;&amp; !this.completed;
+    }
+}
+</code></pre>
+            <p>Observe como os <strong>termos do domínio estão diretamente refletidos no código</strong>, e com métodos
+                que <strong>expressam regras de negócio</strong>, não apenas acessos a dados. Essa forma de codificação
+                é mais expressiva, fácil de ler e de manter.</p>
+            <p>Aqui há uma ligação direta com os conceitos que vimos sobre Clean Code! Quando você usa <strong>linguagem
+                    ubíqua</strong> e deixa as regras de negócio explícitas dentro das classes de domínio, já está
+                aplicando vários princípios de <em>Clean Code</em>:</p>
+            <ul>
+                <li><strong>Nomes que revelam intenção</strong>: <code>Task</code>, <code>isOverdue()</code> e
+                    <code>canBeEditedBy()</code> dizem exatamente o que fazem, evitando comentários supérfluos.
+                </li>
+                <li><strong>Baixo acoplamento e alta coesão</strong>: a classe <code>Task</code> concentra apenas o que
+                    diz respeito a uma tarefa; ela não dispara e-mail nem consulta banco, mantendo um único motivo para
+                    mudar.</li>
+                <li><strong>Código que conta uma história</strong>: ao ler o método <code>canBeEditedBy(user)</code>,
+                    qualquer pessoa entende a regra de permissão sem precisar vasculhar controllers ou services.</li>
+            </ul>
+            <p>Ou seja, modelar o domínio e escolher bons nomes faz o código limpo surgir quase como consequência:
+                funções curtas, sem condicionais espalhadas, com objetos ricos que se validam sozinhos. Isso simplifica
+                testes, refatorações e onboarding de novos devs, os mesmos objetivos defendidos pelo <em>Clean
+                    Code</em>!</p>
+            <h3>3.4. Linguagem ubíqua como contrato entre pessoas e código</h3>
+            <p>A adoção da linguagem ubíqua também <strong>reduz o atrito na comunicação entre desenvolvedores e
+                    especialistas</strong>. Por exemplo:</p>
+            <ul>
+                <li>O analista de negócios diz: “Se a tarefa estiver atrasada, ela deve aparecer em vermelho”.</li>
+                <li>O desenvolvedor diz: “Ok, vou usar o <code>isOverdue()</code> do objeto <code>Task</code> para
+                    aplicar essa lógica no front-end”.</li>
+            </ul>
+            <p>Esse tipo de troca se torna natural, porque ambos estão falando <strong>o mesmo idioma</strong> e o
+                código vira uma <strong>representação exata do modelo mental</strong> de todos os envolvidos no projeto.
+            </p>
+            <p>Aqui no nosso contexto as coisas são bastante simples, mas a força da <strong>linguagem ubíqua</strong>
+                aparece de verdade quando o domínio tem <strong>regras intrincadas</strong>, como no clássico exemplo de
+                <strong>logística de contêineres</strong> apresentado por Eric Evans.
+            </p>
+            <p>Nesse sistema, cada <em>carga</em> navega por uma <em>rota</em> (Itinerary) composta por vários
+                <em>trechos</em> (Legs) a bordo de <em>viagens</em> (Voyages). Durante o trajeto surgem <em>eventos de
+                    manuseio</em> (Handling Events) - embarque, desembarque, armazenagem, inspeção alfandegária - que
+                podem alterar o <em>status de entrega</em> (Delivery Status). Analistas e operadores portuários falam
+                exatamente nesses termos; ao adotar o mesmo vocabulário no código, desenvolvedores evitam traduções
+                mentais e preservam a lógica de negócios com precisão.
+            </p>
+            <pre><code class="language-java">// Modelo de domínio simplificado do livro de Evans
+public class Cargo {
+    private TrackingId trackingId;           // VO: valida formato — ex. &quot;ABC1234567&quot;
+    private RouteSpecification spec;         // origem, destino, deadline
+    private Itinerary itinerary;             // lista de Legs já planejados
+    private Delivery delivery;               // estado atual calculado a cada evento
+
+    /** Reavalia o status quando um evento chega do sistema portuário */
+    public void deriveDeliveryProgress(HandlingEvent lastEvent) {
+        this.delivery = Delivery.derivedFrom(itinerary, lastEvent, spec);
+    }
+
+    /** Regra de negócio: rota ainda atende à especificação? */
+    public boolean isMisrouted() {
+        return !itinerary.satisfies(spec);
+    }
+}
+</code></pre>
+            <p>Quando o <strong>especialista</strong> diz: “Essa carga está <em>misrouted</em> porque desembarcou em
+                Singapura em vez de Tóquio”, o <strong>desenvolvedor</strong> responde: “O método
+                <code>isMisrouted()</code> já detectou isso e disparou um alerta de replanejamento”. Ambos utilizam os
+                mesmos substantivos e verbos: <em>carga</em>, <em>evento de manuseio</em>, <em>rota</em>,
+                <em>misrouted</em>, criando um <strong>contrato vivo</strong> entre conversas de negócio, testes
+                automatizados e código de produção. Em domínios complexos como logística, saúde ou finanças, essa
+                coincidência de linguagem é o que impede regras elaboradas de virarem um emaranhado de <em>ifs</em>
+                dispersos, garantindo que as mudanças continuem <strong>compreensíveis, rastreáveis e seguras</strong>
+                ao longo do tempo.
+            </p>
+            <h3>3.5. Práticas para adotar a linguagem ubíqua</h3>
+            <p>Dentre as práticas para adotarmos a linguagem ubíqua, podemos elencar</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prática</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Conversar com especialistas</strong></td>
+                        <td>Evite criar nomes por conta própria — escute como o cliente fala</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Refletir termos reais no código</strong></td>
+                        <td>Use nomes que façam sentido no domínio, não nomes técnicos genéricos</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Evitar siglas e jargões técnicos desnecessários</strong></td>
+                        <td>Prefira <code>deadline</code> a <code>dt_limite</code>, <code>owner</code> a
+                            <code>usr_fk</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Evitar traduções forçadas</strong></td>
+                        <td>Se o cliente fala “task”, não insista em “tarefa” no código só por patriotismo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Padronizar termos em todo o sistema</strong></td>
+                        <td>Use sempre os mesmos nomes para os mesmos conceitos, em DTOs, entidades, eventos, testes e
+                            endpoints</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Refatorar nomes com frequência</strong></td>
+                        <td>À medida que o entendimento evolui, ajuste os nomes para manter o alinhamento conceitual
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>3.6. Impacto nos testes, commits e documentação</h3>
+            <ul>
+                <li>
+                    <p><strong>Testes:</strong> nomes de testes devem refletir casos de uso do negócio
+                        Ex: <code>shouldMarkTaskAsCompleted_WhenUserIsOwnerAndTaskIsOpen()</code></p>
+                </li>
+                <li>
+                    <p><strong>Commits:</strong> mensagens devem refletir mudanças no domínio
+                        Ex: <code>feat(task): adicionar verificação de atraso baseado em dueDate</code></p>
+                </li>
+                <li>
+                    <p><strong>Documentação:</strong> usar o mesmo vocabulário nas histórias de usuário, nos casos de
+                        uso e no código</p>
+                </li>
+            </ul>
+            <p>Em resumo: a linguagem ubíqua é <strong>mais do que um padrão de nomeação</strong>: ela é o
+                <strong>coração da comunicação entre o negócio e o código</strong>. Ao adotá-la com disciplina,
+                garantimos que todos os envolvidos no projeto falem a mesma língua e compartilhem o mesmo modelo mental.
+            </p>
+            <h2>3.7. Event Storming: o Domínio em Colaboração</h2>
+            <p>Uma das formas mais eficazes e colaborativas de construir a <strong>Linguagem Ubíqua</strong> e
+                identificar os <strong>Subdomínios</strong> e <strong>Bounded Contexts</strong> é através de uma técnica
+                chamada <strong>Event Storming</strong>. Criado por Alberto Brandolini, o Event Storming é uma oficina
+                dinâmica e visual que reúne especialistas de negócio e desenvolvedores para mapear o fluxo de eventos em
+                um sistema, revelando o coração do domínio.</p>
+            <h3>3.7.1. O que é Event Storming?</h3>
+            <p>Event Storming é uma abordagem facilitada para explorar domínios de negócio complexos, focando nos
+                <strong>Eventos de Domínio</strong>. A ideia central é que todos os participantes – desde a área de
+                negócio até a equipe técnica – se reúnem em uma sala grande (ou usam uma ferramenta online
+                colaborativa), munidos de muitos <em>post-its</em> de cores diferentes.
+            </p>
+            <p>A oficina gira em torno de identificar e sequenciar os eventos que acontecem no sistema. Um
+                <strong>Evento de Domínio</strong> é algo significativo que <strong>já aconteceu</strong> no negócio e
+                que os especialistas reconhecem como relevante. Eles são expressos no passado, como &quot;Tarefa
+                Criada&quot;, &quot;Usuário Autenticado&quot; ou &quot;Pagamento Processado&quot;.
+            </p>
+            <h4>Como funciona:</h4>
+            <ol>
+                <li><strong>Linha do Tempo de Eventos:</strong> Os participantes começam colocando <strong>eventos de
+                        domínio (laranja)</strong> em ordem cronológica, do passado para o futuro. &quot;O que acontece
+                    depois disso?&quot; é a pergunta que impulsiona a discussão.</li>
+                <li><strong>Comandos e Agregados:</strong> Para cada evento, busca-se o <strong>comando (azul)</strong>
+                    que o disparou (ex: &quot;Criar Tarefa&quot; leva a &quot;Tarefa Criada&quot;) e o <strong>agregado
+                        (amarelo)</strong> responsável por executar esse comando (ex: a <code>Task</code> é o agregado
+                    que &quot;cria a tarefa&quot;).</li>
+                <li><strong>Sistemas Externos e Pessoas:</strong> Identificam-se sistemas externos (rosa) que interagem
+                    com o domínio e os atores (bonequinhos) que executam os comandos.</li>
+                <li><strong>Políticas e Regras:</strong> Discussões sobre &quot;o que dispara o quê&quot; e &quot;por
+                    que isso acontece&quot; revelam políticas e regras de negócio (verde).</li>
+                <li><strong>Hotspots de Discussão:</strong> Pontos de incerteza, conflito ou complexidade são marcados
+                    como &quot;hotspots&quot; (vermelho) para serem discutidos e aprofundados.</li>
+            </ol>
+            <h3>3.7.2. Por que usar Event Storming?</h3>
+            <ul>
+                <li><strong>Visão Compartilhada:</strong> Garante que todos os envolvidos no projeto (negócio e
+                    tecnologia) construam uma compreensão comum do sistema, utilizando a mesma <strong>Linguagem
+                        Ubíqua</strong>.</li>
+                <li><strong>Identificação de Limites:</strong> À medida que os eventos são mapeados, naturalmente surgem
+                    agrupamentos de eventos e comandos que pertencem a uma mesma área de responsabilidade. Esses
+                    agrupamentos são fortes candidatos a <strong>Subdomínios</strong> e <strong>Bounded
+                        Contexts</strong>.</li>
+                <li><strong>Foco no Comportamento:</strong> Em vez de focar em dados ou telas, o Event Storming
+                    concentra-se nos <strong>comportamentos</strong> do sistema e nas <strong>decisões de
+                        negócio</strong>, o que é crucial para um design orientado ao domínio.</li>
+                <li><strong>Descoberta de Invariantes:</strong> Ao discutir os fluxos e as regras, as invariantes do
+                    sistema (regras que nunca devem ser violadas) vêm à tona, ajudando a modelar os Agregados de forma
+                    mais robusta.</li>
+                <li><strong>Engajamento e Colaboração:</strong> É uma atividade divertida e visual que incentiva a
+                    participação ativa, quebrando barreiras entre as áreas.</li>
+            </ul>
+            <h3>3.7.3. Exemplo na Task API com Event Storming</h3>
+            <p>Vamos imaginar uma pequena sessão de Event Storming para o nosso projeto de gerenciamento de tarefas.</p>
+            <p><strong>Eventos identificados (post-its laranja):</strong></p>
+            <ul>
+                <li>&quot;Usuário Criado&quot;</li>
+                <li>&quot;Usuário Autenticado&quot;</li>
+                <li>&quot;Tarefa Criada&quot;</li>
+                <li>&quot;Tarefa Atribuída&quot;</li>
+                <li>&quot;Tarefa Concluída&quot;</li>
+                <li>&quot;Notificação Enviada&quot;</li>
+                <li>&quot;Relatório de Tarefas Gerado&quot;</li>
+            </ul>
+            <p><strong>Agrupando e descobrindo Contextos:</strong></p>
+            <p>À medida que os eventos são dispostos, percebemos que:</p>
+            <ul>
+                <li>&quot;Usuário Criado&quot; e &quot;Usuário Autenticado&quot; naturalmente se agrupam em um contexto
+                    de <strong>Identidade &amp; Acesso</strong>.</li>
+                <li>&quot;Tarefa Criada&quot;, &quot;Tarefa Atribuída&quot; e &quot;Tarefa Concluída&quot; formam o
+                    núcleo do contexto de <strong>Gerenciamento de Tarefas</strong>.</li>
+                <li>&quot;Notificação Enviada&quot; aponta para um contexto de <strong>Notificação</strong>.</li>
+                <li>&quot;Relatório de Tarefas Gerado&quot; para um contexto de <strong>Relatórios</strong>.</li>
+            </ul>
+            <p><strong>Comandos e Políticas:</strong></p>
+            <ul>
+                <li>Para &quot;Tarefa Criada&quot;, o comando é &quot;Criar Nova Tarefa&quot;, executado pelo
+                    <code>Task</code> (Agregado), disparado por um &quot;Usuário&quot; (Ator).
+                </li>
+                <li>Para &quot;Notificação Enviada&quot;, a política pode ser &quot;Quando a Tarefa é Atribuída, Enviar
+                    Notificação ao Atribuído&quot;.</li>
+            </ul>
+            <p>Com o Event Storming, essas divisões e as interações entre elas (quem dispara o quê) se tornam visíveis e
+                claras para toda a equipe, servindo como um mapa visual para a arquitetura do software.</p>
+            <p>Para se aprofundar um pouco mais no Event Storming, acesse o link a seguir: <a
+                    href="https://medium.com/@jonesroberto/event-storming-guia-b%C3%A1sico-216498f5dd2d">Event Storming
+                    — Guia básico</a></p>
+            <p>Na próxima seção, veremos <strong>como identificar subdomínios na prática</strong>, usando heurísticas
+                que nos ajudam a decidir <strong>onde estão os limites naturais</strong> de cada parte do sistema, base
+                para uma futura divisão em microsserviços.</p>
+            <hr>
+            <h2>4. Heurísticas para Identificar Subdomínios na Prática</h2>
+            <p>Até aqui, vimos que um <strong>subdomínio</strong> é uma <strong>área funcional coesa</strong> dentro do
+                domínio maior do sistema, e que o DDD recomenda que cada subdomínio seja implementado dentro de um
+                <strong>bounded context</strong> próprio. Essa divisão permite que diferentes partes da aplicação sejam
+                desenvolvidas, testadas e evoluídas de forma <strong>independente, consistente e alinhada com as regras
+                    de negócio</strong>.
+            </p>
+            <p>No entanto, surge uma pergunta natural:</p>
+            <blockquote>
+                <p>“Como saber o que é um subdomínio e onde ele começa e termina?”</p>
+            </blockquote>
+            <p>Essa é, talvez, a pergunta mais difícil — e mais importante — ao adotar DDD na prática. Por isso, nesta
+                seção, vamos apresentar <strong>heurísticas</strong> para ajudar você e sua equipe a
+                <strong>identificarem subdomínios com base em critérios objetivos e observáveis</strong>.
+            </p>
+            <h3>4.1. Heurísticas para descobrir subdomínios</h3>
+            <p>A seguir, são apresentados um conjunto de perguntas, ou heurísticas, que você pode aplicar <strong>ao
+                    analisar um módulo, classe ou funcionalidade</strong>. Quanto mais dessas características estiverem
+                presentes, maior a chance de você estar diante de um <strong>subdomínio candidato</strong>.</p>
+            <h4>✅ Heurística 1: Vocabulário distinto?</h4>
+            <ul>
+                <li>Esse módulo usa termos próprios que não aparecem no restante do sistema?</li>
+                <li>Os significados dos termos mudam em contextos diferentes?</li>
+            </ul>
+            <blockquote>
+                <p>Exemplo: &quot;usuário&quot; pode significar login e senha no <code>Auth</code>, mas representar um
+                    colaborador com tarefas no <code>Task</code>.</p>
+            </blockquote>
+            <h4>✅ Heurística 2: Regras de negócio próprias?</h4>
+            <ul>
+                <li>Há validações, cálculos ou fluxos de decisão que só fazem sentido nesse pedaço do sistema?</li>
+                <li>Essas regras são discutidas com especialistas do negócio?</li>
+            </ul>
+            <blockquote>
+                <p>Exemplo: no módulo <code>Task</code>, não se pode editar uma tarefa já concluída.</p>
+            </blockquote>
+            <h4>✅ Heurística 3: Ciclo de vida independente?</h4>
+            <ul>
+                <li>Os dados desse módulo têm um ciclo de criação, atualização e exclusão próprios?</li>
+                <li>Os fluxos desse módulo não precisam esperar por decisões externas?</li>
+            </ul>
+            <blockquote>
+                <p>Exemplo: tarefas podem ser criadas, concluídas e apagadas sem relação direta com o fluxo de login do
+                    usuário.</p>
+            </blockquote>
+            <h4>✅ Heurística 4: Equipe ou papel diferente no negócio?</h4>
+            <ul>
+                <li>Existe uma equipe (real ou imaginária) que seria responsável apenas por essa parte do sistema?</li>
+                <li>O especialista de negócio que define as regras dessa área é diferente de outras partes?</li>
+            </ul>
+            <blockquote>
+                <p>Exemplo: quem cuida de permissões e autenticação pode ser o time de infraestrutura; quem define o
+                    fluxo de tarefas é o time de operações.</p>
+            </blockquote>
+            <h4>✅ Heurística 5: Frequência de mudança distinta?</h4>
+            <ul>
+                <li>Esse módulo muda com frequência diferente de outras partes?</li>
+                <li>As regras desse módulo tendem a evoluir mais rápido (ou mais devagar) do que o restante do sistema?
+                </li>
+            </ul>
+            <blockquote>
+                <p>Exemplo: regras de tarefas (prioridades, categorias, prazos) mudam com frequência conforme o negócio
+                    muda. Regras de autenticação mudam mais raramente.</p>
+            </blockquote>
+            <h4>✅ Heurística 6: Escalabilidade ou desempenho específico?</h4>
+            <ul>
+                <li>Esse módulo tem características de carga, latência ou volume muito distintas?</li>
+                <li>Há justificativas técnicas para separá-lo, como escalabilidade ou resiliência?</li>
+            </ul>
+            <blockquote>
+                <p>Exemplo: o módulo de notificações (e-mails ou SMS) pode precisar de filas e paralelismo, enquanto o
+                    cadastro de usuários pode ser síncrono.</p>
+            </blockquote>
+            <h3>4.2. Aplicando heurísticas ao nosso projeto: Task API</h3>
+            <p>Vamos aplicar essas heurísticas para analisar o que já temos em nosso projeto atual. Considere os três
+                pacotes principais:</p>
+            <h4>📦 <code>auth</code> – autenticação e segurança</h4>
+            <ul>
+                <li><strong>Vocabulário próprio</strong>: <code>token</code>, <code>JWT</code>,
+                    <code>credenciais</code>, <code>autenticação</code>
+                </li>
+                <li><strong>Regras específicas</strong>: login com senha, expiração de token, geração de JWT</li>
+                <li><strong>Frequência de mudança</strong>: baixa — muda apenas se a estratégia de segurança mudar</li>
+                <li><strong>Equipe separada?</strong> Sim, normalmente responsabilidade de times de infraestrutura</li>
+            </ul>
+            <p>👉 <strong>Subdomínio identificado</strong>: <code>Authentication</code> (supporting subdomain)</p>
+            <h4>📦 <code>user</code> – dados do usuário</h4>
+            <ul>
+                <li><strong>Vocabulário</strong>: <code>nome</code>, <code>e-mail</code>, <code>perfil</code>,
+                    <code>papel</code>
+                </li>
+                <li><strong>Regras</strong>: associação de tarefas, permissões</li>
+                <li><strong>Frequência de mudança</strong>: média — novo perfil, papéis, e-mail etc.</li>
+                <li><strong>Equipe dedicada?</strong> Sim, pode haver um time de RH, cadastro ou administração</li>
+            </ul>
+            <p>👉 <strong>Subdomínio identificado</strong>: <code>User Management</code> (supporting subdomain)</p>
+            <h4>📦 <code>task</code> – gestão de tarefas</h4>
+            <ul>
+                <li><strong>Vocabulário</strong>: <code>título</code>, <code>prioridade</code>, <code>categoria</code>,
+                    <code>vencimento</code>, <code>concluída</code>
+                </li>
+                <li><strong>Regras complexas</strong>: não pode editar tarefa concluída, não pode excluir tarefa alheia
+                </li>
+                <li><strong>Frequência de mudança</strong>: alta — regras e categorias podem mudar com o negócio</li>
+                <li><strong>Core business?</strong> Sim — é o diferencial da aplicação</li>
+            </ul>
+            <p>👉 <strong>Subdomínio identificado</strong>: <code>Task Management</code> (core domain)</p>
+            <h3>4.3. Mapeando os subdomínios no código</h3>
+            <p>A partir dessas observações, poderíamos começar a organizar o código em pacotes ou módulos separados,
+                como:</p>
+            <pre><code>src/
+├── auth/          → JWT, autenticação, login
+├── user/          → cadastro, papéis, permissões
+├── task/          → entidades, serviços e controladores relacionados às tarefas
+</code></pre>
+            <p>No futuro, essa separação pode ser evoluída para:</p>
+            <ul>
+                <li>Módulos Maven ou Gradle separados</li>
+                <li>Containers Docker distintos</li>
+                <li>Microsserviços independentes</li>
+            </ul>
+            <p>Mas mesmo em um monólito, <strong>essa separação lógica já ajuda muito na clareza, manutenção e
+                    escalabilidade</strong> do projeto.</p>
+            <p>Na próxima seção, vamos estudar <strong>como representar visualmente os relacionamentos entre
+                    subdomínios</strong>, usando um conceito chamado <strong>Context Map</strong> — ferramenta para
+                entender como os módulos se comunicam e para planejar a extração de microsserviços.</p>
+            <hr>
+            <h2>5. Mapeamento de Contextos e Comunicação (Context Map)</h2>
+            <p>Aprendemos a identificar <strong>subdomínios</strong> dentro de uma aplicação real. Agora, chegou o
+                momento de compreender como <strong>esses subdomínios se relacionam entre si</strong>. Para isso, o
+                Domain-Driven Design propõe uma ferramenta visual e conceitual chamada <strong>Context Map</strong>
+                (Mapa de Contextos).</p>
+            <p>O Context Map é fundamental para arquiteturas baseadas em microsserviços, pois permite <strong>entender
+                    como os diferentes bounded contexts trocam informações entre si</strong>. É através dele que
+                decidimos onde aplicar integrações via API REST, eventos assíncronos, filas, ou até bancos de dados
+                compartilhados (quando inevitável). Em projetos monolíticos, o mapa também orienta <strong>módulos
+                    internos e fronteiras de código</strong>.</p>
+            <h3>5.1. O que é um Context Map?</h3>
+            <blockquote>
+                <p>🧠 <strong>Definição:</strong> O Context Map (Mapa de Contextos) é um <strong>diagrama que representa
+                        os diferentes bounded contexts do sistema</strong> e <strong>como eles se relacionam entre
+                        si</strong>. Ele explicita os limites, os contratos e os mecanismos de integração entre
+                    contextos distintos.</p>
+            </blockquote>
+            <p>Enquanto o <strong>bounded context</strong> define o limite interno de consistência de um modelo de
+                domínio, o <strong>context map define o que existe entre esses limites</strong>: como os modelos se
+                comunicam, como os times colaboram e como os dados são transferidos entre fronteiras.</p>
+            <h3>5.2. Exemplo simples de Context Map</h3>
+            <p>Para o nosso projeto de To-Do List, que já possui separações entre os subdomínios <code>Auth</code>,
+                <code>User</code> e <code>Task</code>, o <strong>context map inicial</strong> poderia ser representado
+                assim:
+            </p>
+            <pre><code>+-------------------+          REST          +-------------------+
+|    Auth Context   |  &lt;-------------------  |   Task Context     |
+| - Login           |                       | - Criação de Tarefa |
+| - Token JWT       |                       | - Conclusão         |
++-------------------+                       +-------------------+
+         |                                           ^
+         |                                           |
+         |                         Ownership (ref.) |
+         |                                           |
+         v                                           |
++-------------------+           API / Shared Kernel |
+|   User Context    |  &lt;---------------------------&gt;|
+| - Cadastro        |                               |
+| - Perfis / Roles  |                               |
++-------------------+                               |
+                                                    |
+    ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+           Comunicação Assíncrona (eventual)
+</code></pre>
+            <p>Esse diagrama mostra:</p>
+            <ul>
+                <li><code>Auth</code> fornece tokens JWT consumidos por <code>Task</code>;</li>
+                <li><code>Task</code> depende de <code>User</code> para resolver o dono da tarefa (<code>owner</code>);
+                </li>
+                <li><code>User</code> e <code>Task</code> podem compartilhar parte do modelo (ex: ID e nome do usuário)
+                    — configurando um <strong>Shared Kernel</strong>;</li>
+                <li>Em um cenário mais avançado, <code>Task</code> poderia se manter atualizado sobre mudanças no
+                    usuário via <strong>eventos assíncronos</strong> disparados por <code>User</code>.</li>
+            </ul>
+            <h3>5.3. Tipos de Relacionamento no Context Map</h3>
+            <p>O DDD descreve vários <strong>padrões de relacionamento entre contextos</strong>. Abaixo, destacamos os
+                principais, aplicáveis tanto a microsserviços quanto a monólitos modulados.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo de Relacionamento</th>
+                        <th>Descrição</th>
+                        <th>Exemplo prático</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Shared Kernel</strong></td>
+                        <td>Dois contextos compartilham um pequeno modelo comum e versionado em conjunto.</td>
+                        <td><code>User</code> e <code>Task</code> compartilham o identificador do usuário</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Customer / Supplier</strong></td>
+                        <td>Um contexto depende diretamente de outro e consome seus dados/modelo.</td>
+                        <td><code>Task</code> é consumidor de <code>Auth</code> (precisa validar tokens)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conformist</strong></td>
+                        <td>Um contexto aceita o modelo do outro sem adaptar. É um cliente passivo.</td>
+                        <td><code>Task</code> usa diretamente o DTO de <code>User</code>, sem abstrair</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Anticorruption Layer (ACL)</strong></td>
+                        <td>Um contexto consumidor cria um tradutor que adapta o modelo do fornecedor para o seu próprio
+                            modelo interno.</td>
+                        <td><code>Task</code> consome <code>User</code> via API, mas converte para <code>TaskUser</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Open Host Service</strong></td>
+                        <td>Um contexto fornece uma API pública bem definida que outros podem consumir.</td>
+                        <td><code>Auth</code> expõe <code>/login</code> e <code>/token</code> para todos os serviços
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Published Language</strong></td>
+                        <td>Os contextos comunicam-se usando um contrato público e bem documentado, como eventos
+                            assíncronos ou schemas compartilhados.</td>
+                        <td><code>User</code> publica eventos como <code>UserCreated</code>, <code>UserUpdated</code> em
+                            uma fila Kafka ou RabbitMQ</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Esses padrões ajudam a <strong>evitar acoplamento excessivo</strong>, <strong>clarear
+                    responsabilidades</strong> e <strong>orientar decisões técnicas</strong> sobre como os serviços (ou
+                módulos) devem se integrar.</p>
+            <h3>5.4. Regras de ouro para relacionamentos saudáveis</h3>
+            <ul>
+                <li><strong>Evite depender diretamente do modelo interno de outro contexto</strong> → Prefira contratos
+                    públicos ou DTOs específicos.</li>
+                <li><strong>Quando precisar se integrar, defina explicitamente o tipo de relacionamento</strong> →
+                    Customer/Supplier? ACL? Shared Kernel?</li>
+                <li><strong>Estabeleça fronteiras claras e documentadas</strong> → APIs, eventos, modelos compartilhados
+                    devem ser explícitos.</li>
+                <li><strong>Não use o mesmo banco de dados entre contextos diferentes</strong> → Isso quebra a
+                    independência dos contextos e gera acoplamento acidental.</li>
+                <li><strong>Prefira integração assíncrona quando possível</strong> → Melhora a escalabilidade e reduz
+                    dependência em tempo de execução.</li>
+            </ul>
+            <h3>5.5. Context Map em projetos monolíticos</h3>
+            <p>Mesmo em projetos monolíticos (como o nosso até agora), o Context Map pode ser aplicado:</p>
+            <ul>
+                <li><strong>Separando pacotes ou módulos internos</strong> com base nos bounded contexts;</li>
+                <li>Criando <strong>interfaces explícitas</strong> entre os módulos, mesmo que sejam métodos Java;</li>
+                <li>Mantendo <strong>contratos estáveis</strong> entre as camadas (DTOs, interfaces, serviços);</li>
+                <li>Facilitando, no futuro, a extração de microsserviços — já que os limites já estão definidos.</li>
+            </ul>
+            <h3>5.6. Ferramentas para desenhar Context Maps</h3>
+            <p>Você pode representar context maps com ferramentas simples como:</p>
+            <ul>
+                <li>Diagramas de caixa e seta no <strong>draw.io</strong>, <strong>Lucidchart</strong>,
+                    <strong>Miro</strong> ou <strong>Excalidraw</strong>;
+                </li>
+                <li>Anotações no código com pacotes <code>auth.*</code>, <code>user.*</code>, <code>task.*</code>;</li>
+                <li>Mapas de dependência usando <strong>arquitetura hexagonal</strong> ou <strong>Clean
+                        Architecture</strong>, por exemplo;</li>
+                <li>Representações visuais em <strong>event storming</strong> (usando sticky notes físicos ou digitais).
+                </li>
+            </ul>
+            <h3>5.7. O Context Map como bússola estratégica</h3>
+            <p>Em equipes ágeis, o Context Map também é útil para:</p>
+            <ul>
+                <li><strong>Distribuir responsabilidades entre times</strong> (cada time pode assumir um contexto);</li>
+                <li><strong>Planejar releases ou refatorações</strong> (extração gradual de microsserviços);</li>
+                <li><strong>Negociar contratos entre equipes</strong> (APIs, eventos, permissões);</li>
+                <li><strong>Gerenciar dependências</strong> e evitar cascatas de mudanças entre módulos.</li>
+            </ul>
+            <p>Por isso, ele não é apenas uma ferramenta técnica — mas também <strong>organizacional e
+                    estratégica</strong>.</p>
+            <p>Agora veremos como todos esses conceitos se relacionam com <strong>microsserviços na prática</strong> — e
+                por que tentar “fazer microsserviços sem DDD” pode nos levar a sistemas frágeis, redundantes e difíceis
+                de manter.</p>
+            <hr>
+            <h2>6. A Conexão entre DDD e Microsserviços</h2>
+            <p>Ao longo desta aula, aprendemos que o Domain-Driven Design nos ajuda a entender, dividir e expressar
+                sistemas complexos a partir de seus <strong>conceitos de negócio</strong>. Agora, vamos compreender por
+                que <strong>DDD é uma base sólida para arquiteturas de microsserviços</strong> — e como ele nos guia na
+                construção de serviços pequenos, autônomos, bem delimitados e orientados a domínio.</p>
+            <blockquote>
+                <p>⚠️ Antes de pensar em extrair microsserviços, precisamos <strong>identificar contextos delimitados e
+                        subdomínios coesos</strong>. Sem isso, apenas fragmentamos um sistema de maneira arbitrária — o
+                    que tende a aumentar a complexidade, e não resolvê-la.</p>
+            </blockquote>
+            <h3>6.1. Por que microsserviços precisam de DDD?</h3>
+            <p>Microsserviços prometem várias vantagens:</p>
+            <ul>
+                <li>Escalabilidade independente</li>
+                <li>Entregas mais rápidas por times pequenos</li>
+                <li>Maior resiliência a falhas</li>
+                <li>Flexibilidade tecnológica</li>
+            </ul>
+            <p>Entretanto, <strong>sem um mapeamento de domínios bem feito</strong>, essas promessas frequentemente se
+                perdem. O que acontece, na prática:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sem DDD</th>
+                        <th>Com DDD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Serviços definidos por conveniência técnica (ex: por CRUD ou tabela)</td>
+                        <td>Serviços definidos por limites de negócio (bounded contexts)</td>
+                    </tr>
+                    <tr>
+                        <td>Modelo de dados compartilhado entre serviços</td>
+                        <td>Cada serviço tem seu próprio modelo, alinhado ao domínio</td>
+                    </tr>
+                    <tr>
+                        <td>Alto acoplamento entre APIs</td>
+                        <td>Comunicação controlada, baseada em contratos claros</td>
+                    </tr>
+                    <tr>
+                        <td>Mudança em um serviço exige alterar outros</td>
+                        <td>Serviços evoluem com mais autonomia</td>
+                    </tr>
+                    <tr>
+                        <td>Entendimento frágil do que cada serviço faz</td>
+                        <td>Cada serviço tem propósito claro e está vinculado a um subdomínio</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>6.2. Microsserviço ≠ Recurso REST</h3>
+            <p>Muitas equipes caem no erro de criar microsserviços com base em <strong>entidades isoladas</strong>:</p>
+            <ul>
+                <li><code>task-service</code>: gerencia tarefas</li>
+                <li><code>user-service</code>: gerencia usuários</li>
+                <li><code>notification-service</code>: envia mensagens</li>
+            </ul>
+            <p>Na prática, esses serviços acabam sendo apenas <strong>CRUDs distribuídos</strong> — sem autonomia real,
+                sem lógica de negócio relevante, e <strong>com alto acoplamento entre si</strong>, pois o fluxo real
+                exige múltiplas chamadas entre eles para fazer qualquer coisa útil.</p>
+            <blockquote>
+                <p>🎯 Microsserviços de verdade representam <strong>casos de uso ou domínios significativos</strong>, e
+                    não apenas entidades de banco.</p>
+            </blockquote>
+            <h3>6.3. De bounded context → para microsserviço</h3>
+            <p>O mapeamento que fizemos anteriormente com <code>Auth</code>, <code>User</code> e <code>Task</code> é o
+                ponto de partida para uma futura divisão em microsserviços:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subdomínio</th>
+                        <th>Bounded Context</th>
+                        <th>Futuro microsserviço?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Autenticação</td>
+                        <td><code>AuthContext</code></td>
+                        <td>✅ <code>auth-service</code></td>
+                    </tr>
+                    <tr>
+                        <td>Usuários e permissões</td>
+                        <td><code>UserContext</code></td>
+                        <td>✅ <code>user-service</code></td>
+                    </tr>
+                    <tr>
+                        <td>Gestão de tarefas</td>
+                        <td><code>TaskContext</code></td>
+                        <td>✅ <code>task-service</code> (core domain)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Se estruturarmos corretamente esses contextos <strong>desde agora</strong> — mesmo dentro de um monólito
+                —, estaremos <strong>preparando o código, os testes e os contratos</strong> para uma eventual extração
+                futura com menor atrito.</p>
+            <h3>6.4. Comunicação entre serviços: como o DDD ajuda</h3>
+            <p>Uma das maiores dificuldades em arquiteturas de microsserviços é <strong>lidar com a comunicação entre
+                    eles</strong>. O DDD nos ajuda a:</p>
+            <ul>
+                <li><strong>Definir quem fala com quem</strong> (via Context Map)</li>
+                <li><strong>Controlar acoplamento</strong> com padrões como <em>Anticorruption Layer</em>, <em>Open Host
+                        Service</em>, <em>Published Language</em></li>
+                <li><strong>Separar modelos internos dos externos</strong> com DTOs, interfaces, eventos</li>
+                <li><strong>Decidir onde aplicar sincronia (REST) e assíncronia (mensageria)</strong></li>
+            </ul>
+            <p>Exemplo:</p>
+            <ul>
+                <li>O <code>task-service</code> não precisa saber como funciona o modelo completo de
+                    <code>user-service</code>. Ele pode expor apenas o <code>TaskOwner</code>, um objeto com
+                    <code>id</code> e <code>nome</code>.
+                </li>
+                <li>O <code>user-service</code> publica eventos como <code>UserRoleChanged</code> que o
+                    <code>task-service</code> consome, atualizando permissões de edição.
+                </li>
+            </ul>
+            <h3>6.5. Time-to-market e times independentes</h3>
+            <p>Com bounded contexts bem definidos e alinhados a subdomínios estratégicos, é possível <strong>alocar
+                    equipes independentes para cada contexto</strong>:</p>
+            <ul>
+                <li>Time A: cuida do <code>auth-service</code></li>
+                <li>Time B: cuida do <code>user-service</code></li>
+                <li>Time C: foca no <code>task-service</code></li>
+            </ul>
+            <p>Cada equipe:</p>
+            <ul>
+                <li>Possui autonomia de deploy</li>
+                <li>Assume ownership do domínio</li>
+                <li>Evolui regras e funcionalidades específicas sem impactar outros serviços</li>
+            </ul>
+            <p>Esse modelo reduz gargalos, evita conflitos e <strong>promove ownership real</strong>, um dos maiores
+                desafios em projetos complexos.</p>
+            <h3>6.6. Quando <em>não</em> usar microsserviços?</h3>
+            <p>DDD não exige microsserviços. Ele pode (e deve!) ser aplicado em <strong>monólitos bem
+                    estruturados</strong>. Microsserviços são recomendados quando:</p>
+            <ul>
+                <li>Há escala organizacional (múltiplos times)</li>
+                <li>Existem necessidades claras de escalar partes diferentes do sistema separadamente</li>
+                <li>O sistema é grande, com muitas regras de negócio que evoluem de forma autônoma</li>
+            </ul>
+            <blockquote>
+                <p>💡 Antes de dividir, organize. Primeiro os <strong>bounded contexts</strong>, depois (talvez) os
+                    <strong>microsserviços</strong>.
+                </p>
+            </blockquote>
+            <h3>6.7. Resumo: DDD como base arquitetural</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>DDD Fornece…</th>
+                        <th>Microsserviços Precisam de…</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Subdomínios e Contextos Delimitados</td>
+                        <td>Serviços autônomos e focados em domínio</td>
+                    </tr>
+                    <tr>
+                        <td>Contratos claros de integração</td>
+                        <td>APIs bem definidas, eventos controlados</td>
+                    </tr>
+                    <tr>
+                        <td>Modelos expressivos e ubíquos</td>
+                        <td>Código de negócio compreensível e testável</td>
+                    </tr>
+                    <tr>
+                        <td>Separação entre modelos internos e externos</td>
+                        <td>Baixo acoplamento entre serviços</td>
+                    </tr>
+                    <tr>
+                        <td>Estratégia para crescimento controlado</td>
+                        <td>Arquitetura escalável e sustentável</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Na próxima seção, finalizaremos com uma <strong>síntese de boas práticas</strong> e <strong>principais
+                    erros a evitar ao aplicar DDD</strong> — especialmente em times iniciantes.</p>
+            <hr>
+            <h2>7. Boas Práticas e Armadilhas Comuns no uso de DDD</h2>
+            <p>Domain-Driven Design é, antes de tudo, uma <strong>abordagem estratégica para enfrentar sistemas
+                    complexos</strong>. E como toda abordagem poderosa, ela pode ser <strong>mal utilizada</strong> — o
+                que não apenas neutraliza seus benefícios, mas pode até gerar mais confusão e acoplamento.</p>
+            <p>Nesta seção, reunimos <strong>boas práticas recomendadas por especialistas e pela literatura</strong>,
+                além de <strong>erros frequentes cometidos por times iniciantes</strong>, com sugestões concretas de
+                como evitá-los.</p>
+            <h3>7.1. Boas práticas ao aplicar DDD</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prática</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>✅ <strong>Comece pelo negócio, não pelo código</strong></td>
+                        <td>Converse com especialistas do domínio, observe o vocabulário, entenda o problema real antes
+                            de desenhar tabelas ou endpoints.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Adote e cultive a linguagem ubíqua</strong></td>
+                        <td>Use os mesmos termos em reuniões, documentação, testes, código e nome de variáveis. Essa
+                            consistência acelera o entendimento e reduz ambiguidades.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Modele com base nos comportamentos, não só nos dados</strong></td>
+                        <td>Entidades não são apenas conjuntos de campos — elas devem encapsular regras, decisões e
+                            estados do domínio.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Separe modelos de domínio de modelos de infraestrutura</strong></td>
+                        <td>Evite misturar regras de negócio com lógica de banco, frameworks ou serialização.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Identifique e respeite os bounded contexts</strong></td>
+                        <td>Cada contexto deve ter sua própria linguagem, modelo e fronteiras técnicas e organizacionais
+                            bem definidas.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Modele casos de uso reais, não apenas operações CRUD</strong></td>
+                        <td>Ex: <code>concluirTarefa()</code> faz mais sentido do que <code>updateTaskFlag()</code>. A
+                            intenção deve ser expressa claramente no código.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Escreva testes com linguagem do negócio</strong></td>
+                        <td>Testes são ótima forma de reforçar o modelo. Um bom teste revela o que o sistema faz com
+                            termos claros e domínios bem definidos.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Comece com um monólito modular</strong></td>
+                        <td>Você não precisa extrair microsserviços no início. Dominar o domínio e separar contextos em
+                            módulos é o passo mais importante.</td>
+                    </tr>
+                    <tr>
+                        <td>✅ <strong>Documente o Context Map</strong></td>
+                        <td>Mesmo que informal, mantenha um diagrama ou descrição dos contextos e seus relacionamentos.
+                            Isso guia decisões futuras.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>7.2. Armadilhas comuns (e como evitá-las)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Armadilha</th>
+                        <th>Problema causado</th>
+                        <th>Como evitar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>❌ <strong>Transformar DDD em “camadas técnicas” sem foco no domínio</strong></td>
+                        <td>Classes como <code>XService</code>, <code>YManager</code>, <code>ZUtils</code> que não
+                            representam nenhum conceito real</td>
+                        <td>Comece pela linguagem do negócio. Modele com base em entidades e comportamentos reais</td>
+                    </tr>
+                    <tr>
+                        <td>❌ <strong>Modelo anêmico (sem comportamento)</strong></td>
+                        <td>Entidades viram apenas estruturas de dados, sem regras ou decisões</td>
+                        <td>Encapsule lógica dentro das entidades, com métodos como <code>isOverdue()</code>,
+                            <code>canBeEditedBy()</code> etc.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>❌ <strong>Usar DDD em sistemas simples demais</strong></td>
+                        <td>Gera sobrecarga sem ganho real</td>
+                        <td>Avalie a complexidade do domínio. Use DDD quando há regras, decisões e variações relevantes
+                            no negócio</td>
+                    </tr>
+                    <tr>
+                        <td>❌ <strong>Confundir subdomínio com “entidade”</strong></td>
+                        <td>Tentar criar um microsserviço por tabela do banco</td>
+                        <td>Subdomínios representam <strong>funções do negócio</strong>, não objetos do banco</td>
+                    </tr>
+                    <tr>
+                        <td>❌ <strong>Compartilhar banco de dados entre contextos</strong></td>
+                        <td>Altíssimo acoplamento e quebra de encapsulamento</td>
+                        <td>Use APIs, eventos ou antifraudes (ACLs) para comunicação. Cada contexto tem seu modelo e
+                            persistência</td>
+                    </tr>
+                    <tr>
+                        <td>❌ <strong>Adotar eventos sem bounded context claro</strong></td>
+                        <td>Gera uma “eventosfera” caótica, sem controle ou sentido</td>
+                        <td>Só publique eventos de negócio com significado e com consumidores bem definidos</td>
+                    </tr>
+                    <tr>
+                        <td>❌ <strong>Ignorar colaboração com o especialista do domínio</strong></td>
+                        <td>O modelo vira uma abstração técnica irrelevante</td>
+                        <td>O domínio é construído em colaboração — mantenha o diálogo constante com os usuários e
+                            analistas</td>
+                    </tr>
+                    <tr>
+                        <td>❌ <strong>Microsserviços antes de entender o domínio</strong></td>
+                        <td>Só adiciona complexidade, sem autonomia real</td>
+                        <td>Primeiro separe contextos, depois (se necessário) extraia microsserviços</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>7.3. Dica de ouro: <em>“Entenda primeiro. Modele depois.”</em></h3>
+            <p>A principal armadilha do DDD é <strong>tratar como técnica o que é, na verdade, filosofia e
+                    estratégia</strong>.</p>
+            <ul>
+                <li>DDD não é sobre criar <code>AggregateRoot.java</code></li>
+                <li>DDD não é sobre usar <code>@Entity</code> com <code>@Service</code></li>
+                <li>DDD não é sobre separar pastas com nomes bonitos</li>
+            </ul>
+            <p>DDD é <strong>sobre entender profundamente o domínio de negócio</strong>, encontrar os limites naturais
+                de cada parte, <strong>explicitar os contratos entre elas</strong> e garantir que <strong>as decisões
+                    corretas sejam expressas no código</strong> — com clareza, com coesão, e com autonomia.</p>
+            <h3>7.4. Quando parar de modelar?</h3>
+            <p>É comum ouvir: “mas quando o modelo está bom o suficiente?”</p>
+            <p>Uma boa regra é:</p>
+            <blockquote>
+                <p><strong>Pare de modelar quando você consegue implementar as funcionalidades mais importantes do
+                        sistema de forma expressiva, compreensível e sem gambiarras.</strong></p>
+            </blockquote>
+            <p>Se você ainda precisa “dar um jeitinho” para contornar inconsistências, criar validações espalhadas ou
+                reimplementar lógicas em vários lugares... provavelmente ainda falta refinar o modelo ou dividir melhor
+                os contextos.</p>
+            <h3>7.5. Conclusão</h3>
+            <p>O Domain-Driven Design, quando bem aplicado, nos ajuda a <strong>desenvolver sistemas mais
+                    compreensíveis, sustentáveis e alinhados com a realidade do negócio</strong>. Ele <strong>não é uma
+                    bala de prata</strong>, mas é um conjunto de princípios que <strong>evita que a complexidade do
+                    sistema cresça de forma descontrolada</strong>.</p>
+            <p>Mais do que um padrão de arquitetura, o DDD nos convida a sermos <strong>modeladores
+                    conscientes</strong>, <strong>desenvolvedores curiosos</strong> e <strong>colaboradores ativos do
+                    entendimento do problema</strong>.</p>
+            <p>Se adotado com propósito, ele transforma não apenas o código — mas a forma como equipes inteiras pensam,
+                falam e constroem software.</p>
+            <hr>
+            <h1>8. Projeto Final da disciplina</h1>
+            <p>Na aula anterior, vocês exploraram mapearam seus <strong>Bounded Contexts</strong> e identificaram
+                potenciais candidatos para se tornarem microsserviços. Agora, o desafio é levar essa teoria para a
+                prática! Vocês vão iniciar a jornada de <strong>transformar um pedaço da sua aplicação em um
+                    microsserviço independente</strong>, aplicando diretamente os conceitos estratégicos e táticos do
+                DDD.</p>
+            <p>Sua equipe deverá escolher <strong>um (1) Bounded Context</strong> do projeto intermediário que
+                desenvolveram para a disciplina. O objetivo é criar um <strong>novo projeto Spring Boot</strong> que
+                represente esse microsserviço isolado.</p>
+            <h3>Etapas da Atividade:</h3>
+            <ol>
+                <li>
+                    <p><strong>Revisão e Delimitação Final do Bounded Context Escolhido:</strong></p>
+                    <ul>
+                        <li>Revisem o <strong>Bounded Context</strong> que sua equipe selecionou para a extração.
+                            Verifiquem se ele faz sentido à luz do que foi apresentado nessa aula.</li>
+                        <li>Reforcem a <strong>linguagem ubíqua</strong> específica desse contexto. Quais são os termos,
+                            entidades e operações que só fazem sentido aqui?</li>
+                        <li>Documentem brevemente a fronteira: o que pertence a este microsserviço e o que não pertence?
+                            Quais são as <strong>responsabilidades exclusivas</strong> dele?</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Criação do Novo Projeto do Microsserviço:</strong></p>
+                    <ul>
+                        <li>Criem um <strong>novo projeto Spring Boot</strong> separado do monólito original. Este será
+                            o repositório ou módulo do seu microsserviço.</li>
+                        <li>Dê a ele um nome que reflita seu <strong>Bounded Context</strong> (ex:
+                            <code>task-management-service</code>, <code>identity-access-service</code>).
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Migração do Modelo de Domínio e Lógica de Negócio (DDD Tático):</strong></p>
+                    <ul>
+                        <li><strong>Migrem</strong> ou <strong>recriem</strong> as classes de domínio relevantes
+                            (<code>Entidades</code>, <code>Value Objects</code>, <code>Aggregate Roots</code>) para
+                            dentro do novo projeto do microsserviço.</li>
+                        <li>Garanta que a <strong>lógica de negócio</strong> associada a essas classes esteja
+                            encapsulada dentro delas, seguindo os princípios do DDD tático (comportamento rico,
+                            invariantes nos agregados).</li>
+                        <li>Reorganize a estrutura de pacotes do novo microsserviço para refletir o
+                            <strong>DDD</strong>, utilizando pacotes como <code>domain/</code>,
+                            <code>application/</code>, <code>infrastructure/</code> dentro do seu contexto (ex:
+                            <code>com.seuprojeto.task.domain</code>, <code>com.seuprojeto.task.application</code>).
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Definição da API Externa (Contrato do Microsserviço):</strong></p>
+                    <ul>
+                        <li>O microsserviço precisará expor uma API para que outras partes do sistema (incluindo o
+                            monólito original) possam interagir com ele.</li>
+                        <li><strong>Definam e implementem endpoints REST</strong> (Controllers) no novo microsserviço
+                            que permitam realizar as operações principais do seu <strong>Bounded Context</strong>.</li>
+                        <li>Lembrem-se: essa API deve ser <strong>pública e bem definida</strong>, expondo apenas o
+                            necessário e evitando vazar detalhes internos do modelo de domínio do microsserviço. Use
+                            <strong>DTOs</strong> (Data Transfer Objects) para entrada e saída de dados, jamais expondo
+                            diretamente as entidades de domínio internas.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Adaptação do Monólito Original (Camada Anti-Corrupção - Desafio Extra,
+                            opcional):</strong></p>
+                    <ul>
+                        <li>No monólito original, onde o contexto extraído costumava viver, <strong>removam</strong> as
+                            classes e lógicas que foram migradas para o novo microsserviço.</li>
+                        <li><strong>Substituam</strong> as chamadas internas a essa lógica por chamadas para a
+                            <strong>nova API REST</strong> do microsserviço.
+                        </li>
+                        <li><strong>Desafio Extra (Camada Anti-Corrupção):</strong> Se houver complexidade na integração
+                            ou na tradução de modelos entre o monólito e o novo microsserviço, considerem a criação de
+                            uma <strong>Camada Anti-Corrupção (ACL)</strong> no monólito. Essa camada atuaria como um
+                            tradutor, adaptando o modelo do novo microsserviço para o modelo ainda existente no
+                            monólito, isolando o acoplamento.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h3>Exemplo de Aplicação (para um contexto de &quot;Gerenciamento de Tarefas&quot;):</h3>
+            <p>Suponha que vocês extraíram o <strong>Bounded Context &quot;Gerenciamento de Tarefas&quot;</strong> para
+                um novo microsserviço <code>task-service</code>.</p>
+            <p><strong>No novo Microsserviço (<code>task-service</code>):</strong></p>
+            <ul>
+                <li>Estrutura de pastas: <code>src/main/java/com/edtech/task/domain</code>,
+                    <code>com/edtech/task/application</code>, <code>com/edtech/task/infrastructure</code>.
+                </li>
+                <li>Classes como <code>Task</code>, <code>Title</code>, <code>Priority</code>, <code>Deadline</code>,
+                    <code>TaskId</code> (Value Objects e Aggregate Root) estariam no pacote <code>domain</code>.
+                </li>
+                <li>Um <code>TaskApplicationService</code> para coordenar operações no <code>application</code>.</li>
+                <li>Um <code>TaskController</code> no <code>infrastructure</code> (ou diretamente na raiz da API) com
+                    endpoints como <code>POST /tasks</code>, <code>PUT /tasks/{id}/complete</code>,
+                    <code>GET /tasks/{id}</code>.
+                </li>
+                <li>Os DTOs para <code>POST /tasks</code> seriam <code>CreateTaskRequest</code> (com título, prioridade,
+                    etc.), e para <code>GET /tasks/{id}</code> seria <code>TaskResponse</code> (com status, data, etc.).
+                </li>
+            </ul>
+            <p><strong>No Monólito Original:</strong></p>
+            <ul>
+                <li>Onde antes havia um <code>TaskService</code> monolítico, agora ele faria uma <strong>chamada
+                        HTTP</strong> para <code>http://task-service/api/tasks</code> para criar uma tarefa.</li>
+                <li>Pode ser necessário um cliente REST (ex: <code>RestTemplate</code> ou <code>WebClient</code> do
+                    Spring) para fazer essas chamadas. Pesquisem!</li>
+            </ul>
+            <h3>Formato da Entrega:</h3>
+            <p>Cada equipe deve entregar:</p>
+            <ol>
+                <li>
+                    <p><strong>Documentação da Extração (2-3 páginas):</strong></p>
+                    <ul>
+                        <li><strong>Bounded Context Escolhido:</strong> Qual foi o Bounded Context selecionado para
+                            extração e qual a sua justificativa (baseada em taxa de mudança, escalabilidade,
+                            criticidade)?</li>
+                        <li><strong>Context Map Simples:</strong> Um diagrama (mesmo que simples, em texto ou PlantUML)
+                            mostrando o novo microsserviço e como ele se relaciona com o monólito original. Indiquem o
+                            <strong>tipo de relacionamento</strong> (ex: Customer/Supplier).
+                        </li>
+                        <li><strong>Linguagem Ubíqua e Modelagem Tática:</strong> Descrevam os principais
+                            <strong>elementos táticos (Entidades, VOs, Agregados)</strong> que foram migrados e como
+                            eles aplicam a <strong>linguagem ubíqua</strong> desse contexto.
+                        </li>
+                        <li><strong>Contrato do Microsserviço:</strong> Listem os principais <strong>endpoints
+                                REST</strong> que o novo microsserviço expõe e quais são os <strong>DTOs</strong> de
+                            entrada/saída (nome e principais campos).</li>
+                        <li><strong>Adaptação do Monólito:</strong> Expliquem como o monólito original foi adaptado para
+                            se comunicar com o novo microsserviço (chamadas REST, e se houver, menção à ACL).</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Repositórios de Código:</strong></p>
+                    <ul>
+                        <li>O <strong>novo repositório (ou pasta/módulo)</strong> do microsserviço Spring Boot extraído.
+                        </li>
+                        <li>O <strong>repositório original do monólito</strong>, mostrando as modificações para se
+                            integrar ao novo serviço.</li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong>Demonstração (obrigatória):</strong></p>
+                    <ul>
+                        <li>Preparem uma breve demonstração da sua aplicação, mostrando o monólito chamando (ou
+                            interagindo de alguma forma) com o novo microsserviço.</li>
+                        <li>Estejam prontos para explicar o código e as decisões de design tomadas.</li>
+                    </ul>
+                </li>
+            </ol>
+            <p>Entrega no Moodle!</p>
+            <h1><strong>Bom trabalho!🛠️</strong></h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus
+                    Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
