@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 08 - Autenticação com JWT</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="Aula04.html"><span class="mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="Aula05.html"><span class="mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="Aula06.html"><span class="mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="Aula07.html"><span class="mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="Aula08.html"><span class="mr-0"></span>08 - REST V</a>
+                </li>
+                <li>
+                    <a href="Aula09.html"><span class="mr-0"></span>09 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="Aula10.html"><span class="mr-0"></span>10 - Microsserviços II</a>
+                </li>
+                <li class="active">
+                    <a href="Aula11.html"><span class="mr-0"></span>11 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços VI</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VII</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+
+
+
+
+
+
+            <h1><strong>Aula 11 – Duas soluções possíveis para o nosso Projeto</strong></h1>
+            <p>Na aula anterior, propusemos o projeto de extração de um Microsserviço. Agora, vamos propor duas soluções
+                distintas, com base no todo que fizemos em aula: uma considerando a extração do nosso <em>core
+                    subdomain</em> e outra considerando a extração de um <em>support subdomain</em> (autenticação e
+                autorização).</p>
+            <p>Bora?</p>
+            <h2>1. Contextualizando o Desafio</h2>
+            <p>Antes de mergulharmos nas soluções, vamos revisitar nosso ponto de partida. Atualmente, temos uma
+                aplicação monolítica de lista de tarefas (<em>To-Do List</em>). Embora bem estruturada em camadas, toda
+                a lógica de negócio reside em um único processo implantável. Os principais domínios que identificamos
+                são:</p>
+            <ol>
+                <li><strong>Gerenciamento de Tarefas (<code>Task Management</code>)</strong>: O coração da nossa
+                    aplicação. Lida com a criação, atualização, conclusão e listagem de tarefas. Este é o nosso
+                    <strong>Core Domain</strong>, a funcionalidade que entrega o principal valor ao nosso usuário.</li>
+                <li><strong>Identidade e Acesso (<code>Identity &amp; Access</code>)</strong>: Responsável por cadastrar
+                    usuários, autenticá-los e controlar suas permissões (roles). Este é um <strong>Supporting
+                        Subdomain</strong>, pois ele dá suporte à funcionalidade principal, mas não é o diferencial do
+                    produto.</li>
+            </ol>
+            <p>A extração de microsserviços, como vimos na Aula 10, é uma decisão estratégica que busca aumentar a
+                autonomia das equipes, a escalabilidade e a resiliência do sistema. A grande questão é: <strong>por onde
+                    começar?</strong></p>
+            <p>Não existe uma resposta única. A escolha depende dos objetivos de negócio e dos desafios técnicos que
+                queremos resolver primeiro. Vamos explorar duas abordagens estratégicas distintas, mostrando como
+                ficaria a implementação de cada uma.</p>
+            <hr>
+            <h2>2. Solução 1: Extraindo o Core Domain (Gerenciamento de Tarefas)</h2>
+            <p>A primeira abordagem consiste em extrair a funcionalidade mais crítica e central do nosso sistema, o
+                Gerenciamento de Tarefas, para um microsserviço dedicado.</p>
+            <h3>2.1. Por que extrair o Core Domain?</h3>
+            <p>Extrair o <em>Core Domain</em> é uma estratégia interessante quando:</p>
+            <ul>
+                <li><strong>A lógica de negócio é complexa e muda com frequência</strong>: Isolar o domínio principal
+                    permite que a equipe focada nele possa iterar e implantar novas funcionalidades de forma mais rápida
+                    e segura, sem impactar o resto do sistema.</li>
+                <li><strong>A escalabilidade é crítica</strong>: Por exemplo, se no nosso contexto a criação e consulta
+                    de tarefas for a operação mais demandada da aplicação, um serviço dedicado a isso pode ser escalado
+                    de forma independente para atender a picos de tráfego.</li>
+                <li><strong>Queremos inovação focada</strong>: Permite que a equipe de produto e desenvolvimento se
+                    concentre em melhorar a principal proposta de valor da aplicação com autonomia.</li>
+            </ul>
+            <p>É importante destacarmos que em um sistema real e complexo, é provável, e inclusive muitas vezes
+                desejável, que o <em>Core Domain</em> seja implementado através de múltiplos microsserviços. A ideia de
+                que um <em>Core Domain</em> equivale a um único microsserviço é uma simplificação que estamos fazendo
+                deliberadamente no nosso exemplo, mas na verdade essa não é a prática adotada visto que usualmente a
+                complexidade de um negócio real é muito maior que a do nosso exemplo: lembrem-se, o <em>Core Domain</em>
+                representa a área de negócio que contém a maior complexidade e a principal proposta de valor do produto,
+                e essa complexidade pode ser grande demais para ser gerenciada de forma coesa e eficiente dentro de uma
+                única unidade de implantação (um só microsserviço).</p>
+            <p>Por exemplo, imagine um <em>Core Domain</em> de uma plataforma de e-commerce focado na &quot;Jornada de
+                Compra do Cliente&quot;. Este é, sem dúvida, o coração do negócio. No entanto, ele pode ser decomposto
+                em microsserviços menores e mais coesos, como um <strong>Serviço de Carrinho de Compras</strong>, um
+                <strong>Serviço de Precificação e Promoções</strong>, um <strong>Serviço de Orquestração de
+                    Pagamento</strong> e um <strong>Serviço de Gestão de Pedidos</strong>. Todos eles pertencem ao mesmo
+                <em>Core Domain</em>, pois lidam com a lógica de negócio mais crítica e que muda com frequência, mas
+                cada um tem uma responsabilidade bem definida.</p>
+            <p>Ou seja, é importante ter isso em mente e não generalizar a nossa solução para o &quot;mundo real&quot;,
+                pois aqui nossa preocupação é puramente pedagógica.</p>
+            <h3>2.2. Arquitetura Proposta</h3>
+            <p>Nesta solução onde o <em>Core Domain</em> será extraído, teremos duas aplicações:</p>
+            <ol>
+                <li><strong><code>auth-service</code> (o antigo monólito)</strong>: Continuará responsável pelo cadastro
+                    de usuários, autenticação e geração de tokens JWT. Ele atuará como nosso <strong>Servidor de
+                        Autenticação</strong>.</li>
+                <li><strong><code>task-service</code> (o novo microsserviço)</strong>: Será o responsável exclusivo por
+                    toda a lógica de tarefas. Atuará como um <strong>Resource Server</strong>, protegendo seus endpoints
+                    e validando os tokens JWT gerados pelo <code>auth-service</code>.</li>
+            </ol>
+            <p>O fluxo de comunicação seria o seguinte:</p>
+            <ol>
+                <li>O cliente (frontend) se autentica no <code>auth-service</code> e obtém um token JWT.</li>
+                <li>Para qualquer operação com tarefas (criar, listar, etc.), o cliente faz a requisição para o
+                    <code>task-service</code>, enviando o token JWT no cabeçalho <code>Authorization</code>.</li>
+                <li>O <code>task-service</code> valida o token (verificando sua assinatura com a chave pública do
+                    <code>auth-service</code>) e, se válido, extrai o <code>userId</code> do token para associar a
+                    tarefa ao usuário correto.</li>
+            </ol>
+            <p>Perceba que essa arquitetura com dois serviços é um ótimo ponto de partida do ponto de vista pedagógico,
+                mas é natural pensar: e se amanhã tivermos não apenas o <code>task-service</code>, mas também um
+                <code>notification-service</code>, um <code>report-service</code> e um <code>payment-service</code>? Ou
+                seja, o que acontece se o sistema crescer? Vamos ter que ficar verificando validade de Tokens em todos
+                os microsserviços?</p>
+            <p>Se seguirmos o modelo atual, cada um desses serviços teria que ter sua própria cópia da lógica de
+                <code>SecurityConfig</code> para validar os tokens. Isso rapidamente vira um pesadelo:</p>
+            <ul>
+                <li><strong>Código duplicado por todo lado</strong>: Qualquer ajuste na validação do token (como
+                    adicionar uma nova verificação) precisaria ser replicado em cinco lugares diferentes. A chance de
+                    esquecer um e introduzir uma falha de segurança é enorme.</li>
+                <li><strong>Serviços &quot;poluídos&quot;</strong>: A responsabilidade de cada serviço deveria ser o seu
+                    domínio (tarefas, notificações, etc.), e não se preocupar com a infraestrutura de validação de
+                    tokens.</li>
+            </ul>
+            <p>É para evitar esse tipo de problema que um padrão muito comum em microsserviços entra em cena: o
+                <strong>API Gateway</strong>. A ideia é simples: em vez de cada serviço validar o token individualmente,
+                colocamos um &quot;porteiro&quot; na frente de todos eles. O API Gateway se torna o <strong>único ponto
+                    de entrada</strong> para a nossa aplicação. O fluxo, com um Gateway, ficaria assim:</p>
+            <ol>
+                <li>O cliente se autentica no <code>auth-service</code> e pega seu token.</li>
+                <li>O cliente envia <strong>todas</strong> as requisições (para tarefas, notificações, etc.) para o API
+                    Gateway, sempre com o token.</li>
+                <li><strong>É o Gateway quem valida o token</strong>. Se estiver tudo certo, ele repassa a requisição
+                    para o microsserviço correspondente (que agora não precisa mais se preocupar com isso).</li>
+            </ol>
+            <p>As vantagens são grandes:</p>
+            <ul>
+                <li><strong>Lógica centralizada</strong>: A validação de tokens, logs, métricas e outras preocupações
+                    &quot;transversais&quot; vivem em um só lugar.</li>
+                <li><strong>Serviços mais limpos</strong>: O <code>task-service</code> agora só se preocupa com tarefas.
+                    Ele simplesmente confia que, se a requisição chegou até ele, é porque o Gateway já fez o trabalho
+                    sujo da segurança. O Gateway pode até facilitar as coisas, extraindo o <code>userId</code> do token
+                    e passando como um cabeçalho simples (<code>X-User-ID: 123</code>) para os serviços internos.</li>
+            </ul>
+            <p>Tecnologias como <strong>Spring Cloud Gateway</strong> podem ser utilizadas para implementar esse padrão.
+            </p>
+            <p>Portanto, embora para o nosso exercício a validação em cada serviço seja um aprendizado inicial, em um
+                cenário real com múltiplos serviços, o caminho natural seria evoluir para um API Gateway. Novamente:
+                essa perspectiva não está sendo adotada agora para reduzirmos a complexidade.</p>
+            <h3>2.3. Passo a Passo para Implementação</h3>
+            <p>Vamos detalhar as etapas para realizar essa extração.</p>
+            <h4><strong>Passo 1: Criar o novo projeto <code>task-service</code></strong></h4>
+            <ol>
+                <li>Use o Spring Initializr para criar um novo projeto Spring Boot.</li>
+                <li>Nomeie o grupo como <code>br.ifsp.edu.todo</code>.</li>
+                <li>Nomeie o artefato como <code>task-service</code>.</li>
+                <li>Adicione as mesmas dependências que temos no projeto original relacionadas a Web, JPA, Validação,
+                    Segurança (OAuth2 Resource Server) e o driver do banco de dados, a saber: <code>Spring Web</code>,
+                    <code>Spring Data JPA</code>, <code>Validation</code>, <code>Spring Security</code>,
+                    <code>OAuth2 Resource Server</code>, <code>Lombok </code>, <code>MariaDB Driver</code> (ou
+                    <code>MySQL Driver</code>, dependendo do seu banco), <code>Flyway Migration</code> (estamos
+                    utilizando para gerenciar as migrations no projeto todo) e o <code>H2 Database</code> (banco de
+                    dados para os testes).</li>
+            </ol>
+            <h4><strong>Passo 2: Migrar a Lógica de Tarefas</strong></h4>
+            <ol>
+                <li>
+                    <p><strong>Mova as classes</strong> do projeto original para o <code>task-service</code>:</p>
+                    <ul>
+                        <li><strong>Model</strong>: <code>Task</code>, <code>Category</code>, <code>Priority</code>.
+                        </li>
+                        <li><strong>DTOs</strong>: <code>TaskRequestDTO</code>, <code>TaskResponseDTO</code>,
+                            <code>PagedResponse</code>.</li>
+                        <li><strong>Repository</strong>: <code>TaskRepository</code>.</li>
+                        <li><strong>Controller</strong>: <code>TaskController</code>.</li>
+                        <li><strong>Service</strong>: <code>TaskService</code>.</li>
+                        <li><strong>Exceptions</strong>: <code>InvalidTaskStateException</code>,
+                            <code>ResourceNotFoundException</code>.</li>
+                        <li><strong>Mappers</strong>: <code>PagedResponseMapper</code>.</li>
+                    </ul>
+                </li>
+            </ol>
+            <p>Nossa estrutura de diretórios do <code>task-service</code> ficaria algo como:</p>
+            <pre><code>task-service/
+└── src/
+    └── main/
+        ├── java/
+        │   └── br/
+        │       └── ifsp/
+        │           └── edu/
+        │               └── todo/
+        │                   └── task/
+        │                       ├── config/          // Configurações, como ModelMapper
+        │                       │   └── ModelMapperConfig.java
+        │                       ├── controller/
+        │                       │   └── TaskController.java
+        │                       ├── dto/
+        │                       │   ├── page/
+        │                       │   │   └── PagedResponse.java
+        │                       │   └── task/
+        │                       │       ├── TaskRequestDTO.java
+        │                       │       └── TaskResponseDTO.java
+        │                       ├── exception/
+        │                       │   ├── GlobalExceptionHandler.java // Essencial para tratar erros
+        │                       │   ├── InvalidTaskStateException.java
+        │                       │   ├── ErrorResponse.java        
+        │                       │   └── ResourceNotFoundException.java
+        │                       ├── mapper/
+        │                       │   └── PagedResponseMapper.java
+        │                       ├── model/
+        │                       │   ├── enumerations/  // Subpacote para enums
+        │                       │   │   ├── Category.java
+        │                       │   │   └── Priority.java
+        │                       │   └── Task.java
+        │                       ├── repository/
+        │                       │   └── TaskRepository.java
+        │                       ├── service/
+        │                       │   └── TaskService.java
+        │                       └── TaskServiceApplication.java // Classe principal
+        │
+        └── resources/
+            ├── db/migration/    // Scripts do Flyway para o banco de tarefas
+            │   └── V1__Create_Task_Table.sql
+            └── application.properties
+</code></pre>
+            <ol start="2">
+                <li>
+                    <p><strong>Ajuste a Entidade <code>Task</code></strong>:
+                        A entidade <code>Task</code> no projeto original tem uma relação <code>@ManyToOne</code> com a
+                        entidade <code>User</code>. Como o <code>task-service</code> não conhecerá a entidade
+                        <code>User</code> (que pertence a outro serviço), devemos quebrar essa associação direta.</p>
+                    <ul>
+                        <li><strong>Antes (no monólito):</strong>
+                            <pre><code class="language-java">@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = &quot;user_id&quot;, nullable = false)
+private User user;
+</code></pre>
+                        </li>
+                        <li><strong>Depois (no <code>task-service</code>):</strong>
+                            <pre><code class="language-java">@NotNull
+@Column(name = &quot;user_id&quot;)
+private Long userId;
+</code></pre>
+                        </li>
+                    </ul>
+                    <p> Agora, o <code>task-service</code> armazena apenas o <strong>ID do usuário</strong>, mantendo os
+                        serviços desacoplados.</p>
+                </li>
+            </ol>
+            <h4><strong>Passo 3: Configurar a Segurança no <code>task-service</code></strong></h4>
+            <p>O <code>task-service</code> precisa validar os tokens JWT. A configuração de segurança
+                (<code>SecurityConfig.java</code>) será a de um <strong>Resource Server</strong>.</p>
+            <pre><code class="language-java">// SecurityConfig.java no task-service
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Value(&quot;${jwt.public.key}&quot;)
+    private RSAPublicKey key;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -&gt; csrf.disable())
+            .authorizeHttpRequests(auth -&gt; auth
+                .anyRequest().authenticated() // Todas as rotas são protegidas
+            )
+            .oauth2ResourceServer(conf -&gt; conf.jwt(Customizer.withDefaults())) // Habilita validação de JWT
+            .sessionManagement(session -&gt; session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
+
+    @Bean
+    JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(this.key).build();
+    }
+}
+</code></pre>
+            <ul>
+                <li><strong>Atenção</strong>: O <code>task-service</code> precisa da <strong>chave pública
+                        (<code>app.pub</code>)</strong> para validar os tokens. A chave privada (<code>app.key</code>)
+                    permanece apenas no <code>auth-service</code>. Ou seja, temos que mover a <code>app.pub</code> para
+                    resources no nosso task-service.</li>
+            </ul>
+            <h4><strong>Passo 4: Adaptar o <code>TaskService</code> e <code>TaskController</code></strong></h4>
+            <p>A lógica para criar e consultar tarefas agora deve usar o <code>userId</code> extraído do token.</p>
+            <ul>
+                <li>
+                    <p><strong><code>TaskService.java</code> (método <code>createTask</code>)</strong></p>
+                    <pre><code class="language-java">// O service agora recebe o userId diretamente
+public TaskResponseDTO createTask(TaskRequestDTO taskDto, Long userId) {
+    // ... validações ...
+    Task task = modelMapper.map(taskDto, Task.class);
+    task.setUserId(userId); // Associa a tarefa ao ID do usuário
+    task.setCreatedAt(LocalDateTime.now());
+    task.setCompleted(false);
+    Task createdTask = taskRepository.save(task);
+    return modelMapper.map(createdTask, TaskResponseDTO.class);
+}
+</code></pre>
+                </li>
+                <li>
+                    <p><strong><code>TaskController.java</code> (método <code>createTask</code>)</strong>
+                        O controller irá extrair as informações do usuário do token JWT usando a anotação
+                        <code>@AuthenticationPrincipal</code>.</p>
+                    <pre><code class="language-java">@PostMapping
+public ResponseEntity&lt;TaskResponseDTO&gt; createTask(@Valid @RequestBody TaskRequestDTO task,
+        @AuthenticationPrincipal Jwt jwt) {
+    Long userId = jwt.getClaimAsLong(&quot;userId&quot;); // Extrai a claim &#39;userId&#39; do token
+    TaskResponseDTO taskResponseDTO = taskService.createTask(task, userId);
+    return ResponseEntity.status(HttpStatus.CREATED).body(taskResponseDTO);
+}
+</code></pre>
+                </li>
+            </ul>
+            <h4><strong>Passo 5: Remover a lógica de tarefas do monólito (<code>auth-service</code>)</strong></h4>
+            <p>No projeto original, remova todas as classes e dependências relacionadas a tarefas que foram migradas. O
+                monólito agora é o <code>auth-service</code> e sua única responsabilidade é a identidade.</p>
+            <ul>
+                <li>O <code>auth-service</code> (<code>JwtService</code>) deve ser ajustado para <strong>incluir o
+                        <code>userId</code> nas claims do token</strong> quando ele é gerado.
+                    <pre><code class="language-java">// JwtService.java no auth-service
+public String generateToken(User user) {
+    Instant now = Instant.now();
+    long expire = 3600L;
+
+    var claims = JwtClaimsSet.builder()
+            .issuer(&quot;auth-service&quot;)
+            .issuedAt(now)
+            .expiresAt(now.plusSeconds(expire))
+            .subject(user.getUsername())
+            .claim(&quot;userId&quot;, user.getId()) // &lt;--- ADICIONAR ESTA CLAIM
+            .build();
+
+    return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+}
+</code></pre>
+                </li>
+            </ul>
+            <h3>2.4. Vantagens e Desvantagens desta Abordagem</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th align="left">Vantagens</th>
+                        <th align="left">Desvantagens</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td align="left">✅ Foco total na evolução do <strong>Core Domain</strong>.</td>
+                        <td align="left">❌ O monólito original ainda retém a complexidade de autenticação.</td>
+                    </tr>
+                    <tr>
+                        <td align="left">✅ Escalabilidade isolada para a funcionalidade mais usada.</td>
+                        <td align="left">❌ Requer um mecanismo de comunicação de rede entre os serviços.</td>
+                    </tr>
+                    <tr>
+                        <td align="left">✅ A equipe de tarefas ganha autonomia total de implantação.</td>
+                        <td align="left">❌ Aumenta a complexidade operacional (dois serviços para gerenciar).</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr>
+            <h2>3. Solução 2: Extraindo o Supporting Subdomain (Autenticação e Autorização)</h2>
+            <p>A segunda abordagem é extrair o domínio de suporte de <strong>Identidade e Acesso</strong> para um
+                microsserviço dedicado. Esta é uma estratégia muito comum, pois a gestão de identidade é uma
+                funcionalidade genérica, bem delimitada e fundamental para a criação de um ecossistema de serviços
+                coeso.</p>
+            <h3>3.1. Por que extrair o Domínio de Suporte?</h3>
+            <p>Extrair um <em>Supporting Subdomain</em> como o de autenticação é vantajoso quando:</p>
+            <ul>
+                <li><strong>Queremos reutilizar a solução de identidade</strong>: Um serviço de autenticação
+                    centralizado pode servir a múltiplos outros serviços ou aplicações no futuro.</li>
+                <li><strong>Buscamos simplificar o Core Domain</strong>: Ao mover a complexidade da segurança para fora,
+                    o serviço principal (que continuará com a lógica de tarefas) pode se concentrar exclusivamente em
+                    sua regra de negócio.</li>
+                <li><strong>A equipe de segurança/infra é diferente</strong>: Permite que uma equipe especializada
+                    gerencie a identidade, enquanto outras equipes consomem essa funcionalidade como um serviço.</li>
+            </ul>
+            <h3>3.2. Arquitetura Proposta</h3>
+            <p>Nesta solução, a divisão de responsabilidades se inverte em relação à primeira abordagem:</p>
+            <ol>
+                <li><strong><code>auth-service</code> (o novo microsserviço)</strong>: Será responsável por cadastro,
+                    login, gerenciamento de usuários/roles e emissão de tokens JWT. Atuará como nosso <strong>Servidor
+                        de Autenticação e Autorização</strong>.</li>
+                <li><strong><code>task-service</code> (o antigo monólito, agora focado)</strong>: Continuará responsável
+                    pelo gerenciamento de tarefas, mas agora atuará como um <strong>Resource Server</strong>, consumindo
+                    e validando os tokens gerados pelo <code>auth-service</code>.</li>
+            </ol>
+            <p>O fluxo de comunicação do usuário final seria idêntico ao da Solução 1, mas a origem e o destino das
+                responsabilidades de cada serviço são diferentes.</p>
+            <h3>3.3. Perspectiva Estrutural e de Decisão de Negócio</h3>
+            <p><strong>Do ponto de vista da implementação, o código final resultante desta solução seria praticamente
+                    idêntico ao da Solução 1.</strong>. Por esse motivo, não é necessário replicá-lo aqui novamente.</p>
+            <p>Teríamos um <code>auth-service</code> gerando tokens com uma <em>claim</em> <code>userId</code> e um
+                <code>task-service</code> validando esses tokens para autorizar as operações. A diferença crucial não
+                está no código final, mas na <strong>estratégia de migração</strong> e nas <strong>implicações para o
+                    negócio</strong>.</p>
+            <p>Diferente da primeira solução, onde criamos um novo serviço para o <em>Core Domain</em>, aqui o processo
+                é o de &quot;esculpir&quot; o serviço de autenticação a partir do monólito existente. O projeto
+                monolítico original não é descartado; pelo contrário, ele é o ponto de partida que será
+                &quot;limpo&quot; e simplificado. Toda a lógica de identidade, cadastro e segurança de autenticação
+                (controllers, services, repositories e entidades como <code>User</code> e <code>Role</code>) seria
+                movida para um projeto completamente novo: o <code>auth-service</code>.</p>
+            <p>O que resta no projeto original? Exatamente o nosso <em>Core Domain</em>. Ele se torna, por definição, o
+                <code>task-service</code>. Sua responsabilidade é afunilada, e seu código é reduzido, removendo-se tudo
+                que não diz respeito à gestão de tarefas. Naturalmente, ele precisaria passar por adaptações: a entidade
+                <code>Task</code> passaria a referenciar um <code>userId</code> em vez de uma entidade <code>User</code>
+                completa, e sua configuração de segurança seria alterada para atuar como um <em>Resource Server</em>,
+                apenas validando tokens.</p>
+            <p>A decisão de extrair primeiro um domínio de suporte é frequentemente vista como uma <strong>estratégia
+                    pragmática e de menor risco</strong> por várias razões de negócio:</p>
+            <ol>
+                <li><strong>Criação de um Ativo Estratégico</strong>: Ao isolar a autenticação, a empresa cria
+                    imediatamente um ativo reutilizável. Qualquer novo microsserviço (<code>notification-service</code>,
+                    <code>report-service</code>, etc.) que surgir no futuro pode se integrar a este
+                    <code>auth-service</code> central, acelerando o desenvolvimento e garantindo uma base de usuários
+                    unificada.</li>
+                <li><strong>Redução da Carga Cognitiva</strong>: A equipe que desenvolve o <em>Core Domain</em>
+                    (tarefas) é liberada da complexidade de gerenciar segurança, criptografia e tokens. Ela pode focar
+                    100% em entregar valor ao usuário final, consumindo a segurança como uma utilidade. Isso permite
+                    maior especialização e agilidade.</li>
+                <li><strong>Fundação para o Ecossistema</strong>: Este padrão estabelece uma base sólida para um
+                    ecossistema de microsserviços. O <code>auth-service</code> se torna a porta de entrada de
+                    identidade, e padrões como o API Gateway, discutido na Solução 1, se encaixam perfeitamente neste
+                    modelo, centralizando a validação de tokens antes de distribuir as chamadas para os serviços de
+                    negócio.</li>
+                <li><strong>Risco Controlado</strong>: A lógica de autenticação, por ser mais estável e genérica,
+                    geralmente representa um risco menor de extração em comparação com o <em>Core Domain</em>, que tende
+                    a ser mais volátil e intrinsecamente complexo. Começar por aqui permite que a equipe ganhe
+                    experiência com a arquitetura de microsserviços em um domínio bem definido antes de abordar as
+                    partes mais críticas do negócio.</li>
+            </ol>
+            <p>Em resumo, esta abordagem prioriza a construção de uma fundação robusta e reutilizável, simplificando a
+                aplicação principal e preparando o terreno para uma expansão futura de forma organizada e escalável.</p>
+            <h3>3.4. Vantagens e Desvantagens desta Abordagem</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th align="left">Vantagens</th>
+                        <th align="left">Desvantagens</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td align="left">✅ Cria um serviço de identidade <strong>reutilizável</strong>.</td>
+                        <td align="left">❌ A lógica de negócio principal (<code>Task</code>) ainda reside em um monólito
+                            que pode ter outras responsabilidades.</td>
+                    </tr>
+                    <tr>
+                        <td align="left">✅ <strong>Simplifica o Core Domain</strong>, que não precisa mais se preocupar
+                            com segurança.</td>
+                        <td align="left">❌ Requer que a equipe do Core Domain integre-se com uma API externa para obter
+                            informações do usuário, se necessário.</td>
+                    </tr>
+                    <tr>
+                        <td align="left">✅ Alinha-se bem com padrões de mercado (ex: ter um serviço de SSO).</td>
+                        <td align="left">❌ A complexidade da extração inicial pode ser maior se o acoplamento entre
+                            usuário e tarefas for muito alto no código legado.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr>
+            <h2>4. Bônus! Uma Terceira Solução: Criando um Serviço Agregador com Anti-Corruption Layer (ACL)</h2>
+            <p>Nesta terceira abordagem, não vamos extrair nada do monólito original. Em vez disso, vamos assumir que a
+                <strong>Solução 1</strong> já foi implementada: temos um <code>auth-service</code> e um
+                <code>task-service</code> independentes e funcionais. O código da Solução 1 já está disponibilizado no
+                Moodle.</p>
+            <p>O nosso objetivo agora é criar um terceiro microsserviço, chamado
+                <strong><code>report-service</code></strong>, com uma responsabilidade muito específica: gerar um
+                relatório de produtividade de um usuário. Para isso, ele precisará consumir dados dos outros dois
+                serviços, atuando como um <strong>orquestrador</strong> ou <strong>agregador</strong>. A ideia aqui é
+                demonstrar uma outra possibilidade de criação de microsserviço, que em um primeiro momento não seria
+                possível já que o nosso escopo original do to-do list era bastante restrito.</p>
+            <h3>4.1. Por que criar um Serviço Agregador?</h3>
+            <p>A criação de um serviço agregador como o <code>report-service</code> propicia uma série de benefícios:
+            </p>
+            <ul>
+                <li><strong>Simplifica o Cliente (Frontend)</strong>: Em vez de o frontend ter que fazer duas chamadas
+                    separadas (uma para o <code>task-service</code> para pegar as tarefas e outra para o
+                    <code>auth-service</code> para pegar os dados do usuário) e juntar as informações no lado do
+                    cliente, ele faz uma única chamada para o <code>report-service</code>, que entrega os dados já
+                    consolidados.</li>
+                <li><strong>Encapsula a Lógica de Orquestração</strong>: A complexidade de saber &quot;quais serviços
+                    chamar e em que ordem&quot; fica contida dentro do <code>report-service</code>. Se no futuro for
+                    preciso chamar um terceiro serviço (ex: <code>gamification-service</code>), o frontend não precisa
+                    saber; apenas o <code>report-service</code> é alterado.</li>
+                <li><strong>Cria Novas Visões de Dados</strong>: Permite criar novas representações e junções de dados
+                    que não foram originalmente previstas pelos serviços individuais, agregando novo valor ao negócio
+                    sem precisar modificar os serviços já existentes e estáveis.</li>
+                <li><strong>Mantém a Autonomia dos Domínios</strong>: O <code>task-service</code> continua não
+                    precisando saber nada sobre os detalhes de um usuário, e o <code>auth-service</code> não sabe nada
+                    sobre tarefas. O <code>report-service</code> funciona como uma camada especializada que entende como
+                    relacionar esses dois contextos distintos.</li>
+            </ul>
+            <h3>4.2. Arquitetura Proposta</h3>
+            <p>O fluxo de comunicação para esta nova funcionalidade seria:</p>
+            <ol>
+                <li>O cliente (frontend) se autentica no <code>auth-service</code> e obtém um token JWT.</li>
+                <li>O cliente faz uma requisição para o novo serviço, por exemplo:
+                    <code>GET /reports/productivity/{userId}</code>, enviando o token JWT no cabeçalho
+                    <code>Authorization</code>.</li>
+                <li>O <strong><code>report-service</code></strong> recebe a requisição. Por ser um <em>Resource
+                        Server</em>, ele primeiro valida o token JWT para garantir que a chamada é autêntica.</li>
+                <li>Dentro do <code>report-service</code>:
+                    a. Ele usa um <strong><code>RestTemplate</code></strong> para fazer uma chamada interna para o
+                    <code>task-service</code> (ex: <code>GET /tasks?userId={userId}</code>) para buscar todas as tarefas
+                    daquele usuário, passando o token JWT adiante.
+                    b. Ele usa outro <strong><code>RestTemplate</code></strong> para fazer uma chamada para o
+                    <code>auth-service</code> (ex: <code>GET /users/{userId}</code>) para buscar o nome e email do
+                    usuário.</li>
+                <li>O <code>report-service</code> junta as informações, monta um DTO de relatório
+                    (<code>ProductivityReportDTO</code>) e o retorna para o cliente.</li>
+            </ol>
+            <h3>4.3. O Papel do <code>RestTemplate</code> e do Anti-Corruption Layer (ACL)</h3>
+            <p>O <code>RestTemplate</code> é a ferramenta clássica do Spring Framework para realizar chamadas HTTP
+                client. No nosso <code>report-service</code>, ele será o mecanismo para se comunicar com as APIs REST do
+                <code>auth-service</code> e do <code>task-service</code>.</p>
+            <p>Para isso, configuramos um <code>Bean</code> de <code>RestTemplate</code> na nossa aplicação:</p>
+            <pre><code class="language-java">@Configuration
+public class AppConfig {
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+</code></pre>
+            <p>E este <code>RestTemplate</code> será então injetado nos componentes que precisam fazer as chamadas
+                externas.</p>
+            <p>Já a ACL é um padrão de design (DDD) importante nesse caso. O <code>report-service</code> tem seu próprio
+                domínio (relatórios), e ele <strong>não deve ser &quot;contaminado&quot; pelos modelos de domínio dos
+                    outros serviços</strong>. Se o <code>report-service</code> usasse diretamente os DTOs do
+                <code>task-service</code> (<code>TaskResponseDTO</code>) em sua lógica interna, qualquer mudança no
+                <code>task-service</code> poderia quebrar o <code>report-service</code>.</p>
+            <p>O ACL previne isso. Ele funciona como uma camada de &quot;tradução&quot; na fronteira do nosso serviço.
+            </p>
+            <p><strong>Como implementar o ACL:</strong></p>
+            <ol>
+                <li>
+                    <p><strong>Modelos Internos</strong>: Dentro do <code>report-service</code>, criamos nossas próprias
+                        representações de dados, simples e focadas no que precisamos.</p>
+                    <pre><code class="language-java">// Modelo interno no report-service
+public record UserInfo(Long id, String name, String email) {}
+public record TaskInfo(String title, boolean isCompleted, LocalDate dueDate) {}
+</code></pre>
+                </li>
+                <li>
+                    <p><strong>Modelos Externos (Stubs)</strong>: Criamos DTOs que representam exatamente a estrutura de
+                        dados que o serviço externo nos retorna.</p>
+                    <pre><code class="language-java">// DTO que espelha a resposta do task-service
+public record ExternalTaskDTO(UUID id, String title, String description, boolean completed, String priority, LocalDate dueDate) {}
+</code></pre>
+                </li>
+                <li>
+                    <p><strong>A Camada de Tradução (O ACL)</strong>: Criamos uma classe cuja única responsabilidade é
+                        chamar o serviço externo e traduzir o modelo externo para o nosso modelo interno.</p>
+                    <pre><code class="language-java">@Component
+public class TaskServiceACL {
+
+    private final RestTemplate restTemplate;
+    // ... construtor
+
+    public List&lt;TaskInfo&gt; findTasksByUser(Long userId, String token) {
+        // Lógica para adicionar o token no header da requisição
+        // ...
+        
+        // Chama a API externa
+        ResponseEntity&lt;ExternalTaskDTO[]&gt; response = restTemplate.exchange(
+            &quot;http://task-service/api/tasks?userId=&quot; + userId, 
+            HttpMethod.GET, 
+            httpEntity, // Entidade com headers (token)
+            ExternalTaskDTO[].class
+        );
+        
+        // TRADUÇÃO: Mapeia o modelo externo para o interno
+        return Arrays.stream(response.getBody())
+                     .map(externalTask -&gt; new TaskInfo(
+                         externalTask.title(), 
+                         externalTask.completed(), 
+                         externalTask.dueDate()
+                     ))
+                     .collect(Collectors.toList());
+    }
+}
+</code></pre>
+                </li>
+            </ol>
+            <p>A lógica de negócio do <code>report-service</code> <strong>só conhece e manipula <code>UserInfo</code> e
+                    <code>TaskInfo</code></strong>. Ela nunca vê um <code>ExternalTaskDTO</code>. Se o
+                <code>task-service</code> adicionar um novo campo ao seu DTO, o <code>report-service</code> não quebra;
+                apenas a camada de tradução (ACL) precisaria ser ajustada se quiséssemos usar o novo campo.</p>
+            <h3>4.4. Vantagens e Desvantagens desta Abordagem</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th align="left">Vantagens</th>
+                        <th align="left">Desvantagens</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td align="left">✅ <strong>Alta Coesão e Baixo Acoplamento</strong>: O ACL garante que os
+                            serviços permaneçam desacoplados.</td>
+                        <td align="left">❌ <strong>Aumento da Complexidade Operacional</strong>: Mais um serviço para
+                            implantar, monitorar e gerenciar.</td>
+                    </tr>
+                    <tr>
+                        <td align="left">✅ <strong>Agilidade para Novas Funcionalidades</strong>: Permite criar novas
+                            visões de dados sem alterar serviços existentes.</td>
+                        <td align="left">❌ <strong>Latência de Rede</strong>: Uma requisição do cliente agora dispara
+                            múltiplas chamadas na rede interna, aumentando o tempo de resposta.</td>
+                    </tr>
+                    <tr>
+                        <td align="left">✅ <strong>Simplificação do Frontend</strong>: Reduz o número de chamadas e a
+                            lógica no lado do cliente.</td>
+                        <td align="left">❌ <strong>Ponto Único de Falha</strong>: Se o <code>report-service</code>
+                            falhar, a funcionalidade de relatório fica indisponível.</td>
+                    </tr>
+                    <tr>
+                        <td align="left">✅ <strong>Promove o Reúso</strong>: Os serviços base (<code>auth</code> e
+                            <code>task</code>) são genéricos e podem ser consumidos por muitos outros agregadores.</td>
+                        <td align="left">❌ <strong>Pode virar um &quot;mini-monólito&quot;</strong>: Se muitas lógicas
+                            de orquestração forem adicionadas, o serviço pode ficar complexo e difícil de manter.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>No Moodle disponibilizei também o código-fonte com a <code>report-service</code>. Deem uma olhada!</p>
+            <hr>
+            <h2>5. Conclusão: Qual Caminho Seguir?</h2>
+            <p>Nesta aula, vimos que a jornada para uma arquitetura de microsserviços não tem um mapa único, mas sim um
+                conjunto de estratégias que aplicamos de acordo com o contexto e a maturidade do nosso sistema.
+                Exploramos três caminhos distintos, cada um com seu momento e propósito.</p>
+            <p>As <strong>Soluções 1 e 2</strong> representam as clássicas decisões de <strong>decomposição de um
+                    monólito</strong>. Elas respondem à pergunta: &quot;Por onde começar a quebrar?&quot;.</p>
+            <ul>
+                <li>
+                    <p>A escolha de <strong>extrair o Core Domain (Solução 1)</strong> é o caminho a seguir quando a
+                        lógica de negócio principal é o maior gargalo, complexa e precisa evoluir rapidamente, livre das
+                        amarras do restante do sistema. O objetivo é dar autonomia total à equipe que cuida da principal
+                        proposta de valor do produto.</p>
+                </li>
+                <li>
+                    <p>Por outro lado, <strong>extrair um Supporting Subdomain (Solução 2)</strong>, como o de
+                        identidade, é uma jogada de fundação. Priorizamos a criação de um ativo reutilizável que servirá
+                        de base para um ecossistema futuro, enquanto simplificamos os nossos serviços de negócio ao
+                        remover deles responsabilidades genéricas.</p>
+                </li>
+            </ul>
+            <p>Já a <strong>Solução 3 (Serviço Agregador)</strong> nos mostra o passo seguinte na jornada: a
+                <strong>composição e evolução</strong> de um sistema que já é distribuído. Ela responde à pergunta:
+                &quot;Como criar novas funcionalidades sobre os serviços que já existem?&quot;.</p>
+            <p>O nosso serviço agregador, protegido por um Anti-Corruption Layer (ACL), nos permite inovar na
+                &quot;superfície&quot; do nosso ecossistema, criando novas visões de dados e simplificando a vida dos
+                clientes (frontends) sem perturbar os serviços base.</p>
+            <p>Portanto, a pergunta &quot;Qual caminho seguir?&quot; se desdobra para &quot;Qual é o nosso desafio
+                <em>agora</em>?&quot;.</p>
+            <ul>
+                <li>O gargalo é a inovação no core? <strong>Decomponha-o (Solução 1)</strong>.</li>
+                <li>Precisamos de uma base sólida e reutilizável para o futuro? <strong>Decomponha um serviço de suporte
+                        (Solução 2)</strong>.</li>
+                <li>Os serviços existentes são estáveis, mas precisamos de uma nova funcionalidade que os combine?
+                    <strong>Componha-os com um agregador (Solução 3)</strong>.</li>
+            </ul>
+            <p>Independentemente da escolha, o mais importante é que a decisão seja guiada pelos princípios do
+                <strong>Domain-Driven Design (DDD)</strong>. Identificar corretamente seus subdomínios e <em>bounded
+                    contexts</em> é o primeiro e mais importante passo para uma arquitetura de microsserviços
+                bem-sucedida e sustentável.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus
+                    Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
