@@ -76,926 +76,1079 @@
 
         <div id="content" class="p-4 p-md-5 pt-5">
 
-            <h1><strong>Aula 01 - Revisão de Análise e Programação Orientada a Objetos</strong></h1>
-            <hr>
-            <h2><strong>Revisão de APO1</strong></h2>
-            <p><strong>Objetivo:</strong> Relembrar fundamentos de Java, OOP, coleções, tratamento de erros e UML
-                básico.
-            </p>
-            <h3><strong>Sintaxe Java e Estruturas de Controle</strong></h3>
-            <p><strong>Conteúdo:</strong> </p>
-            <ul>
-                <li>Tipos primitivos, operadores (lógicos, relacionais, ternários). </li>
-                <li>Estruturas de decisão (<code>if-else</code>, <code>switch</code>), repetição (<code>for</code>,
-                    <code>while</code>, <code>do-while</code>).
-                </li>
-                <li>Boas práticas: legibilidade e eficiência.</li>
-            </ul>
-            <h3>1. Sintaxe Básica do Java</h3>
-            <h4>1.1 Tipos Primitivos e Variáveis</h4>
-            <p>No Java, os tipos primitivos representam valores simples, não objetos, e são otimizados para performance.
-                Entre
-                eles temos:</p>
-            <ul>
-                <li><strong>byte</strong> (8 bits, -128 a 127)</li>
-                <li><strong>short</strong> (16 bits, -32768 a 32767)</li>
-                <li><strong>int</strong> (32 bits, -2.147.483.648 a 2.147.483.647)</li>
-                <li><strong>long</strong> (64 bits)</li>
-                <li><strong>float</strong> (32 bits, ponto flutuante)</li>
-                <li><strong>double</strong> (64 bits, ponto flutuante, maior precisão)</li>
-                <li><strong>char</strong> (16 bits, representa um caractere Unicode)</li>
-                <li><strong>boolean</strong> (pode ser <code>true</code> ou <code>false</code>)</li>
-            </ul>
-            <p>Ao declarar uma variável, fazemos:</p>
-            <pre><code class="language-java">int idade = 25;
+
+
+
+
+         <h1><strong>Aula 01 - Revisão sobre Java e POO</strong></h1>
+<p>O objetivo principal desta disciplina é o desenvolvimento de APIs e microsserviços com Java e Spring Boot. Contudo, a construção de software depende diretamente do domínio de seus fundamentos. É por isso que nesse primeiro momento faremos uma ampla revisão dos pilares da programação orientada a objetos com Java.</p>
+<p>Nesta revisão estratégica de APOO1 e APOO2, não vamos apenas relembrar a sintaxe, mas entender o &quot;porquê&quot; por trás de cada conceito. Por que preferir composição à herança em certos cenários? Como as coleções do Java Framework otimizam nosso trabalho? De que forma o tratamento de exceções torna nossas aplicações mais confiáveis?</p>
+<p>Este material foi desenhado para ser um guia prático e consolidar esta base essencial, que será a chave para desenvolvermos, juntos, soluções de software cada vez mais sofisticadas.</p>
+<p><strong>ATENÇÃO!</strong></p>
+<p>Essa é a orientação mais importante que vou passar para vocês: <strong>não utilize ferramentas de IA para solucionar os exercícios.</strong> O objetivo agora é que vocês se dediquem a entender os fundamentos, enfrentando os desafios e raciocinando sobre os problemas <strong>por conta própria.</strong>. Esse <em>ainda</em> não é o momento de usar essas ferramentas e esse esforço é necessário para que, no futuro, vocês possam utilizá-las da forma correta: como aliadas que aumentam a produtividade, e não como um recurso que gera dependência. IAs servem para acelerar o trabalho, não se deixem tornar desenvolvedores que dependem dela para fazer o básico.</p>
+<p>Entendido? Então vamos lá!</p>
+
+<hr>
+<h2><strong>PARTE I - Fundamentos da Linguagem Java</strong></h2>
+<h3><strong>1. Sintaxe Básica do Java</strong></h3>
+<h3><strong>1.1. Tipos Primitivos e Variáveis</strong></h3>
+<p>No Java, os tipos primitivos representam valores simples, não objetos, e são otimizados para performance. Entre eles temos:</p>
+<ul>
+<li><strong>byte</strong> (8 bits, -128 a 127)</li>
+<li><strong>short</strong> (16 bits, -32768 a 32767)</li>
+<li><strong>int</strong> (32 bits, -2.147.483.648 a 2.147.483.647)</li>
+<li><strong>long</strong> (64 bits)</li>
+<li><strong>float</strong> (32 bits, ponto flutuante)</li>
+<li><strong>double</strong> (64 bits, ponto flutuante, maior precisão)</li>
+<li><strong>char</strong> (16 bits, representa um caractere Unicode)</li>
+<li><strong>boolean</strong> (pode ser <code>true</code> ou <code>false</code>)</li>
+</ul>
+<p>Ao declarar uma variável, fazemos:</p>
+<pre><code class="language-java">int idade = 25;
 double salario = 2500.75;
 boolean ativo = true;
 </code></pre>
-            <h3>1.2 Operadores</h3>
-            <ul>
-                <li><strong>Aritméticos</strong>: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>,
-                    <code>%</code>
-                </li>
-                <li><strong>Lógicos</strong>: <code>&amp;&amp;</code> (E), <code>||</code> (OU), <code>!</code> (NÃO)
-                </li>
-                <li><strong>Relacionais</strong>: <code>==</code>, <code>!=</code>, <code>&gt;</code>,
-                    <code>&gt;=</code>,
-                    <code>&lt;</code>, <code>&lt;=</code>
-                </li>
-                <li><strong>Unários</strong>: <code>++</code> (incremento), <code>--</code> (decremento)</li>
-                <li><strong>Ternário</strong>: <code>condicao ? valorSeVerdadeiro : valorSeFalso</code></li>
-            </ul>
-            <p>Exemplo de operador ternário:</p>
-            <pre><code class="language-java">int x = (5 &gt; 3) ? 10 : 0; // x será 10
+<h3><strong>1.2. Operadores</strong></h3>
+<ul>
+<li><strong>Aritméticos</strong>: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code></li>
+<li><strong>De Atribuição</strong>:<ul>
+<li><code>=</code> (Atribuição simples): Atribui o valor da direita à variável da esquerda.</li>
+<li><code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>, <code>%=</code> (Atribuição composta): Realiza uma operação aritmética e atribui o resultado à variável. Por exemplo, <code>x += y</code> é uma forma abreviada de <code>x = x + y</code>.</li>
+</ul>
+</li>
+<li><strong>Relacionais</strong>: <code>==</code>, <code>!=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code></li>
+<li><strong>Lógicos</strong>: <code>&amp;&amp;</code> (E), <code>||</code> (OU), <code>!</code> (NÃO)</li>
+<li><strong>Unários</strong>: <code>++</code> (incremento), <code>--</code> (decremento)</li>
+<li><strong>Ternário</strong>: <code>condicao ? valorSeVerdadeiro : valorSeFalso</code></li>
+</ul>
+<p><strong>Exemplo de Operadores de Atribuição:</strong></p>
+<pre><code class="language-java">int saldo = 100;
+saldo += 50; // Equivalente a: saldo = saldo + 100; (saldo agora é 150)
+saldo -= 20; // Equivalente a: saldo = saldo - 20; (saldo agora é 130)
+
+int x = (5 &gt; 3) ? 10 : 0; // Exemplo de ternário, que também faz uma atribuição
 </code></pre>
-            <h3>1.3 Estruturas de Controle</h3>
-            <ul>
-                <li><strong>if/else</strong>:
-                    <pre><code class="language-java">if (idade &gt;= 18) {
+<h3><strong>1.3. Estruturas de Controle</strong></h3>
+<p>Estruturas de controle direcionam o fluxo de execução do programa.</p>
+<ul>
+<li><strong>Decisão (<code>if-else</code>, <code>switch</code>)</strong>:</li>
+</ul>
+<pre><code class="language-java">if (idade &gt;= 18) {
     System.out.println(&quot;Maior de idade&quot;);
 } else {
     System.out.println(&quot;Menor de idade&quot;);
 }
 </code></pre>
-                </li>
-                <li><strong>switch</strong>:
-                    <pre><code class="language-java">switch (diaDaSemana) {
-    case 1: System.out.println(&quot;Segunda&quot;); break;
-    case 2: System.out.println(&quot;Terça&quot;); break;
-    // ...
-    default: System.out.println(&quot;Dia inválido&quot;); break;
+<ul>
+<li><p><strong>Repetição (<code>for</code>, <code>for-each</code>, <code>while</code>, <code>do-while</code>)</strong>:</p>
+</li>
+<li><p><strong><code>for</code> tradicional</strong>: Ideal quando você precisa de acesso ao índice ou tem um controle mais complexo sobre a iteração.</p>
+</li>
+</ul>
+<pre><code class="language-java">for (int i = 0; i &lt; 5; i++) {
+    System.out.println(&quot;O valor de i é: &quot; + i);
 }
 </code></pre>
-                </li>
-                <li><strong>for</strong> (tradicional):
-                    <pre><code class="language-java">for (int i = 0; i &lt; 10; i++) {
-    System.out.println(i);
+<ul>
+<li><strong><code>for-each</code> (Enhanced for loop)</strong>: A forma mais simples e segura de percorrer todos os elementos de um array ou coleção, sem se preocupar com índices.</li>
+</ul>
+<pre><code class="language-java">List&lt;String&gt; nomes = Arrays.asList(&quot;Ana&quot;, &quot;João&quot;, &quot;Carlos&quot;);
+
+for (String nome : nomes) {
+    System.out.println(&quot;Olá, &quot; + nome);
 }
 </code></pre>
-                </li>
-                <li><strong>while</strong> / <strong>do-while</strong>:
-                    <pre><code class="language-java">int i = 0;
-while (i &lt; 10) {
-    System.out.println(i);
-    i++;
+<ul>
+<li><strong><code>while</code> e <code>do-while</code></strong>: Executam um bloco de código enquanto uma condição for verdadeira. A diferença é que o <code>do-while</code> garante que o bloco seja executado pelo menos uma vez.</li>
+</ul>
+<pre><code class="language-java">int contador = 0;
+while (contador &lt; 3) {
+    System.out.println(&quot;Contador: &quot; + contador);
+    contador++;
 }
 </code></pre>
-                </li>
-            </ul>
-            <hr>
-            <h3><strong>2. OOP Básico (Classes, Objetos, Encapsulamento)</strong></h3>
-            <p><strong>Conteúdo:</strong> </p>
-            <ul>
-                <li>Classes vs. objetos: definição e instanciação. </li>
-                <li>Modificadores de acesso (<code>private</code>, <code>public</code>, <code>protected</code>). </li>
-                <li>Encapsulamento: uso de getters/setters.</li>
-            </ul>
-            <h3>2.1 Classes e Objetos</h3>
-            <ul>
-                <li><strong>Classe</strong>: Molde que define atributos (dados) e métodos (comportamentos).</li>
-                <li><strong>Objeto</strong>: Instância de uma classe em tempo de execução.</li>
-            </ul>
-            <p>Exemplo:</p>
-            <pre><code class="language-java">public class Produto {
-    // Atributos (propriedades)
+<h3><strong>1.4. Arrays</strong></h3>
+<p>Os arrays em Java são estruturas de dados de tamanho fixo, utilizados para armazenar elementos do mesmo tipo. Eles são declarados da seguinte forma:</p>
+<pre><code class="language-java">int[] numeros = new int[5]; // Array de inteiros com 5 posições
+String[] nomes = {&quot;João&quot;, &quot;Maria&quot;, &quot;Pedro&quot;}; // Array inicializado diretamente
+</code></pre>
+<p>Os arrays têm a vantagem de serem eficientes em termos de memória e acessíveis via índices, mas sua desvantagem é o tamanho fixo, que não pode ser alterado após a criação.</p>
+<h3><strong>1.5. A Classe <code>String</code></strong></h3>
+<p>Diferente dos tipos vistos na seção 1.1, <strong><code>String</code> não é um tipo primitivo, e sim uma classe</strong>. Isso significa que toda variável do tipo <code>String</code> é um objeto, com seus próprios métodos.</p>
+<pre><code class="language-java">String nome = &quot;Maria Silva&quot;; // &#39;nome&#39; é um objeto da classe String
+
+int quantidadeDeLetras = nome.length(); // Chamando um método do objeto
+String nomeMaiusculo = nome.toUpperCase(); // Criando um novo objeto String
+
+System.out.println(nomeMaiusculo); // Imprime &quot;MARIA SILVA&quot;
+</code></pre>
+<h3><strong>1.6. Constantes com a Palavra-chave <code>final</code></strong></h3>
+<p>Para declarar uma variável cujo valor não pode ser alterado após a inicialização (uma constante), usamos a palavra-chave <code>final</code>.</p>
+<pre><code class="language-java">final double PI = 3.14159;
+// A linha abaixo causaria um erro de compilação, pois PI é uma constante.
+// PI = 3.14; 
+</code></pre>
+<h3><strong>1.7. Conversão de Tipos (Type Casting)</strong></h3>
+<p>Converter um valor de um tipo para outro é uma operação comum.</p>
+<ul>
+<li><p><strong>Conversão Implícita (Alargamento):</strong> Ocorre automaticamente quando não há risco de perda de dados (de um tipo menor para um maior).</p>
+<pre><code class="language-java">int meuInt = 100;
+double meuDouble = meuInt; // Conversão automática para 100.0
+</code></pre>
+</li>
+<li><p><strong>Conversão Explícita (Estreitamento / Casting):</strong> Deve ser feita manualmente quando há risco de perda de informação.</p>
+<pre><code class="language-java">double precoProduto = 19.99;
+int precoInteiro = (int) precoProduto; // Forçamos a conversão para int
+// O valor de precoInteiro será 19 (a parte decimal é perdida)
+</code></pre>
+</li>
+</ul>
+<h3><strong>1.8. Entrada de Dados pelo Usuário (Scanner)</strong></h3>
+<p>Para criar programas interativos, usamos a classe <code>Scanner</code> para ler dados digitados pelo usuário.</p>
+<pre><code class="language-java">import java.util.Scanner; // 1. Precisa importar a classe
+
+public class InteracaoUsuario {
+    public static void main(String[] args) {
+        // 2. Cria o objeto Scanner para ler da entrada do sistema
+        Scanner leitor = new Scanner(System.in);
+
+        System.out.print(&quot;Digite seu nome: &quot;);
+        String nome = leitor.nextLine(); // Lê uma linha de texto
+
+        System.out.print(&quot;Digite sua idade: &quot;);
+        int idade = leitor.nextInt(); // Lê um número inteiro
+
+        System.out.printf(&quot;Olá, %s! Você tem %d anos.%n&quot;, nome, idade);
+
+        // 3. É uma boa prática fechar o leitor quando não for mais usar
+        leitor.close(); 
+    }
+}
+</code></pre>
+<hr>
+<h2><strong>PARTE II - O Paradigma da Programação Orientada a Objetos (POO)</strong></h2>
+<p>A Programação Orientada a Objetos (POO) é um paradigma que estrutura o software em torno de &quot;objetos&quot; em vez de funções e lógica. Vamos explorar seus pilares fundamentais.</p>
+<h3><strong>2.1. Classes, Objetos e Construtores</strong></h3>
+<ul>
+<li><strong>Classe</strong>: É o nosso molde ou planta. Ela define um conjunto de <strong>atributos</strong> (características ou dados) e <strong>métodos</strong> (ações ou comportamentos) que um tipo de objeto terá.</li>
+<li><strong>Objeto</strong>: É a instância concreta de uma classe, criada em memória durante a execução do programa. Cada objeto tem seu próprio estado (valores dos seus atributos).</li>
+<li><strong>Construtor</strong>: Um método especial, com o mesmo nome da classe, responsável por inicializar um objeto no momento de sua criação (<code>new</code>).</li>
+</ul>
+<p><strong>Exemplo Simples:</strong>
+A classe <code>Produto</code> define o que todo produto no nosso sistema terá: um nome e um preço. O construtor garante que todo produto seja criado com esses valores.</p>
+<pre><code class="language-java">public class Produto {
+    // Atributos (estado do objeto)
     private String nome;
     private double preco;
 
-    // Construtor
+    // Construtor: inicializa o objeto quando ele é criado
     public Produto(String nome, double preco) {
         this.nome = nome;
         this.preco = preco;
     }
 
-    // Métodos de acesso (getters e setters)
+    // Métodos (comportamento do objeto)
     public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-
     public double getPreco() { return preco; }
-    public void setPreco(double preco) { this.preco = preco; }
 
-    // Método de negócio
     public double calcularDesconto(double percentual) {
-        return preco - (preco * percentual);
+        return this.preco * (1 - percentual / 100);
     }
 }
 </code></pre>
-            <h3>2.2 Encapsulamento</h3>
-            <p>O encapsulamento é o princípio de proteger os dados internos de um objeto, expondo somente o necessário
-                por
-                meio
-                de métodos públicos. Isso aumenta a segurança e a clareza do código. Em Java, utilizamos
-                <strong>modificadores
-                    de acesso</strong>:
-            </p>
-            <ul>
-                <li><code>public</code>: acessível de qualquer lugar.</li>
-                <li><code>private</code>: acessível apenas dentro da própria classe.</li>
-                <li><code>protected</code>: acessível na classe, no mesmo pacote ou em subclasses.</li>
-                <li>(default – sem palavra-chave): acessível no mesmo pacote.</li>
-            </ul>
-            <h3>2.3 Construtores</h3>
-            <p>São métodos especiais que inicializam um objeto no momento em que é criado. Possuem o mesmo nome da
-                classe e
-                não
-                retornam valor.</p>
-            <p>No exemplo acima, o construtor recebe como parâmetros <code>String nome</code> e
-                <code>double preco</code> e
-                inicializa as variáveis de instância (atributos) com os valores desses parâmetros. A palavra de
-                <code>this</code> distingue variáveis de instância de parâmetros locais.
-            </p>
-            <h3>2.4 Herança</h3>
-            <p>Permite criar classes especializadas a partir de classes existentes. Usamos a palavra-chave
-                <code>extends</code>
-                em Java.
-            </p>
-            <pre><code class="language-java">public class Carro extends Veiculo {
-    // Carro herda atributos e métodos de Veiculo
-}
-</code></pre>
-            <ul>
-                <li>Promove o <strong>reuso de código</strong>.</li>
-                <li>É importante verificar se a relação “é-um” (IS-A) realmente faz sentido no modelo, caso contrário
-                    não se
-                    deve usar herança.</li>
-            </ul>
-            <p>Entretanto, a <strong>composição</strong> (ter objetos como membros) é geralmente preferida em vez da
-                <strong>herança</strong> (estender classes) devido a:
-            </p>
-            <h4><strong>2.4.1. Flexibilidade e Baixo Acoplamento</strong></h4>
-            <ul>
-                <li><strong>Herança</strong> cria uma relação rígida &quot;é-um&quot; entre classes, tornando o código
-                    frágil a
-                    mudanças na superclasse.</li>
-                <li><strong>Composição</strong> estabelece uma relação &quot;tem-um&quot;, permitindo substituir
-                    componentes
-                    sem
-                    afetar a classe principal.</li>
-            </ul>
-            <h5>Exemplo com Herança (Problema):</h5>
-            <pre><code class="language-java">class Veiculo {
-    void ligarMotor() { /* ... */ }
-}
+<h3><strong>2.2. Encapsulamento e Modificadores de Acesso</strong></h3>
+<p>O encapsulamento é o princípio de proteger os dados internos de um objeto de acessos indevidos. Em Java, isso é feito declarando os atributos como <code>private</code> e fornecendo métodos públicos (<code>getters</code> e <code>setters</code>) para acessá-los de forma controlada.</p>
+<ul>
+<li><strong><code>public</code></strong>: Acessível de qualquer lugar.</li>
+<li><strong><code>private</code></strong>: Acessível apenas de dentro da própria classe.</li>
+<li><strong><code>protected</code></strong>: Acessível pela própria classe, por classes no mesmo pacote e por subclasses.</li>
+<li><strong>(default)</strong>: Acessível apenas por classes no mesmo pacote.</li>
+</ul>
+<p><strong>Exemplo Prático:</strong>
+Na classe <code>SalariedEmployee</code>, o <code>weeklySalary</code> é privado. O método <code>setWeeklySalary</code> valida o valor antes de atribuí-lo, garantindo que o salário nunca seja negativo.</p>
+<pre><code class="language-java">public class SalariedEmployee extends Employee {
+    private double weeklySalary; // Atributo privado e protegido
 
-class Carro extends Veiculo { 
-    // Herda tudo de Veiculo, mesmo que não precise.
-}
-
-// E se surgir um CarroElétrico que não usa motor a combustão?
-class CarroEletrico extends Veiculo {
-    // Sobrescrever ligarMotor()? O motor é elétrico!
-}
-</code></pre>
-            <h5>Exemplo com Composição (Solução):</h5>
-            <pre><code class="language-java">interface Motor {
-    void ligar();
-}
-
-class MotorCombustão implements Motor {
-    public void ligar() { /* ... */ }
-}
-
-class MotorElétrico implements Motor {
-    public void ligar() { /* ... */ }
-}
-
-class Carro {
-    private Motor motor;
-
-    public Carro(Motor motor) {
-        this.motor = motor; // Composição: Carro &quot;tem um&quot; Motor
+    // Método público para obter o valor (Getter)
+    public double getWeeklySalary() {
+        return weeklySalary;
     }
 
-    void ligar() {
-        motor.ligar(); // Comportamento definido pelo motor escolhido
+    // Método público para alterar o valor com validação (Setter)
+    public void setWeeklySalary(double weeklySalary) {
+        if (weeklySalary &lt; 0.0) {
+            throw new IllegalArgumentException(&quot;Weekly salary must be &gt;= 0.0&quot;);
+        }
+        this.weeklySalary = weeklySalary;
+    }
+    //...
+}
+</code></pre>
+<h3><strong>2.3. Herança e a Palavra-chave <code>super</code></strong></h3>
+<p>A herança permite que uma classe (subclasse) herde atributos e métodos de outra (superclasse), promovendo o reuso de código através de uma relação <strong>&quot;é-um&quot;</strong>. A subclasse pode adicionar novos comportamentos ou modificar os herdados.</p>
+<ul>
+<li><strong><code>extends</code></strong>: Palavra-chave usada para definir a herança.</li>
+<li><strong><code>super</code></strong>: Palavra-chave usada para se referir à superclasse, seja para chamar seu construtor (<code>super(...)</code>) ou seus métodos (<code>super.metodo()</code>).</li>
+</ul>
+<p><strong>Exemplo Prático:</strong>
+No nosso sistema de pagamentos, <code>BasePlusCommissionEmployee</code> <strong>é um</strong> <code>CommissionEmployee</code> que também tem um salário base. Ele herda tudo de <code>CommissionEmployee</code> e apenas adiciona o que lhe é específico.</p>
+<pre><code class="language-java">// Superclasse
+public class CommissionEmployee {
+    // Atributos como firstName, lastName, grossSales, etc.
+    public CommissionEmployee(String firstName, ..., double commissionRate) {
+        // ... lógica do construtor
+    }
+    public double earnings() {
+        return getCommissionRate() * getGrossSales();
+    }
+    // ...
+}
+
+// Subclasse
+public class BasePlusCommissionEmployee extends CommissionEmployee {
+    private double baseSalary;
+
+    public BasePlusCommissionEmployee(String firstName, ..., double baseSalary) {
+        // 1. Chama o construtor da superclasse para inicializar os atributos herdados
+        super(firstName, ..., commissionRate);
+        // 2. Inicializa seu próprio atributo
+        this.baseSalary = baseSalary;
+    }
+
+    // Sobrescreve o método earnings para adicionar sua própria lógica
+    @Override
+    public double earnings() {
+        // 3. Reutiliza o método da superclasse e adiciona o salário base
+        return getBaseSalary() + super.earnings();
+    }
+    // ...
+}
+</code></pre>
+<h3><strong>2.4. Polimorfismo e a Palavra-chave <code>this</code></strong></h3>
+<p>Polimorfismo (do grego, &quot;muitas formas&quot;) é a capacidade de um objeto ser referenciado de múltiplas maneiras. Em termos práticos, permite que tratemos objetos de subclasses diferentes de forma uniforme, através da referência da superclasse.</p>
+<ul>
+<li><strong><code>@Override</code></strong>: Anotação que indica que um método está sobrescrevendo um método da superclasse.</li>
+<li><strong><code>this</code></strong>: Palavra-chave que se refere à <strong>instância atual</strong> do objeto. É usada para desambiguar variáveis de instância de parâmetros locais ou para chamar outro construtor da mesma classe (<code>this(...)</code>).</li>
+</ul>
+<p><strong>Exemplo Prático:</strong>
+Podemos ter um array do tipo <code>Employee</code> (a superclasse) que armazena objetos de vários tipos de funcionários (<code>SalariedEmployee</code>, <code>HourlyEmployee</code>, etc.). Ao iterar e chamar o método <code>getPaymentAmount()</code>, o Java, através da <strong>ligação dinâmica</strong>, executa a versão correta do método para cada objeto específico.</p>
+<pre><code class="language-java">// A interface Payable define o contrato
+public interface Payable {
+    double getPaymentAmount();
+}
+
+// Employee implementa o contrato
+public abstract class Employee implements Payable {
+    // ...
+}
+
+// As subclasses concretas fornecem a implementação
+public class SalariedEmployee extends Employee {
+    private double weeklySalary;
+    // ...
+    @Override
+    public double getPaymentAmount() { return this.weeklySalary; } // &#39;this&#39; é opcional aqui
+}
+
+public class Invoice implements Payable {
+    private int quantity;
+    private double pricePerItem;
+    // ...
+    @Override
+    public double getPaymentAmount() { return this.quantity * this.pricePerItem; }
+}
+
+// --- Polimorfismo em Ação ---
+public class TestePagamentos {
+    public static void main(String[] args) {
+        // Array do tipo da INTERFACE pode conter qualquer objeto que a implemente
+        Payable[] objetosPagaveis = new Payable[2];
+        objetosPagaveis[0] = new SalariedEmployee(&quot;João&quot;, &quot;Silva&quot;, &quot;111&quot;, 1200.0);
+        objetosPagaveis[1] = new Invoice(&quot;01234&quot;, &quot;Peça de computador&quot;, 2, 350.0);
+
+        System.out.println(&quot;Processando pagamentos de forma polimórfica:&quot;);
+
+        for (Payable pagavel : objetosPagaveis) {
+            // Não importa se &#39;pagavel&#39; é um Employee ou um Invoice,
+            // ele responderá à chamada getPaymentAmount() da sua própria maneira.
+            System.out.printf(&quot;Pagamento devido: $%,.2f%n&quot;, pagavel.getPaymentAmount());
+        }
     }
 }
-
-// Uso:
-Carro carroGasolina = new Carro(new MotorCombustão());
-Carro carroEletrico = new Carro(new MotorEletrico()); // Flexibilidade!
 </code></pre>
-            <h4><strong>2.4.2 Evita Hierarquias Complexas</strong></h4>
-            <p>Herança múltipla não é permitida em Java, e hierarquias profundas tornam o código difícil de manter.</p>
-            <h5>Exemplo Ruim (Herança):</h5>
-            <pre><code class="language-java">abstract class Personagem {
-    abstract void mover();
-}
-
-class HeroiVoador extends Personagem {
-    void mover() { /* Voar */ }
-}
-
-class HeroiNadador extends Personagem {
-    void mover() { /* Nadar */ }
-}
-
-// E se um herói precisar voar E nadar? Teríamos que criar:
-class HeroiVoadorNadador extends Personagem {}
-/* Duplicação de código! */
-</code></pre>
-            <h5>Solução com Composição</h5>
-            <p>Encapsule habilidades como componentes independentes:</p>
-            <pre><code class="language-java">interface HabilidadeMovimento {
+<p>Algo importante a se citar é que o comportamento polimórfico acima é viabilizado pelo mecanismo de <strong>ligação dinâmica</strong> (dynamic binding), como mencionado anteriormente. Esse processo ocorre em duas etapas:</p>
+<ol>
+<li><p><strong>Em tempo de compilação:</strong> O compilador valida a chamada <code>pagavel.getPaymentAmount()</code> apenas com base no tipo da referência (<code>Payable</code>), garantindo que o método existe no contrato da interface. Nesta fase, a implementação específica a ser executada ainda é desconhecida.</p>
+</li>
+<li><p><strong>Em tempo de execução:</strong> A JVM (Java Virtual Machine) identifica a classe <strong>real</strong> do objeto ao qual a referência <code>pagavel</code> aponta a cada iteração (<code>SalariedEmployee</code> ou <code>Invoice</code>). Somente nesse momento a JVM &quot;liga&quot; a chamada do método à sua implementação (<code>@Override</code>) correspondente, encontrada na classe do objeto real.</p>
+</li>
+</ol>
+<p>Dessa forma, a mesma linha de código no laço <code>for</code> invoca diferentes blocos de código, o que torna o sistema extensível e flexível.</p>
+<h3><strong>2.5. Classes Abstratas e Interfaces</strong></h3>
+<p>Tanto classes abstratas quanto interfaces são usadas para definir contratos e alcançar o polimorfismo, mas elas têm propósitos diferentes.</p>
+<ul>
+<li><p><strong>Classe Abstrata</strong>: Usada para criar uma classe base que compartilha código comum (atributos e métodos concretos) com múltiplas subclasses. Uma classe só pode herdar de <strong>uma</strong> classe abstrata. Use quando as subclasses compartilham uma forte relação <strong>&quot;é-um&quot;</strong> e código.</p>
+<ul>
+<li><strong>Exemplo</strong>: <code>Employee</code> é uma classe abstrata porque todos os funcionários têm <code>firstName</code> e <code>lastName</code>, mas o cálculo de <code>getPaymentAmount()</code> é específico para cada tipo.</li>
+</ul>
+</li>
+<li><p><strong>Interface</strong>: Define um contrato puro de comportamentos (métodos) que uma classe deve implementar. Uma classe pode implementar <strong>múltiplas</strong> interfaces. Use para definir uma capacidade ou &quot;papel&quot; que classes não relacionadas podem desempenhar.</p>
+<ul>
+<li><strong>Exemplo</strong>: <code>Payable</code> é uma interface porque tanto um <code>Employee</code> quanto uma <code>Invoice</code> podem ser &quot;pagáveis&quot;, mas não compartilham nenhuma outra característica em comum.</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Característica</th>
+<th>Classe Abstrata</th>
+<th>Interface</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Herança</strong></td>
+<td>Uma classe pode herdar de apenas UMA classe abstrata.</td>
+<td>Uma classe pode implementar MÚLTIPLAS interfaces.</td>
+</tr>
+<tr>
+<td><strong>Atributos</strong></td>
+<td>Pode ter atributos de instância (não <code>static</code>).</td>
+<td>Não pode ter atributos de instância (apenas constantes <code>static final</code>).</td>
+</tr>
+<tr>
+<td><strong>Métodos Concretos</strong></td>
+<td>Pode ter métodos com implementação.</td>
+<td>Pode ter métodos <code>default</code> e <code>static</code> (desde o Java 8).</td>
+</tr>
+<tr>
+<td><strong>Propósito Principal</strong></td>
+<td>Compartilhar código e identidade comum (relação &quot;é-um&quot;).</td>
+<td>Definir um contrato de comportamento (relação &quot;é capaz de&quot;).</td>
+</tr>
+</tbody></table>
+<h3><strong>2.6. Composição sobre Herança: Um Princípio de Design</strong></h3>
+<p>Como vimos, a herança cria um forte acoplamento. Muitas vezes, um design mais flexível é alcançado através da <strong>composição</strong>, onde uma classe contém uma instância de outra classe (relação <strong>&quot;tem-um&quot;</strong>).</p>
+<p><strong>Quando usar Herança?</strong></p>
+<ul>
+<li>Quando a relação &quot;é-um&quot; é genuína e imutável (<code>SalariedEmployee</code> sempre será um <code>Employee</code>).</li>
+<li>Quando a superclasse foi projetada para ser estendida e é estável.</li>
+</ul>
+<p><strong>Quando preferir Composição?</strong></p>
+<ul>
+<li>Para reutilizar código de classes não relacionadas.</li>
+<li>Quando você quer poder alterar o comportamento em tempo de execução.</li>
+<li>Para criar designs mais flexíveis e com menor acoplamento, favorecendo a injeção de dependências.</li>
+</ul>
+<p><strong>Exemplo de Design Flexível com Composição:</strong>
+Um <code>Personagem</code> que pode ter diferentes <code>HabilidadeMovimento</code>. Em vez de criar <code>HeroiVoador</code> e <code>HeroiNadador</code>, o <code>Personagem</code> <strong>tem uma</strong> <code>HabilidadeMovimento</code> que pode ser trocada.</p>
+<pre><code class="language-java">interface HabilidadeMovimento {
     void mover();
 }
-
-class Voar implements HabilidadeMovimento {
-    public void mover() { System.out.println(&quot;Voando!&quot;); }
-}
-
-class Nadar implements HabilidadeMovimento {
-    public void mover() { System.out.println(&quot;Nadando!&quot;); }
-}
+class Voar implements HabilidadeMovimento { /*...*/ }
+class Nadar implements HabilidadeMovimento { /*...*/ }
 
 class Personagem {
-    private HabilidadeMovimento habilidade;
+    private HabilidadeMovimento habilidade; // Composição
 
-    public Personagem(HabilidadeMovimento habilidade) {
-        this.habilidade = habilidade; 
-        // Composição: Personagem &quot;tem uma&quot; habilidade
+    public Personagem(HabilidadeMovimento habilidadeInicial) {
+        this.habilidade = habilidadeInicial;
     }
 
-    void mover() {
-        habilidade.mover();
+    public void setHabilidade(HabilidadeMovimento novaHabilidade) {
+        this.habilidade = novaHabilidade; // Comportamento pode ser alterado
     }
 
-    // Permite mudar a habilidade em tempo de execução!
-    void setHabilidade(HabilidadeMovimento novaHabilidade) {
-        this.habilidade = novaHabilidade;
-    }
-}
-
-// Uso dinâmico:
-Personagem heroi = new Personagem(new Voar());
-heroi.mover(); // Voando!
-
-heroi.setHabilidade(new Nadar());
-heroi.mover(); // Nadando!`
-</code></pre>
-            <h4><strong>2.4.3. Reutilização de Código sem Acoplamento</strong></h4>
-            <p>Na composição, você reutiliza comportamentos sem herdar métodos desnecessários.</p>
-            <h5>Exemplo com Herança</h5>
-            <pre><code class="language-java">class ListaPersonalizada extends ArrayList&lt;String&gt; {
-    // Herda todos os métodos de ArrayList, mesmo os indesejados.
-}
-</code></pre>
-            <h5>Exemplo com Composição</h5>
-            <pre><code class="language-java">class ListaPersonalizada {
-    private List&lt;String&gt; lista = new ArrayList&lt;&gt;();
-
-    // Expõe apenas os métodos necessários:
-    public void addElemento(String elemento) {
-        lista.add(elemento);
-    }
-
-    public int tamanho() {
-        return lista.size();
+    public void mover() {
+        this.habilidade.mover();
     }
 }
 </code></pre>
-            <p>O código exemplo acima é redundante, pois é meramente um wrapper para a classe ArrayList, mas demonstra o
-                ponto
-                principal.</p>
-            <h4><strong>2.4.4. Princípio SOLID: Aberto/Fechado e Inversão de Dependência</strong></h4>
-            <p>A composição permite estender comportamentos sem modificar a classe original, seguindo o princípio
-                <strong>&quot;Prefira interfaces a implementações&quot;</strong>.
-            </p>
-            <h5>Exemplo com Interfaces:</h5>
-            <pre><code class="language-java">interface Notificador {
-    void enviar(String mensagem);
-}
-
-class EmailNotificador implements Notificador {
-    public void enviar(String mensagem) { /* ... */ }
-}
-
-class SMSNotificador implements Notificador {
-    public void enviar(String mensagem) { /* ... */ }
-}
-
-class Sistema {
-    private Notificador notificador;
-
-    public Sistema(Notificador notificador) { 
-        // Injeção de dependência
-        this.notificador = notificador;
-    }
-
-    void alertar() {
-        notificador.enviar(&quot;Alerta!&quot;); 
-        // Troque o notificador sem alterar Sistema
-    }
-}
-</code></pre>
-            <h4><strong>2.4.5 Quando Usar Herança?</strong></h4>
-            <p>A herança é útil quando:</p>
-            <ul>
-                <li>Existe uma relação clara <strong>&quot;é-um&quot;</strong> (ex: <code>Gato extends Animal</code>).
-                </li>
-                <li>Você precisa de <strong>polimorfismo</strong> verdadeiro.</li>
-                <li>A superclasse é estável e não mudará frequentemente.</li>
-            </ul>
-            <p>A composição oferece:</p>
-            <ul>
-                <li><strong>Menos acoplamento</strong>: Mudanças em componentes não afetam a classe principal.</li>
-                <li><strong>Maior flexibilidade</strong>: Comportamentos podem ser trocados em tempo de execução.</li>
-                <li><strong>Melhor teste</strong>: Componentes podem ser mockados facilmente.</li>
-            </ul>
-            <p>Use herança para modelar relações hierárquicas genuínas e imutáveis. Para tudo mais, prefira composição!
-                🛠️
-            </p>
-            <h3>2.5. Polimorfismo</h3>
-            <p>Significa “muitas formas”. Em OOP, há dois principais tipos:</p>
-            <ul>
-                <li><strong>Sobrecarga (Overload)</strong>: mesmo nome de método, mas parâmetros diferentes.
-                    <pre><code class="language-java">public int soma(int a, int b) { return a + b; }
-public double soma(double a, double b) { return a + b; }
-</code></pre>
-                </li>
-                <li><strong>Sobreposição (Override)</strong>: redefinir um método herdado de uma superclasse.
-                    <pre><code class="language-java">@Override
-public void acelerar() {
-    System.out.println(&quot;O carro está acelerando&quot;);
-}
-</code></pre>
-                </li>
-            </ul>
-            <h3>2.6. Interfaces e Classes Abstratas</h3>
-            <ul>
-                <li><strong>Interfaces</strong>: definem <strong>contratos</strong> de métodos (sem implementação),
-                    obrigando as
-                    classes que as implementam a fornecer a lógica.
-                    <pre><code class="language-java">public interface Conectavel {
-    void connect();
-    void disconnect();
-}
-</code></pre>
-                </li>
-                <li><strong>Classes Abstratas</strong>: não podem ser instanciadas diretamente e podem conter métodos
-                    abstratos
-                    (sem corpo) ou concretos (com implementação).
-                    <pre><code class="language-java">public abstract class Funcionario {
-    public abstract void calculaSalario();
-    public void baterPonto() {
-        System.out.println(&quot;Ponto registrado&quot;);
-    }
-}
-</code></pre>
-                </li>
-            </ul>
-            <h3>2.7 Exemplos Práticos</h3>
-            <h4>Classe ContaBancaria</h4>
-            <p>Modelando uma conta bancária com encapsulamento e validação de saldo.</p>
-            <pre><code class="language-java">public class ContaBancaria {
-    private String titular;
-    private double saldo;
-
-    public ContaBancaria(String titular, double saldoInicial) {
-        this.titular = titular;
-        this.saldo = saldoInicial;
-    }
-
-    public String getTitular() { return titular; }
-
-    public double getSaldo() { return saldo; }
-
-    public void depositar(double valor) {
-        if (valor &gt; 0) {
-            saldo += valor;
-        } else {
-            System.out.println(&quot;Valor inválido para depósito.&quot;);
-        }
-    }
-
-    public boolean sacar(double valor) {
-        if (valor &gt; 0 &amp;&amp; saldo &gt;= valor) {
-            saldo -= valor;
-            return true;
-        }
-        System.out.println(&quot;Saldo insuficiente ou valor inválido.&quot;);
-        return false;
-    }
-}
-</code></pre>
-            <h4>Uso da ContaBancaria</h4>
-            <pre><code class="language-java">public class BancoTeste {
-    public static void main(String[] args) {
-        ContaBancaria conta = new ContaBancaria(&quot;Ana Silva&quot;, 1000.0);
-        conta.depositar(500);
-        conta.sacar(300);
-        System.out.printf(&quot;Saldo final: R$%.2f%n&quot;, conta.getSaldo());
-    }
-}
-</code></pre>
-            <h4>Uso de Herança: ContaPoupanca</h4>
-            <p>Criando uma conta poupança que herda de <code>ContaBancaria</code>.</p>
-            <pre><code class="language-java">public class ContaPoupanca extends ContaBancaria {
-    private double taxaJuros;
-
-    public ContaPoupanca(String titular, double saldoInicial, double taxaJuros) {
-        super(titular, saldoInicial);
-        this.taxaJuros = taxaJuros;
-    }
-
-    public void aplicarJuros() {
-        depositar(getSaldo() * taxaJuros);
-    }
-}
-</code></pre>
-            <h4>Uso de Composição: Cliente e ContaBancaria</h4>
-            <p>Evitando herança desnecessária com um relacionamento &quot;tem-um&quot;.</p>
-            <pre><code class="language-java">public class Cliente {
-    private String nome;
-    private ContaBancaria conta;
-
-    public Cliente(String nome, ContaBancaria conta) {
-        this.nome = nome;
-        this.conta = conta;
-    }
-
-    public void exibirSaldo() {
-        System.out.printf(&quot;Cliente: %s - Saldo: R$%.2f%n&quot;, nome, conta.getSaldo());
-    }
-}
-</code></pre>
-            <h4>Polimorfismo: Interface Notificacao</h4>
-            <pre><code class="language-java">interface Notificacao {
-    void enviar(String mensagem);
-}
-
-class EmailNotificacao implements Notificacao {
-    public void enviar(String mensagem) {
-        System.out.println(&quot;Email enviado: &quot; + mensagem);
-    }
-}
-
-class SMSNotificacao implements Notificacao {
-    public void enviar(String mensagem) {
-        System.out.println(&quot;SMS enviado: &quot; + mensagem);
-    }
-}
-</code></pre>
-            <h4>Uso da Interface Notificacao</h4>
-            <pre><code class="language-java">public class SistemaNotificacao {
-    public static void main(String[] args) {
-        Notificacao notificacao = new EmailNotificacao();
-        notificacao.enviar(&quot;Seu saldo foi atualizado.&quot;);
-
-        notificacao = new SMSNotificacao();
-        notificacao.enviar(&quot;Pagamento recebido.&quot;);
-    }
-}
-</code></pre>
-            <h3><strong>2.8. Boas Práticas</strong></h3>
-            <ul>
-                <li><strong>DRY (Don&#39;t Repeat Yourself)</strong>: Evitar código duplicado.</li>
-            </ul>
-            <p>Exemplo de violação desse princípio</p>
-            <pre><code class="language-java">// Código duplicado para calcular imposto em dois lugares diferentes  
-double calcularImpostoPedido(Pedido pedido) {  
-    return pedido.getTotal() * 0.10;  
-}  
-
-void gerarNotaFiscal(Pedido pedido) {  
-    double imposto = pedido.getTotal() * 0.10; // Cálculo repetido  
-    // ...  
-}  
-</code></pre>
-            <p>Solução (extrair para um único método)</p>
-            <pre><code class="language-java">double calcularImposto(double valor) {  
-    return valor * 0.10;  
-}  
-
-// Reutilização em múltiplos lugares:  
-void gerarNotaFiscal(Pedido pedido) {  
-    double imposto = calcularImposto(pedido.getTotal());  
-    // ...  
-}  
-
-double totalComImposto(Pedido pedido) {  
-    return pedido.getTotal() + calcularImposto(pedido.getTotal());  
-}  
-</code></pre>
-            <ul>
-                <li><strong>Validação em Métodos</strong>: Garantir lógica consistente.</li>
-            </ul>
-            <p>Exemplo de violação</p>
-            <pre><code class="language-java">void sacar(double valor) {  
-    saldo -= valor; 
-    // Problema: valor pode ser negativo ou maior que o saldo  
-}  
-</code></pre>
-            <p>Solução</p>
-            <pre><code class="language-java">void sacar(double valor) {  
-    if (valor &lt;= 0) {  
-        throw new IllegalArgumentException(&quot;Valor deve ser positivo.&quot;);  
-    }  
-    if (valor &gt; saldo) {  
-        throw new SaldoInsuficienteException(&quot;Saldo indisponível.&quot;);  
-    }  
-    saldo -= valor;  
-}  
-</code></pre>
-            <p>Para garantir que este princípio está sendo seguido, tenha em mente</p>
-            <ul>
-                <li>
-                    <p>Validação de Parâmetros: Verifique null, intervalos numéricos, ou formatos (ex: e-mail).</p>
-                </li>
-                <li>
-                    <p>Uso de Exceções Significativas: Lançe exceções específicas (IllegalArgumentException,
-                        InvalidStateException).</p>
-                </li>
-                <li>
-                    <p>Uso de Mensagens Claras: Descreva o erro de forma que ajude na depuração (ex: &quot;Valor não
-                        pode
-                        ser
-                        negativo&quot;).</p>
-                </li>
-            </ul>
-            <hr>
-            <h2>3. Coleções, Generics, Reflexão e Exceções</h2>
-            <h3>3.1 Arrays e Coleções</h3>
-            <h4>Arrays</h4>
-            <p>Os arrays em Java são estruturas de dados de tamanho fixo, utilizados para armazenar elementos do mesmo
-                tipo.
-                Eles são declarados da seguinte forma:</p>
-            <pre><code class="language-java">int[] numeros = new int[5]; // Array de inteiros com 5 posições
-String[] nomes = {&quot;João&quot;, &quot;Maria&quot;, &quot;Pedro&quot;}; // Array inicializado diretamente
-</code></pre>
-            <p>Os arrays têm a vantagem de serem eficientes em termos de memória e acessíveis via índices, mas sua
-                desvantagem é
-                o tamanho fixo, que não pode ser alterado após a criação.</p>
-            <h4>Collections Framework</h4>
-            <p>O framework de coleções do Java (“Java Collections Framework” - JCF) fornece estruturas de dados prontas,
-                dinâmicas e mais flexíveis do que arrays tradicionais. Algumas das principais interfaces e classes
-                incluem:
-            </p>
-            <h4>List</h4>
-            <p>A interface <code>List</code> representa uma coleção ordenada de elementos, permitindo duplicatas. As
-                principais
-                implementações são:</p>
-            <ul>
-                <li><code>ArrayList</code> - Implementação baseada em array dinâmico. Rápido para acesso direto, mas
-                    mais
-                    lento
-                    para inserções e remoções no meio da lista.</li>
-                <li><code>LinkedList</code> - Baseado em uma lista duplamente encadeada. Rápido para inserções e
-                    remoções,
-                    mas
-                    mais lento para acessos aleatórios.</li>
-                <li><code>Vector</code> - Similar ao <code>ArrayList</code>, mas sincronizado para acesso concorrente.
-                    Geralmente substituído pelo <code>ArrayList</code> devido às melhorias no gerenciamento de
-                    concorrência
-                    do
-                    Java.</li>
-            </ul>
-            <p>Exemplo:</p>
-            <pre><code class="language-java">List&lt;String&gt; nomes = new ArrayList&lt;&gt;();
-nomes.add(&quot;Ana&quot;);
-nomes.add(&quot;Carlos&quot;);
-nomes.add(&quot;Beatriz&quot;);
-
-System.out.println(nomes.get(1)); // Exibe &quot;Carlos&quot;
-</code></pre>
-            <h4>Set</h4>
-            <p>A interface <code>Set</code> representa uma coleção de elementos únicos (sem duplicatas). As principais
-                implementações são:</p>
-            <ul>
-                <li><code>HashSet</code> - Baseado em tabela hash, oferece alta performance para buscas, mas não garante
-                    ordenação.</li>
-                <li><code>LinkedHashSet</code> - Mantém a ordem de inserção dos elementos.</li>
-                <li><code>TreeSet</code> - Baseado em uma <code>Red-Black Tree</code>, garante ordenação natural dos
-                    elementos.
-                </li>
-            </ul>
-            <p>Exemplo:</p>
-            <pre><code class="language-java">Set&lt;Integer&gt; numeros = new HashSet&lt;&gt;();
-numeros.add(5);
-numeros.add(10);
-numeros.add(5); // Ignorado pois já existe
-
-System.out.println(numeros); // Exibe [5, 10]
-</code></pre>
-            <h4>Map</h4>
-            <p>A interface <code>Map</code> armazena pares (chave, valor). As principais implementações são:</p>
-            <ul>
-                <li><code>HashMap</code> - Baseado em tabela hash, não garante ordem de inserção.</li>
-                <li><code>LinkedHashMap</code> - Mantém a ordem de inserção dos pares.</li>
-                <li><code>TreeMap</code> - Ordena os pares com base na chave.</li>
-            </ul>
-            <p>Exemplo:</p>
-            <pre><code class="language-java">Map&lt;String, Integer&gt; idades = new HashMap&lt;&gt;();
-idades.put(&quot;Ana&quot;, 25);
-idades.put(&quot;Carlos&quot;, 30);
-
-System.out.println(idades.get(&quot;Ana&quot;)); // Exibe 25
-</code></pre>
-            <h4>Queue e Deque</h4>
-            <ul>
-                <li><code>Queue</code> - Representa uma fila (FIFO - First In, First Out). Implementações incluem
-                    <code>LinkedList</code> e <code>PriorityQueue</code>.
-                </li>
-                <li><code>Deque</code> - Representa uma fila de dois extremos (pode adicionar e remover elementos no
-                    início
-                    e no
-                    fim). Implementações incluem <code>ArrayDeque</code> e <code>LinkedList</code>.</li>
-            </ul>
-            <p>Exemplo:</p>
-            <pre><code class="language-java">Queue&lt;String&gt; fila = new LinkedList&lt;&gt;();
-fila.add(&quot;Ana&quot;);
-fila.add(&quot;Carlos&quot;);
-System.out.println(fila.poll()); // Remove e retorna &quot;Ana&quot;
-</code></pre>
-            <h4>Comparativo das Principais Classes de Coleção</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Estrutura</th>
-                        <th>Permite Duplicatas?</th>
-                        <th>Mantém Ordem?</th>
-                        <th>Melhor Uso</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>ArrayList</code></td>
-                        <td>Sim</td>
-                        <td>Sim</td>
-                        <td>Lista dinâmica com acesso rápido por índice</td>
-                    </tr>
-                    <tr>
-                        <td><code>LinkedList</code></td>
-                        <td>Sim</td>
-                        <td>Sim</td>
-                        <td>Inserções e remoções frequentes</td>
-                    </tr>
-                    <tr>
-                        <td><code>HashSet</code></td>
-                        <td>Não</td>
-                        <td>Não</td>
-                        <td>Conjunto de elementos únicos sem ordem</td>
-                    </tr>
-                    <tr>
-                        <td><code>TreeSet</code></td>
-                        <td>Não</td>
-                        <td>Sim (ordenado)</td>
-                        <td>Conjunto de elementos ordenados</td>
-                    </tr>
-                    <tr>
-                        <td><code>HashMap</code></td>
-                        <td>Não (chaves)</td>
-                        <td>Não</td>
-                        <td>Estrutura rápida para pares chave-valor</td>
-                    </tr>
-                    <tr>
-                        <td><code>TreeMap</code></td>
-                        <td>Não (chaves)</td>
-                        <td>Sim (ordenado)</td>
-                        <td>Mapeamento chave-valor ordenado</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>O Java Collections Framework fornece estruturas robustas e eficientes para manipular dados de maneira
-                flexível,
-                sendo uma alternativa muito superior aos arrays quando é necessário lidar com coleções dinâmicas.</p>
-            <h3>3.2 Generics</h3>
-            <p>Os <strong>Generics</strong> permitem definir <strong>tipos parametrizados</strong>, aumentando a
-                segurança
-                de
-                tipos em tempo de compilação e evitando erros de conversão.</p>
-            <h4>Conceito de Generics</h4>
-            <p>Generics permitem que classes, interfaces e métodos sejam parametrizados por tipos, tornando-os mais
-                reutilizáveis e seguros. Antes da introdução dos Generics no Java 5, coleções e outras classes
-                utilizavam
-                objetos genéricos (<code>Object</code>), exigindo conversões explícitas e permitindo a inserção de
-                elementos
-                de
-                tipos incompatíveis.</p>
-            <p>Com Generics, podemos definir um tipo parametrizado, garantindo que somente elementos do tipo
-                especificado
-                sejam
-                armazenados.</p>
-            <h4>Exemplo com List</h4>
-            <pre><code class="language-java">List&lt;String&gt; nomes = new ArrayList&lt;&gt;();
-nomes.add(&quot;Ana&quot;);
-// nomes.add(10); // Erro de compilação
-</code></pre>
-            <h3>Benefícios dos Generics</h3>
-            <ul>
-                <li><strong>Segurança de tipos</strong>: evita erros de tempo de execução ao garantir que apenas
-                    elementos
-                    do
-                    tipo correto sejam adicionados.</li>
-                <li><strong>Reutilização de código</strong>: classes e métodos podem ser escritos para trabalhar com
-                    diferentes
-                    tipos sem precisar de conversões.</li>
-                <li><strong>Legibilidade e manutenção</strong>: código mais claro e menos propenso a erros.</li>
-            </ul>
-            <p>Os Generics são amplamente utilizados no Java, especialmente no framework de coleções, proporcionando
-                flexibilidade e segurança de tipos nas implementações.</p>
-            <h3>3.3 Reflexão</h3>
-            <p>A <strong>Reflexão</strong> é um mecanismo do Java que permite inspecionar e manipular classes, métodos e
-                atributos em tempo de execução. Ela é amplamente utilizada em frameworks para injeção de dependências,
-                serialização de objetos e mapeamento de entidades.</p>
-            <h4>Como Funciona a Reflexão</h4>
-            <p>A reflexão permite obter informações de uma classe e modificar seu comportamento dinamicamente. Isso é
-                feito
-                com
-                a API <code>java.lang.reflect</code>.</p>
-            <h4>Exemplo de Inspeção de Classe</h4>
-            <pre><code class="language-java">import java.lang.reflect.Method;
-
-class Exemplo {
-    public void metodoPublico() {
-        System.out.println(&quot;Método Público&quot;);
-    }
-}
-
-public class ReflexaoExemplo {
-    public static void main(String[] args) throws ClassNotFoundException {
-        Class&lt;?&gt; classe = Class.forName(&quot;Exemplo&quot;);
-        Method[] metodos = classe.getDeclaredMethods();
-        
-        for (Method metodo : metodos) {
-            System.out.println(&quot;Método encontrado: &quot; + metodo.getName());
-        }
-    }
-}
-</code></pre>
-            <p>Neste exemplo, usamos a reflexão para listar os métodos declarados da classe <code>Exemplo</code>.</p>
-            <h4>Modificação de Atributos Privados</h4>
-            <p>A reflexão também pode ser usada para acessar e modificar atributos privados:</p>
-            <pre><code class="language-java">import java.lang.reflect.Field;
-
-class Pessoa {
-    private String nome = &quot;João&quot;;
-}
-
-public class ReflexaoAtributo {
-    public static void main(String[] args) throws Exception {
-        Pessoa p = new Pessoa();
-        Class&lt;?&gt; classe = p.getClass();
-        Field campo = classe.getDeclaredField(&quot;nome&quot;);
-        campo.setAccessible(true);
-        campo.set(p, &quot;Maria&quot;);
-        System.out.println(&quot;Novo nome: &quot; + campo.get(p));
-    }
-}
-</code></pre>
-            <h3>Aplicabilidade da Reflexão</h3>
-            <p>A reflexão é utilizada em diversas situações no desenvolvimento de software, incluindo:</p>
-            <ul>
-                <li><strong>Frameworks de injeção de dependências</strong> (Spring, CDI) - para criar instâncias de
-                    classes
-                    dinamicamente.</li>
-                <li><strong>ORMs (Hibernate, JPA)</strong> - para mapear entidades a tabelas do banco de dados.</li>
-                <li><strong>Serialização e desserialização</strong> - conversão de objetos em formatos como JSON e XML.
-                </li>
-                <li><strong>Criação de testes automatizados</strong> - para acessar métodos privados e validar
-                    comportamentos
-                    sem modificar diretamente o código-fonte.</li>
-            </ul>
-            <p>Embora poderosa, a reflexão deve ser usada com cautela, pois pode impactar a performance da aplicação e
-                quebrar o
-                encapsulamento dos objetos.</p>
-            <h3>3.4 Tratamento de Exceções</h3>
-            <p>O <strong>tratamento de exceções</strong> em Java é essencial para lidar com erros que ocorrem durante a
-                execução
-                do programa. As exceções podem ser tratadas utilizando os blocos <code>try</code>, <code>catch</code> e
-                <code>finally</code>.
-            </p>
-            <h4>Exemplo de Tratamento de Exceção</h4>
-            <pre><code class="language-java">try {
+<hr>
+<h2><strong>PARTE III - Tópicos Essenciais do Ecossistema Java</strong></h2>
+<p>Com os fundamentos da POO estabelecidos, vamos agora explorar recursos cruciais da plataforma Java que nos permitem escrever código mais seguro, robusto e flexível.</p>
+<h3><strong>3.1. Tratamento de Exceções</strong></h3>
+<p>O <strong>tratamento de exceções</strong> é o mecanismo do Java para lidar com erros que ocorrem durante a execução do programa de forma controlada, evitando que a aplicação pare abruptamente. As exceções são tratadas utilizando os blocos <code>try</code>, <code>catch</code> e <code>finally</code>.</p>
+<h4><strong>Exemplo de Tratamento de Exceção</strong></h4>
+<pre><code class="language-java">try {
+    // Bloco de código onde um erro pode ocorrer
     int resultado = 10 / 0;
 } catch (ArithmeticException e) {
-    System.out.println(&quot;Erro de divisão por zero&quot;);
+    // Bloco executado se a exceção do tipo especificado ocorrer
+    System.out.println(&quot;Erro: Tentativa de divisão por zero.&quot;);
 } finally {
-    System.out.println(&quot;Este bloco sempre será executado&quot;);
+    // Bloco opcional que SEMPRE será executado, com ou sem exceção
+    System.out.println(&quot;Finalizando a operação.&quot;);
 }
 </code></pre>
-            <h3>Tipos de Exceções</h3>
-            <p>As exceções em Java são divididas em dois tipos principais:</p>
-            <h4>Exceções Checadas (Checked Exceptions)</h4>
-            <ul>
-                <li>São aquelas que obrigam o programador a tratá-las em tempo de compilação.</li>
-                <li>Exemplo: <code>IOException</code>, <code>SQLException</code>.</li>
-                <li>Devem ser tratadas explicitamente usando <code>try-catch</code> ou propagadas com
-                    <code>throws</code>.
-                </li>
-            </ul>
-            <pre><code class="language-java">import java.io.*;
-
-public class ExemploChecked {
-    public static void main(String[] args) {
-        try {
-            FileReader file = new FileReader(&quot;arquivo.txt&quot;);
-        } catch (FileNotFoundException e) {
-            System.out.println(&quot;Arquivo não encontrado&quot;);
-        }
-    }
+<h4><strong>Tipos de Exceções</strong></h4>
+<ul>
+<li><p><strong>Exceções Checadas (Checked Exceptions)</strong>: São exceções que o compilador obriga o programador a tratar (<code>try-catch</code>) ou declarar (<code>throws</code>). Geralmente representam condições externas recuperáveis (ex: <code>IOException</code>, <code>SQLException</code>).</p>
+<pre><code class="language-java">try {
+    FileReader file = new FileReader(&quot;arquivo_inexistente.txt&quot;);
+} catch (FileNotFoundException e) {
+    System.out.println(&quot;Arquivo não pôde ser encontrado.&quot;);
 }
 </code></pre>
-            <h4>Exceções Não Checadas (Unchecked Exceptions)</h4>
-            <ul>
-                <li>São aquelas que ocorrem em tempo de execução e não precisam ser obrigatoriamente tratadas.</li>
-                <li>Exemplo: <code>NullPointerException</code>, <code>ArrayIndexOutOfBoundsException</code>.</li>
-            </ul>
-            <pre><code class="language-java">public class ExemploUnchecked {
-    public static void main(String[] args) {
-        String texto = null;
-        System.out.println(texto.length()); // Lança NullPointerException
-    }
-}
+</li>
+<li><p><strong>Exceções Não Checadas (Unchecked Exceptions)</strong>: São exceções que ocorrem em tempo de execução, geralmente devido a erros de programação, e não precisam ser obrigatoriamente tratadas (ex: <code>NullPointerException</code>, <code>ArrayIndexOutOfBoundsException</code>).</p>
+<pre><code class="language-java">String texto = null;
+// A linha abaixo lançará uma NullPointerException em tempo de execução
+// System.out.println(texto.length());
 </code></pre>
-            <h3>Criando Exceções Personalizadas</h3>
-            <p>É possível definir exceções personalizadas criando classes que herdam de <code>Exception</code> (checada)
-                ou
-                <code>RuntimeException</code> (não checada):
-            </p>
-            <pre><code class="language-java">class MinhaExcecao extends Exception {
-    public MinhaExcecao(String mensagem) {
+</li>
+</ul>
+<h4><strong>Criando Exceções Personalizadas</strong></h4>
+<p>Podemos criar nossas próprias exceções para representar erros específicos do nosso sistema, herdando de <code>Exception</code> (checada) ou <code>RuntimeException</code> (não checada).</p>
+<pre><code class="language-java">class SaldoInsuficienteException extends Exception {
+    public SaldoInsuficienteException(String mensagem) {
         super(mensagem);
     }
 }
+</code></pre>
+<h3><strong>3.2. Generics</strong></h3>
+<p>Os <strong>Generics</strong> permitem definir <strong>tipos parametrizados</strong> para classes, interfaces e métodos. O principal benefício é aumentar a segurança de tipos em tempo de compilação, eliminando a necessidade de <em>casts</em> e evitando erros em tempo de execução.</p>
+<h4><strong>Conceito de Generics</strong></h4>
+<p>Antes dos Generics (Java 5), coleções armazenavam <code>Object</code>, o que permitia adicionar qualquer tipo de dado a uma mesma lista, gerando potenciais <code>ClassCastException</code> em tempo de execução. Com Generics, especificamos o tipo de dado que a coleção irá armazenar.</p>
+<h4><strong>Exemplo com <code>List</code></strong></h4>
+<pre><code class="language-java">// O uso de &lt;String&gt; garante que esta lista só aceitará Strings
+List&lt;String&gt; nomes = new ArrayList&lt;&gt;();
+nomes.add(&quot;Ana&quot;);
+nomes.add(&quot;Carlos&quot;);
 
-public class TesteExcecaoPersonalizada {
-    public static void main(String[] args) {
-        try {
-            throw new MinhaExcecao(&quot;Erro personalizado&quot;);
-        } catch (MinhaExcecao e) {
-            System.out.println(&quot;Capturado: &quot; + e.getMessage());
-        }
+// A linha abaixo causaria um ERRO DE COMPILAÇÃO, garantindo a segurança de tipos.
+// nomes.add(10); 
+
+String primeiroNome = nomes.get(0); // Não é necessário fazer cast: (String) nomes.get(0)
+</code></pre>
+<h4><strong>Benefícios dos Generics</strong></h4>
+<ul>
+<li><strong>Segurança de tipos</strong>: Detecta erros de tipo em tempo de compilação.</li>
+<li><strong>Reutilização de código</strong>: Permite criar componentes genéricos que funcionam com qualquer tipo.</li>
+<li><strong>Legibilidade</strong>: O código se torna mais claro, pois as intenções de tipo são explícitas.</li>
+</ul>
+<h3><strong>3.3. Reflexão (Reflection)</strong></h3>
+<p>A <strong>Reflexão</strong> é um mecanismo avançado da API do Java que permite a um programa inspecionar e manipular suas próprias estruturas (classes, métodos, atributos) em tempo de execução.</p>
+<p>É uma ferramenta poderosa, sendo a base para o funcionamento de muitos frameworks modernos como Spring (injeção de dependências) e Hibernate/JPA (mapeamento objeto-relacional).</p>
+<h4><strong>Exemplo de Inspeção de Classe</strong></h4>
+<p>Podemos, por exemplo, listar todos os métodos de uma classe dinamicamente.</p>
+<pre><code class="language-java">Class&lt;?&gt; classe = String.class; // Obtém a representação da classe String
+Method[] metodos = classe.getDeclaredMethods();
+
+System.out.println(&quot;Métodos da classe String:&quot;);
+for (Method metodo : metodos) {
+    System.out.println(&quot;- &quot; + metodo.getName());
+}
+</code></pre>
+<h4><strong>Exemplo de Modificação de Atributos Privados</strong></h4>
+<p>A reflexão pode até mesmo quebrar o encapsulamento para acessar e modificar atributos privados (algo que deve ser feito com extremo cuidado, geralmente em testes ou frameworks).</p>
+<pre><code class="language-java">class Pessoa {
+    private String nome = &quot;João&quot;;
+}
+
+//...
+Pessoa p = new Pessoa();
+Field campo = p.getClass().getDeclaredField(&quot;nome&quot;);
+campo.setAccessible(true); // Permite o acesso ao campo privado
+campo.set(p, &quot;Maria&quot;); // Altera o valor do atributo &#39;nome&#39; no objeto &#39;p&#39;
+System.out.println(campo.get(p)); // Imprime &quot;Maria&quot;
+</code></pre>
+<hr>
+<h2><strong>PARTE IV - Explorando a API de Collections do Java</strong></h2>
+<p>Enquanto arrays são úteis para armazenar sequências de tamanho fixo, a maioria das aplicações precisa gerenciar grupos de objetos de forma dinâmica. O <strong>Java Collections Framework (JCF)</strong> resolve esse problema, oferecendo um conjunto robusto e eficiente de estruturas de dados prontas para uso. A escolha da <code>Collection</code> correta é uma decisão de design crucial que impacta diretamente a performance e a clareza do seu código.</p>
+<p>As três interfaces principais que você mais usará são:</p>
+<ul>
+<li><strong><code>List</code></strong>: Para sequências ordenadas de elementos.</li>
+<li><strong><code>Set</code></strong>: Para conjuntos de elementos únicos.</li>
+<li><strong><code>Map</code></strong>: Para associações de chave-valor.</li>
+</ul>
+<p>Vamos analisar as implementações mais comuns de cada uma.</p>
+<h3><strong>4.1. A Interface <code>List</code>: Sequências Ordenadas</strong></h3>
+<p><strong>Promessa:</strong> Uma <code>List</code> garante que os elementos serão mantidos na ordem em que foram inseridos e permite elementos duplicados. O acesso é feito por um índice numérico, assim como nos arrays.</p>
+<h4><strong><code>ArrayList</code></strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Uma lista redimensionável que se destaca no acesso rápido a elementos por sua posição.</li>
+<li><strong>Estrutura Interna:</strong> Utiliza um array (<code>[]</code>) por baixo dos panos. Quando o array enche, um novo array maior é alocado e os elementos são copiados, um processo que pode ser custoso.</li>
+<li><strong>Performance:</strong><ul>
+<li><strong>Acesso por índice (<code>get(i)</code>):</strong> Excelente, tempo constante - $O(1)$.</li>
+<li><strong>Adicionar/Remover no final:</strong> Rápido, tempo constante amortizado - $O(1)$.</li>
+<li><strong>Adicionar/Remover no meio ou início:</strong> Lento, pois exige o deslocamento de todos os elementos subsequentes - tempo linear - $O(n)$.</li>
+</ul>
+</li>
+<li><strong>Caso de Uso Ideal:</strong> Quando a principal operação é a leitura de dados por índice ou a iteração sobre a lista. É a <code>List</code> de propósito geral mais comum.</li>
+</ul>
+<h4><strong><code>LinkedList</code></strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Uma lista otimizada para operações de inserção e remoção rápidas em qualquer ponto da lista.</li>
+<li><strong>Estrutura Interna:</strong> É uma lista duplamente encadeada, onde cada elemento (nó) armazena o valor e ponteiros para o elemento anterior e o próximo.</li>
+<li><strong>Performance:</strong><ul>
+<li><strong>Adicionar/Remover no início ou fim:</strong> Excelente, tempo constante - $O(1)$.</li>
+<li><strong>Acesso por índice (<code>get(i)</code>):</strong> Lento, pois precisa percorrer a lista desde o início ou o fim até encontrar a posição - tempo linear - $O(n)$.</li>
+<li><strong>Inserção/Remoção no meio (se você já tem a referência):</strong> Rápido, tempo constante - $O(1)$.</li>
+</ul>
+</li>
+<li><strong>Caso de Uso Ideal:</strong> Quando a aplicação realiza um grande número de inserções e remoções no início ou no meio da lista, como em uma fila de processamento ou ao construir uma estrutura de dados complexa.</li>
+</ul>
+<h4><strong><code>Vector</code></strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Uma versão legada e sincronizada (<code>thread-safe</code>) do <code>ArrayList</code>.</li>
+<li><strong>Performance:</strong> Similar ao <code>ArrayList</code>, mas com uma sobrecarga de performance devido à sincronização em todos os seus métodos públicos.</li>
+<li><strong>Caso de Uso Ideal:</strong> Raramente é usado em código novo. Para programação concorrente, prefira usar um <code>ArrayList</code> com sincronização explícita ou as collections do pacote <code>java.util.concurrent</code>.</li>
+</ul>
+<h3><strong>4.2. A Interface <code>Set</code>: Conjuntos de Elementos Únicos</strong></h3>
+<p><strong>Promessa:</strong> Um <code>Set</code> garante que não haverá elementos duplicados. A tentativa de adicionar um elemento que já existe (verificado pelos métodos <code>hashCode()</code> e <code>equals()</code>) é simplesmente ignorada.</p>
+<h4><strong><code>HashSet</code></strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Armazenar elementos únicos com a máxima velocidade, sem se preocupar com a ordem.</li>
+<li><strong>Estrutura Interna:</strong> Utiliza uma tabela de dispersão (<code>HashMap</code> por baixo dos panos). A posição de cada elemento é determinada pelo seu <code>hashCode()</code>.</li>
+<li><strong>Performance:</strong> Excelente para as operações principais (<code>add</code>, <code>remove</code>, <code>contains</code>), que geralmente são executadas em tempo constante - $O(1)$. A performance de iteração não é previsível.</li>
+<li><strong>Caso de Uso Ideal:</strong> Verificar rapidamente se um item existe em um grande conjunto de dados, ou simplesmente para garantir a unicidade dos elementos.</li>
+</ul>
+<h4><strong><code>LinkedHashSet</code></strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Um <code>HashSet</code> que lembra a ordem em que os elementos foram inseridos.</li>
+<li><strong>Estrutura Interna:</strong> Combina uma tabela de dispersão com uma lista duplamente encadeada.</li>
+<li><strong>Performance:</strong> Quase tão rápida quanto o <code>HashSet</code> (operações em $O(1)$), mas com uma pequena sobrecarga para manter a ordem da lista.</li>
+<li><strong>Caso de Uso Ideal:</strong> Quando você precisa da velocidade e unicidade de um <code>HashSet</code>, mas também da capacidade de iterar sobre os elementos na ordem original de inserção.</li>
+</ul>
+<h4><strong><code>TreeSet</code></strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Armazena elementos únicos e os mantém perpetuamente em ordem crescente.</li>
+<li><strong>Estrutura Interna:</strong> Utiliza uma árvore Rubro-Negra (<code>Red-Black Tree</code>).</li>
+<li><strong>Performance:</strong> Boa, mas mais lenta que <code>HashSet</code>. As operações (<code>add</code>, <code>remove</code>, <code>contains</code>) são executadas em tempo de logaritmo - $O(\log n)$.</li>
+<li><strong>Ordenação:</strong> Os elementos devem implementar a interface <code>Comparable</code> (ordem natural) ou um <code>Comparator</code> deve ser fornecido no construtor do <code>TreeSet</code>.</li>
+<li><strong>Caso de Uso Ideal:</strong> Quando você precisa manter uma coleção de itens únicos sempre ordenada, como um ranking de pontuações ou uma lista de nomes em ordem alfabética.</li>
+</ul>
+<h3><strong>4.3. A Interface <code>Map</code>: Associações Chave-Valor</strong></h3>
+<p><strong>Promessa:</strong> Um <code>Map</code> armazena pares de chave-valor. Cada chave é única e mapeia para um único valor. É a estrutura de dados ideal para buscas rápidas baseadas em um identificador único.</p>
+<p><em>(As implementações <code>HashMap</code>, <code>LinkedHashMap</code> e <code>TreeMap</code> seguem exatamente a mesma lógica de suas contrapartes <code>Set</code> em termos de estrutura interna, performance e ordenação, mas aplicadas às <strong>chaves</strong> do mapa.)</em></p>
+<ul>
+<li><strong><code>HashMap</code></strong>: Máxima velocidade ($O(1)$) para <code>put</code>, <code>get</code>, <code>remove</code>. A ordem não é garantida. Caso de uso mais comum para mapas.</li>
+<li><strong><code>LinkedHashMap</code></strong>: Velocidade de <code>HashMap</code> com ordem de iteração previsível (ordem de inserção). Ideal para caches ou dados que precisam ser processados na ordem em que chegaram.</li>
+<li><strong><code>TreeMap</code></strong>: Chaves mantidas em ordem crescente ($O(\log n)$). Ideal para dicionários ou dados que precisam ser recuperados em um intervalo ordenado.</li>
+</ul>
+<h3><strong>4.4 Interfaces <code>Queue</code> e <code>Deque</code>: Filas e Pilhas</strong></h3>
+<h4><strong><code>Queue</code> (Fila)</strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Representa uma estrutura <strong>FIFO</strong> (First-In, First-Out), onde o primeiro elemento a entrar é o primeiro a sair, como uma fila de banco.</li>
+<li><strong>Implementações Comuns:</strong> <code>LinkedList</code> e <code>PriorityQueue</code> (uma fila especial que ordena os elementos com base em sua prioridade).</li>
+<li><strong>Caso de Uso Ideal:</strong> Gerenciar tarefas em uma fila de processamento, algoritmos de busca em largura (BFS), ou qualquer cenário que exija processamento ordenado por chegada.</li>
+</ul>
+<h4><strong><code>Deque</code> (Fila de Duas Pontas)</strong></h4>
+<ul>
+<li><strong>Característica Principal:</strong> Uma &quot;double-ended queue&quot; que permite adicionar e remover elementos tanto do início quanto do fim.</li>
+<li><strong>Uso como Pilha (Stack):</strong> Um <code>Deque</code> é a estrutura recomendada atualmente para implementar uma pilha <strong>LIFO</strong> (Last-In, First-Out).<ul>
+<li>Use <code>push(e)</code> para adicionar ao início.</li>
+<li>Use <code>pop()</code> para remover do início.</li>
+</ul>
+</li>
+<li><strong>Implementação Recomendada:</strong> <code>ArrayDeque</code>. É mais eficiente e moderno que a antiga classe <code>Stack</code>.</li>
+<li><strong>Caso de Uso Ideal:</strong> Implementar a funcionalidade de &quot;desfazer&quot; (undo), analisar expressões matemáticas (parsing) ou em algoritmos de busca em profundidade (DFS).</li>
+</ul>
+<h3><strong>4.5. Tabela Resumo: Quando Usar Cada Collection</strong></h3>
+<table>
+<thead>
+<tr>
+<th align="left">Estrutura</th>
+<th align="left"><strong>Preciso de Duplicatas?</strong></th>
+<th align="left"><strong>Preciso de Ordem?</strong></th>
+<th align="left"><strong>Qual é meu foco?</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong><code>ArrayList</code></strong></td>
+<td align="left">Sim</td>
+<td align="left">Sim, de inserção</td>
+<td align="left">Acesso rápido por índice e iteração simples.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>LinkedList</code></strong></td>
+<td align="left">Sim</td>
+<td align="left">Sim, de inserção</td>
+<td align="left">Muitas inserções/remoções no início/fim da lista.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>HashSet</code></strong></td>
+<td align="left"><strong>Não</strong></td>
+<td align="left">Não</td>
+<td align="left">Máxima velocidade para verificar se um item existe.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>LinkedHashSet</code></strong></td>
+<td align="left"><strong>Não</strong></td>
+<td align="left">Sim, de inserção</td>
+<td align="left">Velocidade de <code>HashSet</code> com ordem de iteração previsível.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>TreeSet</code></strong></td>
+<td align="left"><strong>Não</strong></td>
+<td align="left"><strong>Sim, ordenada</strong></td>
+<td align="left">Manter os itens sempre ordenados.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>HashMap</code></strong></td>
+<td align="left"><strong>Não</strong> (chaves)</td>
+<td align="left">Não</td>
+<td align="left">Acesso ultra-rápido a um valor através de uma chave.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>LinkedHashMap</code></strong></td>
+<td align="left"><strong>Não</strong> (chaves)</td>
+<td align="left">Sim, de inserção</td>
+<td align="left">Acesso rápido de <code>HashMap</code> com ordem de iteração previsível.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>TreeMap</code></strong></td>
+<td align="left"><strong>Não</strong> (chaves)</td>
+<td align="left"><strong>Sim, ordenada</strong></td>
+<td align="left">Manter as chaves sempre ordenadas.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>ArrayDeque</code></strong></td>
+<td align="left">Sim</td>
+<td align="left">Sim</td>
+<td align="left">Implementar uma Fila (FIFO) ou uma Pilha (LIFO) de forma eficiente.</td>
+</tr>
+</tbody></table>
+<h3><strong>4.6. Análise de Performance: Complexidade de Tempo e Espaço</strong></h3>
+<p>Para tomar decisões de design informadas, é importante entender a <strong>complexidade computacional</strong> das operações em cada <code>Collection</code>. Usamos a notação <strong>Big O</strong> para descrever como a performance de um algoritmo escala conforme o número de elementos (<code>n</code>) na coleção aumenta.</p>
+<ul>
+<li><strong>Complexidade de Tempo:</strong> Mede o tempo de execução.</li>
+<li><strong>Complexidade de Espaço:</strong> Mede a memória adicional necessária.</li>
+</ul>
+<p><strong>Guia Rápido da Notação Big O:</strong></p>
+<ul>
+<li><strong>$O(1)$ (Tempo Constante):</strong> Excelente. A operação leva o mesmo tempo, não importa o tamanho da coleção. É o &quot;santo graal&quot; da performance.</li>
+<li><strong>$O(\log n)$ (Tempo Logarítmico):</strong> Ótimo. O tempo de execução cresce muito lentamente. Dobrar o número de elementos não dobra o tempo.</li>
+<li><strong>$O(n)$ (Tempo Linear):</strong> Razoável. O tempo de execução cresce em proporção direta ao número de elementos. Percorrer uma lista inteira é um exemplo clássico.</li>
+<li><strong>$O(n^2)$ (Tempo Quadrático):</strong> Ruim. O tempo de execução cresce exponencialmente. Deve ser evitado para grandes coleções (ex: laços aninhados que percorrem a mesma coleção).</li>
+</ul>
+<h4><strong>4.7. Tabela Comparativa de Complexidade de Tempo (Big O)</strong></h4>
+<p>A tabela a seguir apresenta a complexidade de tempo para as operações mais comuns nas principais implementações.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Estrutura</th>
+<th align="center"><strong>add / put</strong></th>
+<th align="center"><strong>remove</strong></th>
+<th align="center"><strong>get / contains</strong></th>
+<th align="center"><strong>Iteração (<code>next</code>)</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>ArrayList</code></td>
+<td align="center">$O(1)$ (Amortizado) [^1]</td>
+<td align="center">$O(n)$ [^2]</td>
+<td align="center">$O(1)$</td>
+<td align="center">$O(1)$</td>
+</tr>
+<tr>
+<td align="left"><code>LinkedList</code></td>
+<td align="center">$O(1)$ [^3]</td>
+<td align="center">$O(1)$ [^3]</td>
+<td align="center">$O(n)$</td>
+<td align="center">$O(1)$</td>
+</tr>
+<tr>
+<td align="left"><code>HashSet</code></td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+</tr>
+<tr>
+<td align="left"><code>LinkedHashSet</code></td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$</td>
+</tr>
+<tr>
+<td align="left"><code>TreeSet</code></td>
+<td align="center">$O(\log n)$</td>
+<td align="center">$O(\log n)$</td>
+<td align="center">$O(\log n)$</td>
+<td align="center">$O(\log n)$</td>
+</tr>
+<tr>
+<td align="left"><code>HashMap</code></td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+</tr>
+<tr>
+<td align="left"><code>LinkedHashMap</code></td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$ (Médio) [^4]</td>
+<td align="center">$O(1)$</td>
+</tr>
+<tr>
+<td align="left"><code>TreeMap</code></td>
+<td align="center">$O(\log n)$</td>
+<td align="center">$O(\log n)$</td>
+<td align="center">$O(\log n)$</td>
+<td align="center">$O(\log n)$</td>
+</tr>
+<tr>
+<td align="left"><code>ArrayDeque</code></td>
+<td align="center">$O(1)$ (Amortizado) [^1]</td>
+<td align="center">$O(1)$ (Amortizado) [^1]</td>
+<td align="center">Não aplicável</td>
+<td align="center">$O(1)$</td>
+</tr>
+</tbody></table>
+<h4><strong>Legenda e Observações Importantes:</strong></h4>
+<p>[^1]: <strong>$O(1)$ Amortizado:</strong> A operação é geralmente muito rápida ($O(1)$), mas ocasionalmente pode ser lenta ($O(n)$). No <code>ArrayList</code> e <code>ArrayDeque</code>, isso acontece quando a capacidade interna do array se esgota e é preciso alocar um novo array maior e copiar todos os elementos. Na média, ao longo de muitas operações, o custo se &quot;amortiza&quot; para $O(1)$.</p>
+<p>[^2]: <strong>$O(n)$ em <code>ArrayList.remove</code>:</strong> Este custo se refere a remover um elemento pelo índice no meio da lista. Remover o <strong>último</strong> elemento é $O(1)$.</p>
+<p>[^3]: <strong>$O(1)$ em <code>LinkedList.add/remove</code>:</strong> Este custo se refere a adicionar ou remover elementos no <strong>início</strong> ou no <strong>fim</strong> da lista. Inserir ou remover no meio é $O(n)$, pois primeiro é preciso navegar até a posição desejada.</p>
+<p>[^4]: <strong>$O(1)$ Médio em Estruturas Hash:</strong> <code>HashSet</code> e <code>HashMap</code> (e suas variantes <code>Linked</code>) oferecem performance de tempo constante no cenário médio. No entanto, no <strong>pior caso</strong>, que ocorre quando há muitas colisões de hash (objetos diferentes gerando o mesmo <code>hashCode</code>), a performance pode degradar para $O(n)$. Isso é raro se os métodos <code>hashCode()</code> e <code>equals()</code> forem bem implementados.</p>
+<h4><strong>Complexidade de Espaço</strong></h4>
+<p>Para todas as coleções mencionadas, a <strong>complexidade de espaço é $O(n)$</strong>. Isso significa que a memória utilizada cresce linearmente com o número de elementos (<code>n</code>) armazenados na coleção.</p>
+<ul>
+<li><strong>Observação para <code>ArrayList</code>:</strong> Um <code>ArrayList</code> tem uma <code>capacidade</code> interna que pode ser maior que seu <code>tamanho</code> real. Ele cresce em saltos para otimizar o custo de adicionar novos elementos. Isso significa que, por um tempo, ele pode ocupar um pouco mais de memória do que o estritamente necessário para os elementos que contém.</li>
+</ul>
+<hr>
+<h2><strong>PARTE V - Modelagem com UML</strong></h2>
+<h3><strong>5.1 O que é e por que usar a UML?</strong></h3>
+<p>A <strong>UML (Unified Modeling Language)</strong> não é apenas um &quot;conjunto de diagramas&quot;, mas sim uma <strong>linguagem de modelagem visual padronizada</strong> para a engenharia de software. Pense nela como a <strong>planta de uma casa</strong>: antes de construir, você desenha a planta para planejar, comunicar ideias e garantir que todos os envolvidos (engenheiros, eletricistas, proprietário) entendam o projeto da mesma forma.</p>
+<p>Na engenharia de software, a UML serve para:</p>
+<ul>
+<li><strong>Visualizar:</strong> Dar uma forma concreta às ideias abstratas do sistema.</li>
+<li><strong>Especificar:</strong> Descrever o sistema de forma precisa, sem ambiguidades.</li>
+<li><strong>Documentar:</strong> Criar um registro da arquitetura e das decisões de design.</li>
+<li><strong>Comunicar:</strong> Servir como uma ponte de comunicação clara entre analistas, desenvolvedores, testadores e até mesmo clientes.</li>
+</ul>
+<p>Vamos focar nos dois diagramas mais fundamentais para o início de um projeto.</p>
+<h3><strong>1. Diagrama de Caso de Uso (Use Case Diagram)</strong></h3>
+<p>Este diagrama responde à pergunta: <strong>&quot;O que o sistema faz do ponto de vista do usuário?&quot;</strong>. Ele descreve as funcionalidades principais do sistema e como os usuários (ou outros sistemas) interagem com ele.</p>
+<h4><strong>Componentes Principais:</strong></h4>
+<ul>
+<li><strong>Ator (Actor):</strong> Representa um papel desempenhado por um usuário, outro sistema ou até mesmo o tempo, que interage com o sistema. É desenhado como um &quot;boneco palito&quot;.<ul>
+<li><em>Exemplo:</em> <code>Cliente</code>, <code>Administrador</code>, <code>Sistema de Pagamento Externo</code>.</li>
+</ul>
+</li>
+<li><strong>Caso de Uso (Use Case):</strong> Representa uma funcionalidade ou um objetivo que um ator deseja alcançar com o sistema. É desenhado como uma elipse.<ul>
+<li><em>Exemplo:</em> <code>Realizar Login</code>, <code>Cadastrar Produto</code>, <code>Gerar Relatório de Vendas</code>.</li>
+</ul>
+</li>
+<li><strong>Fronteira do Sistema (System Boundary):</strong> Uma caixa que delimita o escopo do sistema, separando os casos de uso (dentro) dos atores (fora).</li>
+</ul>
+<h4><strong>Relações Comuns:</strong></h4>
+<ul>
+<li><strong>Associação:</strong> Uma linha contínua ligando um Ator a um Caso de Uso, indicando que o ator participa daquela funcionalidade.</li>
+<li><strong><code>&lt;&lt;include&gt;&gt;</code> (Inclusão):</strong> Uma seta pontilhada que indica que um caso de uso <strong>obrigatoriamente</strong> inclui a funcionalidade de outro. É usado para reutilizar comportamento comum.<ul>
+<li><em>Exemplo:</em> Os casos de uso <code>Consultar Saldo</code> e <code>Realizar Transferência</code> <strong>ambos incluem</strong> o caso de uso <code>Validar Credenciais</code>.</li>
+</ul>
+</li>
+<li><strong><code>&lt;&lt;extend&gt;&gt;</code> (Extensão):</strong> Uma seta pontilhada que indica um comportamento <strong>opcional</strong> ou alternativo que pode estender um caso de uso base, sob certas condições.<ul>
+<li><em>Exemplo:</em> O caso de uso <code>Realizar Empréstimo de Livro</code> pode ser <strong>estendido</strong> pelo caso <code>Calcular Multa por Atraso</code>, mas apenas se o usuário tiver livros atrasados.</li>
+</ul>
+</li>
+</ul>
+<h3><strong>2. Diagrama de Classes (Class Diagram)</strong></h3>
+<p>Este diagrama responde à pergunta: <strong>&quot;Qual é a estrutura estática do meu sistema?&quot;</strong>. Ele é o mapa dos &quot;tijolos&quot; de um sistema orientado a objetos: as classes, seus atributos, métodos e como elas se relacionam umas com as outras.</p>
+<h4><strong>A Caixa da Classe</strong></h4>
+<p>Uma classe é representada por um retângulo dividido em três partes:</p>
+<ol>
+<li><strong>Nome da Classe:</strong> No topo.</li>
+<li><strong>Atributos (Campos):</strong> No meio.</li>
+<li><strong>Métodos (Operações):</strong> Na base.</li>
+</ol>
+<p><strong>Notação de Visibilidade:</strong></p>
+<ul>
+<li><code>+</code> : <code>public</code></li>
+<li><code>-</code> : <code>private</code></li>
+<li><code>#</code> : <code>protected</code></li>
+</ul>
+<pre><code>+---------------------------+
+|         ContaBancaria     |  &lt;-- Nome da Classe
++---------------------------+
+| - titular: String         |  &lt;-- Atributos com visibilidade
+| - saldo: double           |
++---------------------------+
+| + depositar(valor: double): void |  &lt;-- Métodos com visibilidade e parâmetros
+| + sacar(valor: double): boolean  |
+| + getSaldo(): double      |
++---------------------------+
+</code></pre>
+<h4><strong>Relacionamentos Fundamentais:</strong></h4>
+<ul>
+<li><p><strong>Associação:</strong> Uma linha contínua que representa uma relação estrutural entre classes (um objeto &quot;conhece&quot; ou &quot;usa&quot; o outro). Pode ter <strong>multiplicidade</strong>, que indica quantos objetos estão envolvidos.</p>
+<ul>
+<li><code>1</code> : Exatamente um.</li>
+<li><code>*</code> : Zero ou mais.</li>
+<li><code>1..*</code> : Um ou mais.</li>
+<li><code>0..1</code> : Zero ou um.</li>
+</ul>
+<pre><code>+-----------+ 1      1..* +-----------+
+| Professor |&lt;&gt;----------|   Turma   |
++-----------+            +-----------+
+(Um Professor ensina em uma ou mais Turmas)
+</code></pre>
+</li>
+<li><p><strong>Agregação:</strong> Um tipo especial de associação (relação &quot;tem-um&quot;) onde as classes têm um ciclo de vida independente. É representada por um <strong>losango vazio</strong>.</p>
+<ul>
+<li><em>Exemplo:</em> Um <code>Time</code> de futebol <strong>tem</strong> <code>Jogadores</code>. Se o time for desfeito, os jogadores continuam a existir.</li>
+</ul>
+<pre><code>+------+ &lt;&gt;----* +---------+
+| Time |          | Jogador |
++------+          +---------+
+</code></pre>
+</li>
+<li><p><strong>Composição:</strong> Uma forma forte de agregação (&quot;parte-de&quot;) onde o ciclo de vida das partes depende do todo. Se o todo é destruído, as partes também são. É representada por um <strong>losango preenchido</strong>.</p>
+<ul>
+<li><em>Exemplo:</em> Uma <code>NotaFiscal</code> <strong>é composta por</strong> <code>ItensDaNota</code>. Se a nota fiscal for excluída, seus itens não fazem mais sentido e são excluídos também.</li>
+</ul>
+<pre><code>+------------+ &lt;*&gt;----1..* +------------+
+| NotaFiscal |             | ItemDaNota |
++------------+             +------------+
+</code></pre>
+</li>
+<li><p><strong>Generalização (Herança):</strong> Representa a relação &quot;é-um&quot; (<code>extends</code> em Java). É representada por uma seta com uma <strong>ponta de triângulo vazia</strong> apontando para a superclasse.</p>
+<pre><code>      +---------------+
+      | ContaBancaria |
+      +---------------+
+             ^
+             |
+    ---------&#39;---------
+    |                 |
+</code></pre>
+</li>
+</ul>
+<p>+---------------+   +---------------+
+| ContaCorrente |   | ContaPoupanca |
++---------------+   +---------------+
+```</p>
+<ul>
+<li><p><strong>Realização (Implementação):</strong> Representa a relação entre uma classe e uma <code>interface</code> que ela implementa. É representada por uma <strong>linha pontilhada</strong> com uma ponta de triângulo vazia.</p>
+<pre><code>    +-------------+
+    |   Payable   |  (&lt;&lt;interface&gt;&gt;)
+    +-------------+
+           ^
+           | (linha pontilhada)
+    +-------------+
+    |   Invoice   |
+    +-------------+
+</code></pre>
+</li>
+</ul>
+<hr>
+<h2><strong>Exercícios ⚒️</strong></h2>
+<p>Os exercícios abaixo ajudarão a fixar os conceitos abordados. Elabore-os individualmente. </p>
+<h4><strong>Bloco 1: Fundamentos e Estruturas de Controle (Parte I)</strong></h4>
+<ol>
+<li><p><strong>Calculadora de Média:</strong> Escreva um programa que utiliza a classe <code>Scanner</code> para ler 3 notas de um aluno. Calcule e exiba a média aritmética das notas. Em seguida, usando uma estrutura <code>if-else</code>, informe se o aluno foi &quot;Aprovado&quot; (média &gt;= 7), &quot;Recuperação&quot; (média &gt;= 5 e &lt; 7) ou &quot;Reprovado&quot; (média &lt; 5).</p>
+</li>
+<li><p><strong>Tabuada com <code>for</code>:</strong> Peça ao usuário um número inteiro. Use um laço <code>for</code> tradicional para calcular e exibir a tabuada de multiplicação desse número, do 1 ao 10. (Ex: &quot;5 x 1 = 5&quot;, &quot;5 x 2 = 10&quot;, ...).</p>
+</li>
+<li><p><strong>Adivinhe o Número:</strong> Gere um número aleatório entre 1 e 100. Peça ao usuário para adivinhar o número. Use um laço <code>while</code> para continuar pedindo um número até que o usuário acerte. A cada tentativa, dê uma dica se o palpite foi &quot;muito alto&quot; ou &quot;muito baixo&quot;. No final, informe o número de tentativas.</p>
+</li>
+<li><p><strong>Soma de Ímpares em um Array:</strong> Crie um array de inteiros com números pré-definidos. Utilize um laço <code>for-each</code> para percorrer o array e somar todos os números que forem ímpares. Exiba o resultado final.</p>
+</li>
+</ol>
+<h4><strong>Bloco 2: Programação Orientada a Objetos (Parte II)</strong></h4>
+<ol start="5">
+<li><p><strong>Classe <code>Carro</code>:</strong> Crie uma classe <code>Carro</code> com os seguintes atributos privados: <code>marca</code> (String), <code>modelo</code> (String) e <code>ano</code> (int). Implemente um construtor para inicializar esses atributos e métodos públicos <code>getters</code> para cada um deles. Adicione um método <code>exibirInfo()</code> que imprime os detalhes do carro.</p>
+</li>
+<li><p><strong>Classe <code>Circulo</code> com Encapsulamento:</strong> Crie uma classe <code>Circulo</code> com um atributo privado <code>raio</code> (double). Crie um construtor e os métodos <code>getRaio</code> e <code>setRaio</code>. No <code>setRaio</code>, adicione uma validação para garantir que o raio nunca seja um valor negativo ou zero (lance uma <code>IllegalArgumentException</code> se a condição não for atendida). Crie também um método <code>calcularArea()</code> que retorna a área do círculo ($\pi \times raio^2$).</p>
+</li>
+<li><p><strong>Herança de <code>Veiculo</code>:</strong> Crie uma classe <code>Veiculo</code> com atributos <code>marca</code> e <code>modelo</code>. Em seguida, crie duas subclasses: <code>Carro</code> (que adiciona <code>numeroDePortas</code>) e <code>Moto</code> (que adiciona <code>cilindradas</code>). Sobrescreva o método <code>toString()</code> em todas as classes para exibir suas informações de forma completa.</p>
+</li>
+<li><p><strong>Exceção Personalizada <code>SaldoInsuficienteException</code>:</strong> Reutilizando a ideia da <code>ContaBancaria</code> da aula, crie sua própria exceção checada <code>SaldoInsuficienteException</code>. Modifique o método <code>sacar</code> para que, em vez de retornar <code>false</code>, ele lance essa exceção quando o saldo for insuficiente. Crie uma classe de teste para tratar essa exceção com um bloco <code>try-catch</code>.</p>
+</li>
+</ol>
+<h4><strong>Bloco 3: API de Collections - <code>List</code> (Parte IV)</strong></h4>
+<ol start="9">
+<li><p><strong>Lista de Tarefas (<code>ArrayList</code>):</strong> Crie um programa que gerencia uma lista de tarefas (Strings). Permita ao usuário: adicionar uma tarefa, remover uma tarefa pelo seu índice e listar todas as tarefas. Use um <code>ArrayList</code>.</p>
+</li>
+<li><p><strong>Ordenando Números:</strong> Crie um <code>ArrayList</code> de <code>Integer</code>. Adicione 10 números inteiros aleatórios ou definidos por você. Utilize a classe <code>Collections</code> e seu método <code>sort()</code> para ordenar a lista em ordem crescente e, em seguida, exiba o resultado.</p>
+</li>
+<li><p><strong>Manipulando o Início e o Fim (<code>LinkedList</code>):</strong> Crie uma <code>LinkedList</code> para simular uma fila de atendimento. Adicione 5 nomes de clientes no final da fila. Em seguida, &quot;atenda&quot; os 2 primeiros clientes (removendo-os do início da lista). Por fim, adicione 2 novos clientes &quot;prioritários&quot; no início da fila. Exiba a ordem final da fila.</p>
+</li>
+<li><p><strong>Busca por Elemento:</strong> Crie um <code>ArrayList</code> de Strings com nomes de cidades. Peça ao usuário para digitar o nome de uma cidade. Verifique se a cidade está presente na lista usando o método <code>contains()</code>. Se estiver, informe o índice da sua primeira ocorrência usando o método <code>indexOf()</code>.</p>
+</li>
+</ol>
+<h4><strong>Bloco 4: API de Collections - <code>Set</code> (Parte IV)</strong></h4>
+<ol start="13">
+<li><p><strong>Removendo Duplicatas:</strong> Crie um <code>ArrayList</code> de <code>Integer</code> que contenha números duplicados. Escreva um código que receba esta lista e retorne uma nova coleção sem os elementos duplicados. (Dica: a forma mais fácil é usar um <code>HashSet</code>).</p>
+</li>
+<li><p><strong>Unicidade de E-mails (<code>HashSet</code>):</strong> Crie um <code>HashSet</code> para armazenar endereços de e-mail (Strings). Tente adicionar alguns e-mails, incluindo um que seja duplicado. Imprima o tamanho do <code>Set</code> para confirmar que o e-mail duplicado não foi adicionado.</p>
+</li>
+<li><p><strong>Ordem de Inserção (<code>LinkedHashSet</code>):</strong> Crie um <code>LinkedHashSet</code> e adicione os nomes dos dias da semana fora de ordem (ex: &quot;Quarta&quot;, &quot;Segunda&quot;, &quot;Sexta&quot;). Itere sobre o <code>Set</code> e imprima os elementos para verificar que eles são exibidos na ordem exata em que foram inseridos.</p>
+</li>
+<li><p><strong>Nomes em Ordem Alfabética (<code>TreeSet</code>):</strong> Crie um <code>TreeSet</code> de Strings e adicione 5 nomes de pessoas fora da ordem alfabética. Itere sobre o <code>Set</code> e observe que os nomes são impressos em ordem alfabética natural.</p>
+</li>
+<li><p><strong>Objetos Personalizados em um <code>TreeSet</code>:</strong> Crie uma classe <code>Produto</code> com <code>nome</code> (String) e <code>preco</code> (double). Faça com que a classe <code>Produto</code> implemente a interface <code>Comparable</code> para que os produtos sejam ordenados pelo preço (do menor para o maior). Crie um <code>TreeSet&lt;Produto&gt;</code> e adicione alguns produtos para testar a ordenação.</p>
+</li>
+</ol>
+<h4><strong>Bloco 5: API de Collections - <code>Map</code> (Parte IV)</strong></h4>
+<ol start="18">
+<li><p><strong>Dicionário Simples (<code>HashMap</code>):</strong> Crie um <code>HashMap</code> para funcionar como um dicionário de tradução simples (Português -&gt; Inglês). Adicione 5 palavras e suas traduções. Peça ao usuário uma palavra em português e, se ela existir no mapa, exiba sua tradução.</p>
+</li>
+<li><p><strong>Contador de Frequência de Palavras:</strong> Crie uma String contendo um parágrafo de texto. Use um <code>HashMap&lt;String, Integer&gt;</code> para contar a frequência de cada palavra no texto. Ao final, itere sobre o mapa e exiba cada palavra e sua contagem.</p>
+</li>
+<li><p><strong>Agenda de Contatos:</strong> Use um <code>HashMap</code> para criar uma agenda onde a chave é o nome do contato (String) e o valor é o número de telefone (String). Permita ao usuário: adicionar um novo contato, buscar um telefone pelo nome e listar todos os contatos (nome e telefone).</p>
+</li>
+<li><p><strong>Mantendo a Ordem de Cadastro (<code>LinkedHashMap</code>):</strong> Crie um <code>LinkedHashMap</code> para armazenar produtos e seus respectivos códigos (ex: <code>Integer</code> como chave, <code>String</code> como valor). Adicione 5 produtos. Itere sobre o mapa e mostre que a ordem de exibição é a mesma da ordem de inserção.</p>
+</li>
+<li><p><strong>Listagem Ordenada (<code>TreeMap</code>):</strong> Crie um <code>TreeMap</code> para armazenar as notas de alunos em uma prova, onde a chave é o nome do aluno (String) e o valor é a nota (Double). Adicione 5 alunos fora de ordem alfabética. Ao listar os alunos e suas notas, observe que o <code>TreeMap</code> os exibe em ordem alfabética pelo nome.</p>
+</li>
+<li><p><strong>Verificando a Existência de Chave e Valor:</strong> Usando o <code>HashMap</code> do exercício da agenda, escreva um código que verifique se um determinado nome (<code>containsKey</code>) e se um determinado telefone (<code>containsValue</code>) já existem na agenda.</p>
+</li>
+</ol>
+<h4><strong>Bloco 6: API de Collections - <code>Queue</code> e <code>Deque</code> (Parte IV)</strong></h4>
+<ol start="24">
+<li><p><strong>Fila de Impressão (<code>Queue</code>):</strong> Simule uma fila de impressão. Crie uma <code>Queue</code> (usando <code>LinkedList</code> como implementação) e adicione 5 documentos (Strings com nomes como &quot;Documento1.pdf&quot;, &quot;Foto.png&quot;, etc.). Em seguida, processe a fila, &quot;imprimindo&quot; (removendo) cada documento e exibindo seu nome na ordem em que entraram.</p>
+</li>
+<li><p><strong>Pilha de Livros (<code>Deque</code> como Stack):</strong> Use um <code>ArrayDeque</code> para simular uma pilha de livros. Permita ao usuário &quot;empilhar&quot; 3 livros (<code>push</code>). Depois, &quot;desempilhe&quot; um livro (<code>pop</code>) e veja qual foi removido (o último que entrou). Por fim, use <code>peek</code> para &quot;espiar&quot; o livro que está no topo da pilha sem removê-lo.</p>
+</li>
+</ol>
+<h4><strong>Bloco 7: Exercícios Integrados</strong></h4>
+<ol start="26">
+<li><p><strong>Catálogo de Produtos por Categoria:</strong> Crie uma estrutura de dados para um catálogo de produtos. Use um <code>Map&lt;String, List&lt;Produto&gt;&gt;</code>, onde a chave é o nome da categoria (ex: &quot;Eletrônicos&quot;) e o valor é uma lista de objetos da classe <code>Produto</code> pertencentes àquela categoria. Popule a estrutura com alguns dados e depois escreva um código para listar todos os produtos de uma categoria específica.</p>
+</li>
+<li><p><strong>Sorteio de Ganhadores Únicos:</strong> Crie uma lista (<code>ArrayList</code>) com nomes de participantes, permitindo que alguns nomes se repitam. Escreva um método que realize um sorteio: ele deve primeiro garantir que cada participante seja considerado apenas uma vez (mesmo que seu nome apareça várias vezes) e depois sortear aleatoriamente 3 nomes únicos para serem os ganhadores.</p>
+</li>
+<li><p><strong>Invertendo uma Frase:</strong> Peça ao usuário uma frase. Use um <code>Deque</code> (como uma pilha) para armazenar cada palavra da frase. Em seguida, desempilhe as palavras uma a uma para formar e exibir a frase na ordem inversa.</p>
+</li>
+<li><p><strong>Histórico de Navegação:</strong> Use uma <code>LinkedList</code> para simular o histórico de um navegador. Crie métodos <code>visitar(String url)</code>, <code>voltar()</code> e <code>avancar()</code>. O método <code>voltar</code> deve navegar para a URL anterior no histórico, e o <code>avancar</code> para a próxima, gerenciando um &quot;ponteiro&quot; ou índice da página atual.</p>
+</li>
+<li><p><strong>Agrupando Alunos por Nota:</strong> Tendo uma <code>List&lt;Aluno&gt;</code> (onde <code>Aluno</code> tem <code>nome</code> e <code>nota</code>), crie um <code>Map&lt;String, List&lt;Aluno&gt;&gt;</code> que agrupe os alunos por faixa de nota: &quot;Aprovados&quot; (nota &gt;= 7), &quot;Recuperação&quot; (nota &gt;= 5 e &lt; 7) e &quot;Reprovados&quot; (nota &lt; 5).</p>
+</li>
+</ol>
+<h4><strong>Bloco 8: Desafios - Reflection</strong></h4>
+<p>Os exercícios a seguir têm como objetivo praticar o uso da API de Reflexão do Java para inspecionar e manipular objetos dinamicamente.</p>
+<ol start="31">
+<li><strong>Inspetor de Classe com Reflection</strong></li>
+</ol>
+<p>O primeiro exemplo da aula mostra como listar os métodos de uma classe. Vamos expandir essa ideia para criar um inspetor universal.</p>
+<ul>
+<li><p><strong>Objetivo:</strong> Crie uma classe <code>AnalisadorDeClasse</code> com um método estático <code>public static void inspecionar(Object obj)</code>. Este método deve receber qualquer objeto Java e imprimir no console:</p>
+<ol>
+<li>O nome completo da classe do objeto.</li>
+<li>O nome de todos os seus atributos (campos), incluindo os privados.</li>
+<li>O nome de todos os seus métodos, incluindo os privados.</li>
+</ol>
+</li>
+<li><p><strong>Dicas:</strong></p>
+<ul>
+<li>Use <code>obj.getClass()</code> para obter o objeto <code>Class</code>.</li>
+<li>Use <code>getDeclaredFields()</code> para obter os atributos.</li>
+<li>Use <code>getDeclaredMethods()</code> para obter os métodos.</li>
+</ul>
+</li>
+<li><p><strong>Classe para Teste:</strong></p>
+<pre><code class="language-java">class Produto {
+    private int codigo;
+    public String nome;
+    protected double preco;
+
+    public Produto(int codigo, String nome, double preco) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.preco = preco;
+    }
+
+    private double calcularImposto() {
+        return preco * 0.1;
+    }
+}
+
+// No seu método main:
+// Produto p = new Produto(101, &quot;Notebook Gamer&quot;, 8500.0);
+// AnalisadorDeClasse.inspecionar(p);
+</code></pre>
+</li>
+</ul>
+<ol start="32">
+<li><strong>Modificador de Atributos Privados</strong></li>
+</ol>
+<p>A aula demonstra como a reflexão pode quebrar o encapsulamento para modificar atributos privados, uma técnica essencial para frameworks de injeção de dependência e ORM.</p>
+<ul>
+<li><p><strong>Objetivo:</strong> Crie uma classe <code>Configuracao</code> com um atributo <code>private String urlConexao = &quot;localhost:5432&quot;;</code>. Em outra classe, crie um método <code>main</code> que, <strong>sem usar getters ou setters</strong>, utilize reflection para alterar o valor deste atributo privado para <code>&quot;db.producao.com:5432&quot;</code>. Ao final, imprima o valor para confirmar a alteração.</p>
+</li>
+<li><p><strong>Dicas:</strong></p>
+<ol>
+<li>Crie uma instância de <code>Configuracao</code>.</li>
+<li>Obtenha o <code>Field</code> (campo) correspondente a <code>urlConexao</code> usando <code>getDeclaredField(&quot;urlConexao&quot;)</code>.</li>
+<li>Torne o campo acessível com <code>field.setAccessible(true)</code>.</li>
+<li>Altere seu valor usando <code>field.set(objetoInstanciado, &quot;novoValor&quot;)</code>.</li>
+<li>Para verificar, use <code>field.get(objetoInstanciado)</code> para ler o novo valor e imprimi-lo.</li>
+</ol>
+</li>
+</ul>
+<ol start="33">
+<li><strong>Framework de Testes Simulado com Anotações</strong></li>
+</ol>
+<p>Este exercício simula como frameworks (JUnit, TestNG) usam reflection para encontrar e executar métodos de teste automaticamente.</p>
+<ul>
+<li><p><strong>Objetivo:</strong> Desenvolver um pequeno executor de testes que executa métodos marcados com uma anotação personalizada.</p>
+</li>
+<li><p><strong>Passos:</strong></p>
+<ol>
+<li><strong>Crie uma anotação:</strong><pre><code class="language-java">import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+
+@Retention(RetentionPolicy.RUNTIME) // Essencial para que a anotação esteja disponível via reflection
+@Target(ElementType.METHOD) // A anotação só pode ser aplicada a métodos
+public @interface Teste {
+}
+</code></pre>
+</li>
+<li><strong>Crie uma classe com métodos de &quot;teste&quot;:</strong><pre><code class="language-java">public class MinhaClasseDeTeste {
+    @Teste
+    public void testeSoma() {
+        System.out.println(&quot;Executando testeSoma: SUCESSO&quot;);
+    }
+
+    public void metodoComum() {
+        System.out.println(&quot;Este não é um teste.&quot;);
+    }
+
+    @Teste
+    public void testeLogin() {
+        System.out.println(&quot;Executando testeLogin: SUCESSO&quot;);
     }
 }
 </code></pre>
-            <h3>Considerações sobre Tratamento de Exceções</h3>
-            <ul>
-                <li>Evite capturar exceções genéricas como <code>Exception</code>, pois isso pode ocultar erros
-                    específicos.
-                </li>
-                <li>O tratamento adequado de exceções melhora a robustez do código e evita falhas inesperadas durante a
-                    execução
-                    do programa.</li>
-            </ul>
-            <hr>
-            <h2>4. Introdução à UML (Unified Modeling Language)</h2>
-            <p>A UML é um <strong>conjunto de diagramas</strong> para modelar sistemas orientados a objetos. Ajuda a
-                visualizar,
-                especificar e documentar a arquitetura de um software.</p>
-            <h3>4.1 Diagrama de Caso de Uso</h3>
-            <ul>
-                <li>Mostra <strong>atores</strong> (usuários ou sistemas externos) e <strong>casos de uso</strong>
-                    (funcionalidades ou objetivos).</li>
-                <li>Relações: <strong>include</strong> (um caso de uso inclui outro), <strong>extend</strong> (um caso
-                    de
-                    uso
-                    estende outro).</li>
-            </ul>
-            <h3>4.2 Diagrama de Classes</h3>
-            <ul>
-                <li>Mostra <strong>classes</strong>, seus <strong>atributos</strong> e <strong>métodos</strong>, além de
-                    relacionamentos:<ul>
-                        <li><strong>Associação</strong>: relação simples (um objeto “conhece” o outro).</li>
-                        <li><strong>Agregação</strong>: relação “tem-um” mas com vida independente.</li>
-                        <li><strong>Composição</strong>: relação “parte-todo” com ciclo de vida dependente (ex.: carro e
-                            motor).
-                        </li>
-                        <li><strong>Generalização</strong> (herança): seta com linha contínua e triângulo apontando para
-                            a
-                            superclasse.</li>
-                    </ul>
-                </li>
-            </ul>
-            <hr>
-            <h2>5. Exercícios de Fixação de Conteúdo</h2>
-            <p>Os exercícios de fixação de conteúdo estão disponibilizados por meio da plataforma Moodle. Entregue-os
-                dentro
-                do
-                prazo estabelecido e, em caso de dúvidas, não hesite entrar em contato!</p>
-            <p><strong>Bons estudos!</strong></p>
+</li>
+<li><strong>Crie a classe <code>ExecutorDeTestes</code>:</strong><ul>
+<li>Ela deve ter um método <code>public static void executarTestes(Object obj)</code>.</li>
+<li>Dentro deste método, use reflection para obter todos os métodos da classe do objeto recebido.</li>
+<li>Itere sobre os métodos e verifique, para cada um, se ele possui a anotação <code>@Teste</code> usando <code>method.isAnnotationPresent(Teste.class)</code>.</li>
+<li>Se um método tiver a anotação, invoque-o dinamicamente usando <code>method.invoke(obj)</code>.</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<h4><strong>Bloco 9: VcRiquinho e Lanchonete Quase Três Lanches</strong></h4>
+<ol start="34">
+<li>Os exercícios VcRiquinho e Lanchonete Quase Três Lanches estão disponíveis no Moodle. Leia o enunciado e elabore as tarefas pedidas.</li>
+</ol>
+<h3>Todos os exercícios deverão ser entregues no Moodle!</h3>
+<h2>Bom trabalho! ⚒️</h2>
 
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         </div>
+
+
+
+
     </div>
 
     <footer class="footer mt-auto py-3">
