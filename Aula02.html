@@ -76,609 +76,977 @@
 
         <div id="content" class="p-4 p-md-5 pt-5">
 
-            <h1><strong>Aula 02 - Continuação de revisão de conteúdo</strong></h1>
-            <hr>
-            <h2><strong>Revisão de APOO1</strong></h2>
-            <p><strong>Objetivo:</strong> Reforçar fundamentos de Java e OOP. </p>
-            <h3><strong>Sintaxe Java e Estruturas de Controle</strong></h3>
-            <p><strong>Conteúdo:</strong> </p>
-            <ul>
-                <li>Encapsulamento</li>
-                <li>Herança</li>
-                <li>Polimorfismo</li>
-                <li>Interfaces </li>
-                <li>Classes Abstratas</li>
-            </ul>
-            <h3>1. <strong>Conceitos Fundamentais de Programação Orientada a Objetos em Java</strong></h3>
-            <p>Para essa revisão utilizaremos três exemplos disponibilizados no Moodle (Exemplos de código-fonte:
-                Herança, Polimorfismo e Interface) que demonstram conceitos essenciais da <strong>Programação Orientada
-                    a Objetos (POO)</strong>, um paradigma amplamente utilizado no desenvolvimento de software moderno.
-            </p>
-            <p>Cada um dos conceitos abordados nos exemplos será detalhado abaixo, com explicações e exemplos extraídos
-                dos códigos fornecidos. Os códigos foram retirados do livro Java - Como Programar, 10ª edição, de Paul
-                Deitel e Harvey Deitel.</p>
-            <hr>
-            <h2><strong>1. Classes e Objetos</strong></h2>
-            <h3><strong>O que são classes?</strong></h3>
-            <p>Uma <strong>classe</strong> é um modelo para criar objetos. Ela define <strong>atributos (dados)</strong>
-                e <strong>métodos (comportamentos)</strong> que os objetos daquela classe terão.</p>
-            <h3><strong>O que são objetos?</strong></h3>
-            <p>Um <strong>objeto</strong> é uma instância de uma classe. Ele possui um estado (definido pelos atributos
-                da classe) e um comportamento (definido pelos métodos da classe).</p>
-            <h3><strong>Exemplo de Classe e Objeto</strong></h3>
-            <p>No exemplo do sistema de folha de pagamento, temos a classe <code>Employee</code>:</p>
-            <pre><code class="language-java">public abstract class Employee {
-   private final String firstName;
-   private final String lastName;
-   private final String socialSecurityNumber;
-}
-</code></pre>
-            <p>E no arquivo <code>PayrollSystemTest.java</code>, criamos objetos dessa classe:</p>
-            <pre><code class="language-java">SalariedEmployee salariedEmployee = 
-   new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
-</code></pre>
-            <p>Aqui, <code>salariedEmployee</code> é um <strong>objeto</strong> da classe <code>SalariedEmployee</code>.
-            </p>
-            <hr>
-            <h2><strong>2. Encapsulamento</strong></h2>
-            <p>O <strong>encapsulamento</strong> é um princípio que protege os dados de um objeto, permitindo que sejam
-                acessados apenas por meio de métodos específicos (getters e setters).</p>
-            <h3><strong>Exemplo de Encapsulamento</strong></h3>
-            <p>No código abaixo, os atributos são privados (<code>private</code>), e só podem ser acessados por métodos
-                públicos (<code>public</code>).</p>
-            <pre><code class="language-java">private double weeklySalary;
 
-public double getWeeklySalary() {
-   return weeklySalary;
+
+
+
+
+
+
+
+
+
+            <h1><strong>Aula 02 - Aprofundando em Java: Lambdas, Streams e Optionals</strong></h1>
+<p>Na Aula 01, revisamos a base da Programação Orientada a Objetos em Java. Agora, vamos explorar um conjunto de recursos introduzidos a partir do Java 8 que transformaram a maneira como escrevemos código: <strong>Expressões Lambda, a Stream API e a classe <code>Optional</code></strong>.</p>
+<p>Essas ferramentas são o coração do estilo de programação funcional em Java e são usadas extensivamente em frameworks como o Spring Boot. Compreendê-las não é apenas um diferencial, mas um requisito para escrever código limpo e expressivo.</p>
+<p>Não se preocupe se alguns conceitos ainda ficarem &quot;nublados&quot; nesse primeiro momento. Os pontos se conectarão mais adiante quando os utilizarmos para construção de nossas APIs Rest. 🧑‍💻</p>
+<hr>
+<h2><strong>1. Mudando a Perspectiva: Uma Introdução à Programação Funcional</strong></h2>
+<p>Até agora, nossa visão sobre Java foi moldada pela <strong>Programação Orientada a Objetos (POO)</strong>. Na POO, modelamos o mundo como um conjunto de <strong>objetos</strong> que possuem <em>estado</em> (atributos) e <em>comportamento</em> (métodos). O foco está nos substantivos: um <code>Carro</code>, um <code>Cliente</code>, uma <code>NotaFiscal</code>. Nosso código opera modificando o estado desses objetos ao longo do tempo.</p>
+<p>Agora, vamos introduzir uma perspectiva diferente, mas complementar: a <strong>Programação Funcional (PF)</strong>.</p>
+<p>Na Programação Funcional, em vez de focar em objetos que mudam de estado, pensamos em termos de <strong>transformação de dados</strong>. O software é visto como uma série de funções matemáticas, onde cada função recebe uma entrada, processa-a e produz uma saída, <strong>sem alterar nada fora de seu escopo</strong>. O foco aqui está nos verbos: <code>calcular</code>, <code>filtrar</code>, <code>transformar</code>.</p>
+<h3><strong>1.1 Os Pilares da Programação Funcional</strong></h3>
+<p>Para entender essa abordagem, precisamos conhecer três conceitos-chave que a sustentam:</p>
+<h4><strong>1. Funções como Cidadãos de Primeira Classe (First-Class Citizens)</strong></h4>
+<p>Este é o pilar central. Significa que as funções são tratadas como qualquer outro valor no programa. Em Java, isso é alcançado através das <strong>Interfaces Funcionais</strong> e <strong>Expressões Lambda</strong>. Nesse paradigma uma função pode ser:</p>
+<ul>
+<li><p><strong>Atribuída a uma variável:</strong></p>
+<pre><code class="language-java">// A função (x -&gt; x * 2) é atribuída à variável &#39;dobrar&#39;.
+// A variável &#39;dobrar&#39; é do tipo Function&lt;Integer, Integer&gt;, uma interface funcional.
+Function&lt;Integer, Integer&gt; dobrar = x -&gt; x * 2;
+
+// Agora, podemos usar a variável para executar a função.
+int resultado = dobrar.apply(5); // resultado = 10
+</code></pre>
+</li>
+<li><p><strong>Passada como argumento para outra função:</strong></p>
+<pre><code class="language-java">// Este método recebe uma lista e uma função como argumentos.
+public static List&lt;Integer&gt; aplicarFuncaoNaLista(List&lt;Integer&gt; lista, Function&lt;Integer, Integer&gt; funcao) {
+    List&lt;Integer&gt; novaLista = new ArrayList&lt;&gt;();
+    for (Integer item : lista) {
+        novaLista.add(funcao.apply(item));
+    }
+    return novaLista;
 }
 
-public void setWeeklySalary(double weeklySalary) {
-   if (weeklySalary &lt; 0.0)
-      throw new IllegalArgumentException(&quot;Weekly salary must be &gt;= 0.0&quot;);
-   this.weeklySalary = weeklySalary;
+// No código principal, passamos a função &#39;dobrar&#39; como argumento.
+List&lt;Integer&gt; numeros = Arrays.asList(1, 2, 3);
+List&lt;Integer&gt; numerosDobrados = aplicarFuncaoNaLista(numeros, dobrar); // [2, 4, 6]
+</code></pre>
+</li>
+<li><p><strong>Retornada como resultado de outra função:</strong></p>
+<pre><code class="language-java">// Este método retorna uma função que multiplica por um valor específico.
+public static Function&lt;Integer, Integer&gt; criarMultiplicador(int multiplicador) {
+    return numero -&gt; numero * multiplicador;
+}
+
+// Criamos e armazenamos novas funções dinamicamente.
+Function&lt;Integer, Integer&gt; triplicar = criarMultiplicador(3);
+Function&lt;Integer, Integer&gt; quintuplicar = criarMultiplicador(5);
+
+int resultadoTriplo = triplicar.apply(10);   // resultadoTriplo = 30
+int resultadoQuintuplo = quintuplicar.apply(10); // resultadoQuintuplo = 50
+</code></pre>
+</li>
+</ul>
+<p>Essa capacidade é o que abre as portas para as <strong>Expressões Lambda</strong>, que nada mais são do que uma forma de escrever essas funções &quot;portáteis&quot;.</p>
+<h4><strong>2. Imutabilidade e a Ausência de Efeitos Colaterais (Side Effects)</strong></h4>
+<p>Este é talvez o maior contraste com a POO tradicional.</p>
+<ul>
+<li><strong>Efeito Colateral (Side Effect):</strong> É qualquer alteração de estado fora do escopo da função. Modificar um atributo de um objeto que foi passado como parâmetro, alterar uma variável global, escrever em um arquivo ou no console são todos exemplos de efeitos colaterais.</li>
+<li><strong>Imutabilidade:</strong> Significa que os dados, uma vez criados, não podem ser alterados. Em vez de modificar uma lista existente, uma função funcional cria e retorna uma <em>nova</em> lista com as mudanças desejadas.</li>
+</ul>
+<p>Vamos ver a diferença na prática.</p>
+<p><strong>Exemplo com Efeito Colateral (abordagem mutável):</strong></p>
+<pre><code class="language-java">public void dobrarValores(List&lt;Integer&gt; numeros) {
+    // EFEITO COLATERAL: A lista original passada como parâmetro é modificada.
+    for (int i = 0; i &lt; numeros.size(); i++) {
+        numeros.set(i, numeros.get(i) * 2);
+    }
+}
+
+List&lt;Integer&gt; minhaLista = new ArrayList&lt;&gt;(Arrays.asList(1, 2, 3));
+dobrarValores(minhaLista);
+// Agora &#39;minhaLista&#39; foi alterada e contém [2, 4, 6].
+// Isso pode ser inesperado e causar bugs em outras partes do código que usam &#39;minhaLista&#39;.
+</code></pre>
+<p><strong>Exemplo Sem Efeitos Colaterais (abordagem imutável e funcional):</strong></p>
+<pre><code class="language-java">public List&lt;Integer&gt; dobrarValores(List&lt;Integer&gt; numeros) {
+    // SEM EFEITO COLATERAL: A lista original não é modificada.
+    // Uma nova lista é criada e retornada.
+    return numeros.stream()
+                  .map(n -&gt; n * 2)
+                  .collect(Collectors.toList());
+}
+
+List&lt;Integer&gt; minhaLista = Arrays.asList(1, 2, 3);
+List&lt;Integer&gt; listaDobrada = dobrarValores(minhaLista);
+
+// &#39;minhaLista&#39; permanece intacta: [1, 2, 3]
+// &#39;listaDobrada&#39; contém o novo resultado: [2, 4, 6]
+</code></pre>
+<p>E isso é valioso porque código sem efeitos colaterais é mais previsível. Uma função, dadas as mesmas entradas, <strong>sempre</strong> produzirá as mesmas saídas. Isso torna o código mais fácil de testar, depurar e, especialmente, de paralelizar, pois elimina as condições de corrida (quando múltiplas threads tentam modificar o mesmo dado ao mesmo tempo).</p>
+<h4><strong>3. Programação Declarativa vs. Imperativa</strong></h4>
+<p>Este pilar define o estilo de escrita do código.</p>
+<ul>
+<li><strong>Estilo Imperativo (o &quot;como&quot;):</strong> Você descreve passo a passo <em>como</em> o computador deve executar uma tarefa. Laços <code>for</code> e <code>while</code> são a marca registrada desse estilo. Você controla cada detalhe do fluxo.</li>
+<li><strong>Estilo Declarativo (o &quot;o quê&quot;):</strong> Você descreve <em>o que</em> você quer como resultado, e a linguagem ou API se encarrega dos detalhes da execução.</li>
+</ul>
+<p>Vejamos um exemplo simples: obter os nomes dos produtos com preço acima de R$100.</p>
+<p><strong>Abordagem Imperativa (foco no &quot;COMO&quot;):</strong></p>
+<pre><code class="language-java">List&lt;String&gt; nomesProdutosCaros = new ArrayList&lt;&gt;();
+for (Produto produto : listaProdutos) {
+    if (produto.getPreco() &gt; 100.0) {
+        nomesProdutosCaros.add(produto.getNome());
+    }
 }
 </code></pre>
-            <p>Isso garante que <strong>nenhum outro código pode modificar <code>weeklySalary</code>
-                    diretamente</strong>, prevenindo valores inválidos.</p>
-            <hr>
-            <h2><strong>3. Herança</strong></h2>
-            <p>A <strong>herança</strong> permite que uma classe herde atributos e métodos de outra classe. Isso promove
-                a <strong>reutilização de código</strong> e evita redundância. Vejamos o exemplo do sistema de folha de
-                pagamento, disponibilizado abaixo. Leia com atenção as classes abaixo e execute o código em sua máquina.
-            </p>
-            <h4><code>CommissionEmployee</code></h4>
-            <pre><code class="language-java">// Classe que representa um funcionário que recebe comissões.
-
-public class CommissionEmployee
-{
-   private final String firstName;                              
-   private final String lastName;                               
-   private final String socialSecurityNumber;                   
-   private double grossSales; // Vendas brutas semanais      
-   private double commissionRate; // Porcentagem de comissão
-
-   // Construtor com cinco argumentos
-   public CommissionEmployee(String firstName, String lastName, 
-      String socialSecurityNumber, double grossSales, 
-      double commissionRate)
-   {
-      if (grossSales &lt; 0.0) 
-         throw new IllegalArgumentException(&quot;Gross sales must be &gt;= 0.0&quot;);
-
-      if (commissionRate &lt;= 0.0 || commissionRate &gt;= 1.0)
-         throw new IllegalArgumentException(&quot;Commission rate must be &gt; 0.0 and &lt; 1.0&quot;);
-
-      this.firstName = firstName;                                    
-      this.lastName = lastName;                                    
-      this.socialSecurityNumber = socialSecurityNumber;         
-      this.grossSales = grossSales;
-      this.commissionRate = commissionRate;
-   }
-
-   public String getFirstName() { return firstName; }
-   public String getLastName() { return lastName; }
-   public String getSocialSecurityNumber() { return socialSecurityNumber; } 
-
-   public void setGrossSales(double grossSales)
-   {
-      if (grossSales &lt; 0.0) 
-         throw new IllegalArgumentException(&quot;Gross sales must be &gt;= 0.0&quot;);
-
-      this.grossSales = grossSales;
-   }
-
-   public double getGrossSales() { return grossSales; } 
-
-   public void setCommissionRate(double commissionRate)
-   {
-      if (commissionRate &lt;= 0.0 || commissionRate &gt;= 1.0)
-         throw new IllegalArgumentException(&quot;Commission rate must be &gt; 0.0 and &lt; 1.0&quot;);
-
-      this.commissionRate = commissionRate;
-   }
-
-   public double getCommissionRate() { return commissionRate; }
-
-   public double earnings() { return getCommissionRate() * getGrossSales(); }
-
-   @Override 
-   public String toString()
-   {
-      return String.format(&quot;commission employee: %s %s%n&quot; +
-         &quot;social security number: %s%n&quot; +
-         &quot;gross sales: %.2f%ncommission rate: %.2f&quot;, 
-         getFirstName(), getLastName(), 
-         getSocialSecurityNumber(), getGrossSales(), 
-         getCommissionRate());
-   } 
+<p>Aqui, nós instruímos cada passo: crie uma lista vazia, itere sobre a lista original, verifique a condição, adicione à nova lista.</p>
+<p><strong>Abordagem Declarativa (foco no &quot;O QUÊ&quot;):</strong></p>
+<pre><code class="language-java">List&lt;String&gt; nomesProdutosCaros = listaProdutos.stream()
+    .filter(p -&gt; p.getPreco() &gt; 100.0)
+    .map(p -&gt; p.getNome())
+    .collect(Collectors.toList());
+</code></pre>
+<p>Aqui, nós simplesmente declaramos o que queremos: &quot;A partir da lista de produtos, filtre aqueles com preço maior que 100, mapeie o resultado para seus nomes e colete em uma nova lista&quot;. A <strong>Stream API</strong> cuida do &quot;como&quot; por baixo dos panos.</p>
+<h3><strong>1.2 Conectando com o que Você Já Sabe: Recursão</strong></h3>
+<p>Se você já usou <strong>recursão</strong>, já teve um contato com o pensamento funcional. A recursão é uma técnica clássica da Programação Funcional para realizar repetições sem usar laços que dependem de variáveis de controle mutáveis (como o <code>int i = 0</code> do <code>for</code>).</p>
+<h3><strong>Por que Estamos Aprendendo Isso?</strong></h3>
+<p>O Java, a partir da versão 8, abraçou fortemente os conceitos da programação funcional. O motivo é prático: esse paradigma ajuda a escrever código mais <strong>conciso, expressivo e seguro</strong>, especialmente ao lidar com coleções de dados e programação concorrente. No desenvolvimento de APIs com Spring Boot, você usará esses conceitos o tempo todo para manipular dados, tratar respostas assíncronas e escrever lógicas de negócio de forma mais limpa.</p>
+<p>Agora que entendemos a <em>filosofia</em> da programação funcional, vamos analisar as <em>ferramentas</em> que o Java nos oferece para aplicá-la na prática. Começaremos pelas <strong>Expressões Lambda</strong>.</p>
+<hr>
+<h2><strong>2. Expressões Lambda: A Revolução da Concisão</strong></h2>
+<p>Antes do Java 8, tarefas simples como ordenar uma lista com um critério customizado ou definir um evento de clique exigiam a criação de <strong>classes anônimas internas</strong>, resultando em um código verboso.</p>
+<p><strong>O problema:</strong></p>
+<pre><code class="language-java">// Ordenando uma lista de Strings por tamanho (antes do Java 8)
+Collections.sort(nomes, new Comparator&lt;String&gt;() {
+    @Override
+    public int compare(String s1, String s2) {
+        return Integer.compare(s1.length(), s2.length());
+    }
+});
+</code></pre>
+<p>Toda essa estrutura (<code>new Comparator...</code>) existe apenas para passar um único método (<code>compare</code>) como lógica.</p>
+<p>As <strong>Expressões Lambda</strong> resolvem isso, permitindo que você trate funcionalidades como um argumento de método, ou código como dados.</p>
+<p><strong>A solução com Lambda:</strong></p>
+<pre><code class="language-java">// A mesma ordenação, agora com uma expressão lambda
+Collections.sort(nomes, (s1, s2) -&gt; Integer.compare(s1.length(), s2.length()));
+</code></pre>
+<p>O código faz exatamente a mesma coisa, mas de forma muito mais direta e legível. A seguir, vamos detalhar cada parte desse código.</p>
+<p>Ele utiliza o método <code>Collections.sort()</code>, que aceita dois parâmetros:</p>
+<h4><strong>1. Primeiro Parâmetro: <code>nomes</code></strong></h4>
+<ul>
+<li><strong>O que é:</strong> É a <code>List&lt;String&gt;</code> que você deseja ordenar.</li>
+<li><strong>Função:</strong> É o alvo da operação de ordenação.</li>
+</ul>
+<h4><strong>2. Segundo Parâmetro: A Expressão Lambda</strong></h4>
+<ul>
+<li><p><strong>O que é:</strong> É a lógica de comparação, fornecida como uma função. Ela diz ao método <code>sort</code> <em>como</em> ele deve decidir qual dos dois elementos vem primeiro.</p>
+</li>
+<li><p><strong>Função:</strong> A lambda <code>(s1, s2) -&gt; Integer.compare(s1.length(), s2.length())</code> é uma implementação concisa da interface funcional <code>Comparator&lt;String&gt;</code>. Vamos quebrar a lambda em partes:</p>
+<ul>
+<li><p><strong><code>(s1, s2)</code></strong>: Estes são os parâmetros da função. Em qualquer momento da ordenação, o algoritmo pegará dois elementos da lista <code>nomes</code> para comparar, que serão representados por <code>s1</code> e <code>s2</code> (ambos do tipo <code>String</code>).</p>
+</li>
+<li><p><strong><code>-&gt;</code></strong>: É o operador que separa os parâmetros do corpo (a lógica) da função.</p>
+</li>
+<li><p><strong><code>Integer.compare(s1.length(), s2.length())</code></strong>: Esta é a implementação da lógica de comparação.</p>
+<ul>
+<li><code>s1.length()</code>: Pega o comprimento (número de caracteres) da primeira String.</li>
+<li><code>s2.length()</code>: Pega o comprimento da segunda String.</li>
+<li><code>Integer.compare(a, b)</code>: Este método compara dois inteiros (<code>a</code> e <code>b</code>) e retorna:<ul>
+<li>Um número <strong>negativo</strong> se <code>a</code> for menor que <code>b</code>.</li>
+<li><strong>Zero</strong> se <code>a</code> for igual a <code>b</code>.</li>
+<li>Um número <strong>positivo</strong> se <code>a</code> for maior que <code>b</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>O algoritmo de ordenação do <code>Collections.sort</code> usa esse retorno para organizar a lista, resultando em uma ordenação baseada no comprimento das strings, da menor para a maior.</p>
+<p>Bem prático, né? 👽</p>
+<h3><strong>2.1. Anatomia de uma Expressão Lambda</strong></h3>
+<p>Uma lambda é, basicamente, uma função anônima. Como vimos no exemplo acima, sua sintaxe é:
+<code>(parâmetros) -&gt; { corpo da função }</code></p>
+<ul>
+<li><strong>Parâmetros:</strong> Uma lista de parâmetros de entrada (pode ser vazia). O tipo pode ser omitido se o compilador conseguir inferi-lo.</li>
+<li><strong>Seta <code>-&gt;</code>:</strong> Separa os parâmetros do corpo.</li>
+<li><strong>Corpo:</strong> Uma única expressão ou um bloco de código. Se for uma única expressão, o <code>return</code> é implícito e as chaves <code>{}</code> são opcionais.</li>
+</ul>
+<h3><strong>2.2. Interfaces Funcionais: A Base das Lambdas</strong></h3>
+<p>Uma expressão lambda só pode ser usada em um contexto onde um tipo é esperado. Pense nesse tipo como um <strong>contrato</strong> ou um <strong>molde</strong> para a lambda. Em Java, esse molde é sempre uma <strong>Interface Funcional</strong>.</p>
+<p>Uma Interface Funcional é definida por uma regra simples: ela deve conter <strong>apenas um método abstrato</strong>. É a assinatura desse único método que define o formato que a lambda deve seguir (quais parâmetros ela recebe e o que ela retorna).</p>
+<p>O Java já nos fornece um conjunto de interfaces funcionais prontas no pacote <code>java.util.function</code>. Dentre as mais comuns temos:</p>
+<h4><strong>1. <code>Predicate&lt;T&gt;</code></strong></h4>
+<ul>
+<li><strong>Propósito:</strong> Testar uma condição.</li>
+<li><strong>Método abstrato:</strong> <code>boolean test(T t)</code></li>
+<li><strong>Contrato:</strong> Recebe um objeto do tipo <code>T</code> e retorna <code>true</code> ou <code>false</code>.</li>
+<li><strong>Exemplo de Lambda:</strong><pre><code class="language-java">// Testa se um número é par
+Predicate&lt;Integer&gt; isEven = numero -&gt; numero % 2 == 0;
+System.out.println(isEven.test(10)); // Saída: true
+</code></pre>
+</li>
+<li><strong>Uso comum:</strong> Ideal para filtros, como em <code>stream().filter()</code>.</li>
+</ul>
+<h4><strong>2. <code>Function&lt;T, R&gt;</code></strong></h4>
+<ul>
+<li><strong>Propósito:</strong> Transformar um valor de um tipo em outro.</li>
+<li><strong>Método abstrato:</strong> <code>R apply(T t)</code></li>
+<li><strong>Contrato:</strong> Recebe um objeto do tipo <code>T</code> e retorna um objeto do tipo <code>R</code>.</li>
+<li><strong>Exemplo de Lambda:</strong><pre><code class="language-java">// Transforma uma String em seu comprimento (Integer)
+Function&lt;String, Integer&gt; getLength = texto -&gt; texto.length();
+System.out.println(getLength.apply(&quot;Java&quot;)); // Saída: 4
+</code></pre>
+</li>
+<li><strong>Uso comum:</strong> Perfeita para mapeamentos, como em <code>stream().map()</code>.</li>
+</ul>
+<h4><strong>3. <code>Consumer&lt;T&gt;</code></strong></h4>
+<ul>
+<li><strong>Propósito:</strong> &quot;Consumir&quot; um valor para executar uma ação, sem retornar nada.</li>
+<li><strong>Método abstrato:</strong> <code>void accept(T t)</code></li>
+<li><strong>Contrato:</strong> Recebe um objeto do tipo <code>T</code> e retorna <code>void</code>.</li>
+<li><strong>Exemplo de Lambda:</strong><pre><code class="language-java">// Ação de imprimir uma String no console
+Consumer&lt;String&gt; printText = texto -&gt; System.out.println(texto);
+printText.accept(&quot;Olá, Mundo!&quot;); // Imprime &quot;Olá, Mundo!&quot;
+</code></pre>
+</li>
+<li><strong>Uso comum:</strong> Utilizada em operações terminais que executam algo, como <code>list.forEach()</code>.</li>
+</ul>
+<h4><strong>4. <code>Supplier&lt;T&gt;</code></strong></h4>
+<ul>
+<li><strong>Propósito:</strong> Fornecer/criar um valor sem receber nenhuma entrada.</li>
+<li><strong>Método abstrato:</strong> <code>T get()</code></li>
+<li><strong>Contrato:</strong> Não recebe parâmetros e retorna um objeto do tipo <code>T</code>.</li>
+<li><strong>Exemplo de Lambda:</strong><pre><code class="language-java">// Fornece a data e hora atuais
+Supplier&lt;LocalDateTime&gt; now = () -&gt; LocalDateTime.now();
+System.out.println(now.get()); 
+</code></pre>
+</li>
+<li><strong>Uso comum:</strong> Para criação de objetos ou fornecimento de valores padrão, como em <code>Optional.orElseGet()</code>.</li>
+</ul>
+<p>A anotação <code>@FunctionalInterface</code> pode ser usada para garantir que uma interface cumpra o requisito de ter apenas um método abstrato. Ela é opcional, mas funciona como uma <strong>verificação de segurança</strong> para o compilador e uma <strong>dica clara</strong> para outros desenvolvedores de que a interface foi projetada para ser usada com lambdas. Vejamos como isso funciona.</p>
+<h3>Criando sua própria Interface Funcional</h3>
+<p>Você pode facilmente criar suas próprias interfaces funcionais para representar contratos específicos do seu negócio.</p>
+<p><strong>Exemplo: Criando um formatador de texto</strong></p>
+<p>Vamos supor que precisamos de diferentes formas de formatar uma <code>String</code>. Podemos criar uma interface para isso:</p>
+<pre><code class="language-java">@FunctionalInterface
+public interface TextFormatter {
+    String format(String text);
 }
 </code></pre>
-            <h4><code>BasePlusCommissionEmployee</code></h4>
-            <pre><code class="language-java">// Classe que herda CommissionEmployee e adiciona um salário base.
+<ul>
+<li><strong>A Regra:</strong> A interface <code>TextFormatter</code> tem apenas um método abstrato, <code>format(String text)</code>.</li>
+<li><strong>A Anotação:</strong> <code>@FunctionalInterface</code> garante que, se alguém tentar adicionar outro método abstrato a esta interface, o código não compilará.</li>
+</ul>
+<p><strong>Como usar:</strong></p>
+<p>Agora, podemos criar diferentes implementações para este contrato usando lambdas:</p>
+<pre><code class="language-java">// Implementação 1: Converte para maiúsculas
+TextFormatter toUpperCase = texto -&gt; texto.toUpperCase();
 
-public class BasePlusCommissionEmployee extends CommissionEmployee
-{
-   private double baseSalary;
+// Implementação 2: Adiciona &quot;!!!&quot; no final
+TextFormatter addExclamation = texto -&gt; texto + &quot;!!!&quot;;
 
-   public BasePlusCommissionEmployee(String firstName, String lastName, 
-      String socialSecurityNumber, double grossSales, 
-      double commissionRate, double baseSalary)
-   {
-      super(firstName, lastName, socialSecurityNumber, grossSales, commissionRate);
+System.out.println(toUpperCase.format(&quot;java&quot;));      // Saída: JAVA
+System.out.println(addExclamation.format(&quot;Atenção&quot;)); // Saída: Atenção!!!
+</code></pre>
+<p><strong>Lembrando: o mais importante aqui é o conceito!</strong> </p>
+<p><code>@FunctionalInterface</code> formaliza a criação de &quot;moldes&quot; para as suas lambdas. Não se preocupe em decorar todas as interfaces prontas do Java agora. O fundamental é entender que, por trás de toda expressão lambda, existe uma interface funcional definindo o contrato que ela cumpre.</p>
+<hr>
+<h2><strong>3. Stream API: Processando Coleções de Forma Declarativa</strong></h2>
+<p>A Stream API é talvez a adição mais impactante do Java 8. Pense nela como uma <strong>linha de montagem para dados:</strong> você coloca uma coleção de itens em uma ponta, e eles passam por várias estações (filtragem, transformação, ordenação) até saírem do outro lado como um resultado final. Ela introduz uma nova forma de processar coleções de dados, focando no <strong>&quot;o que fazer&quot;</strong> em vez de <strong>&quot;como fazer&quot;</strong>.</p>
+<p>Uma <strong>Stream</strong> não é uma estrutura de dados, mas sim uma sequência de elementos de uma fonte (como uma <code>List</code> ou <code>Set</code>) que suporta operações agregadas.</p>
+<p>O trabalho com streams geralmente segue um padrão de três etapas:</p>
+<ol>
+<li><strong>Fonte (Source):</strong> Obter um stream a partir de uma coleção.</li>
+<li><strong>Operações Intermediárias (Intermediate Operations):</strong> Transformar o stream (filtrar, mapear, etc.). Essas operações são <em>lazy</em> (preguiçosas), ou seja, nada acontece até que uma operação terminal seja chamada.</li>
+<li><strong>Operação Terminal (Terminal Operation):</strong> Produzir um resultado ou um efeito colateral a partir do stream (coletar em uma lista, calcular uma soma, etc.).</li>
+</ol>
+<h3>Contexto Prático: Onde a Stream API Brilha?</h3>
+<p>Imagine que você está trabalhando em uma <strong>API para um e-commerce</strong>. A equipe de marketing pediu um novo endpoint: <code>GET /api/produtos/destaques</code>.</p>
+<p><strong>A Regra de Negócio:</strong> Este endpoint deve retornar uma lista contendo apenas os <strong>nomes</strong> dos produtos considerados &quot;premium&quot; (com preço acima de R$ 500), e esses nomes devem estar em <strong>letras maiúsculas</strong> para serem exibidos em um banner promocional no site.</p>
+<p>Essa lógica de negócio pertence à <strong>camada de Serviço (<code>Service</code>)</strong>. O <code>Controller</code> apenas receberá a requisição e chamará o método do serviço.</p>
+<p>Vamos ver como as duas abordagens se sairiam dentro de um <code>ProductService</code>.</p>
+<h4><strong>1. Abordagem Imperativa (Com <code>for</code>)</strong></h4>
+<p>No seu <code>ProductService</code>, o método ficaria assim:</p>
+<pre><code class="language-java">@Service
+public class ProductService {
 
-      if (baseSalary &lt; 0.0)                   
-         throw new IllegalArgumentException(&quot;Base salary must be &gt;= 0.0&quot;);  
+    @Autowired
+    private ProductRepository productRepository;
 
-      this.baseSalary = baseSalary;
-   }
+    public List&lt;String&gt; findFeaturedProductNamesImperative() {
+        // 1. Busca todos os produtos do banco de dados.
+        List&lt;Product&gt; allProducts = productRepository.findAll();
 
-   public void setBaseSalary(double baseSalary)
-   {
-      if (baseSalary &lt; 0.0)                   
-         throw new IllegalArgumentException(&quot;Base salary must be &gt;= 0.0&quot;);  
+        // 2. Prepara uma lista vazia para armazenar os resultados.
+        List&lt;String&gt; featuredNames = new ArrayList&lt;&gt;();
 
-      this.baseSalary = baseSalary;                
-   } 
+        // 3. Itera sobre cada produto para aplicar a regra de negócio (o &quot;COMO&quot;).
+        for (Product product : allProducts) {
+            if (product.getPrice() &gt; 500.0) {
+                String upperCaseName = product.getName().toUpperCase();
+                featuredNames.add(upperCaseName);
+            }
+        }
 
-   public double getBaseSalary() { return baseSalary; }
-
-   @Override 
-   public double earnings() { return getBaseSalary() + super.earnings(); }
-
-   @Override
-   public String toString()
-   {
-      return String.format(&quot;base-salaried %s%nbase salary: %.2f&quot;, 
-         super.toString(), getBaseSalary());   
-   } 
+        // 4. Retorna a lista preenchida.
+        return featuredNames;
+    }
 }
 </code></pre>
-            <h4><code>BasePlusCommissionEmployeeTest</code></h4>
-            <pre><code class="language-java">// Programa principal para testar BasePlusCommissionEmployee.
+<p>Este código funciona, mas ele detalha cada passo mecânico necessário para chegar ao resultado.</p>
+<h4><strong>2. Abordagem Declarativa (Com Stream API)</strong></h4>
+<p>Usando a Stream API, o mesmo método fica muito mais direto:</p>
+<pre><code class="language-java">@Service
+public class ProductService {
 
-public class BasePlusCommissionEmployeeTest
-{
-   public static void main(String[] args) 
-   {
-      BasePlusCommissionEmployee employee = 
-         new BasePlusCommissionEmployee(&quot;Bob&quot;, &quot;Lewis&quot;, &quot;333-33-3333&quot;, 5000, .04, 300);
+    @Autowired
+    private ProductRepository productRepository;
 
-      System.out.println(&quot;Employee information obtained by get methods:&quot;);
-      System.out.println(employee.toString());
+    public List&lt;String&gt; findFeaturedProductNamesFunctional() {
+        // 1. Busca todos os produtos do banco.
+        List&lt;Product&gt; allProducts = productRepository.findAll();
 
-      employee.setBaseSalary(1000); 
-
-      System.out.println(&quot;\nUpdated employee information:&quot;);
-      System.out.println(employee.toString());
-   }
+        // 2. Descreve a transformação desejada (o &quot;O QUÊ&quot;).
+        return allProducts.stream()
+                .filter(product -&gt; product.getPrice() &gt; 500.0)      // Filtra produtos &#39;premium&#39;
+                .map(product -&gt; product.getName().toUpperCase())   // Mapeia para o nome em maiúsculas
+                .collect(Collectors.toList());                     // Coleta os resultados em uma nova lista
+    }
 }
 </code></pre>
-            <hr>
-            <h3>Explicação do código com Herança</h3>
-            <p>Perceba que o código possui duas classes principais <code>CommissionEmployee</code> e
-                <code>BasePlusCommissionEmployee</code>. A classe <code>BasePlusCommissionEmployee</code> herda as
-                funcionalidades de <code>CommissionEmployee</code> e as sobrecreve, implementando a regra de negócio
-                adequada para a subclasse. Ou seja, <code>BasePlusCommissionEmployee</code> é um
-                <code>CommissionEmployee</code> com regras específicas.
-            </p>
-            <hr>
-            <h2><strong>4. Polimorfismo e Classe Abstrata</strong></h2>
-            <p>O <strong>polimorfismo</strong> permite que diferentes classes usem o mesmo método de formas diferentes.
-            </p>
-            <p>Ainda sobre os conceitos de Herança, na extensão do exemplo do sistema de folha de pagamento,
-                <code>SalariedEmployee</code>, <code>HourlyEmployee</code> e <code>CommissionEmployee</code> herdam de
-                <code>Employee</code>:
-            </p>
-            <pre><code class="language-java">public class SalariedEmployee extends Employee {
+<p>Ou seja, ambos os métodos entregam o mesmo resultado. No entanto, em um serviço de uma aplicação real, a <strong>abordagem funcional (declarativa)</strong> é geralmente preferida porque:</p>
+<ul>
+<li><p><strong>Expressa melhor a intenção:</strong> O código lê como uma descrição da regra de negócio (&quot;pegue os produtos, filtre por preço, transforme em nome maiúsculo&quot;), não como uma série de instruções de baixo nível.</p>
+</li>
+<li><p><strong>É mais concisa e menos propensa a erros:</strong> Menos código &quot;boilerplate&quot; (como criar e adicionar a uma lista manualmente) significa menos lugares para bugs se esconderem.</p>
+</li>
+<li><p><strong>Facilita a manutenção:</strong> Se a regra mudar (ex: &quot;agora também ordene por nome&quot;), adicionar uma nova operação ao stream (<code>.sorted()</code>) é trivial.</p>
+</li>
+</ul>
+<p>Dentre as principais operações da Stream API temos:</p>
+<ul>
+<li><strong><code>filter(Predicate&lt;T&gt;)</code></strong>: Retorna um stream com elementos que correspondem a uma condição.</li>
+<li><strong><code>map(Function&lt;T, R&gt;)</code></strong>: Transforma cada elemento de um tipo <code>T</code> para um tipo <code>R</code>.</li>
+<li><strong><code>sorted()</code></strong>: Ordena os elementos (usando a ordem natural ou um <code>Comparator</code>).</li>
+<li><strong><code>distinct()</code></strong>: Remove elementos duplicados.</li>
+<li><strong><code>forEach(Consumer&lt;T&gt;)</code></strong>: Executa uma ação para cada elemento (operação terminal).</li>
+<li><strong><code>collect(Collector)</code></strong>: Agrupa os resultados em uma coleção, como <code>List</code>, <code>Set</code> ou <code>Map</code> (operação terminal).</li>
+<li><strong><code>findFirst()</code> / <code>findAny()</code></strong>: Retorna um <code>Optional</code> com o primeiro elemento encontrado (operação terminal).</li>
+</ul>
+<p>Veremos algumas dessas ao longo do semestre (e nos exercícios!).</p>
+<hr>
+<h2><strong>4. A Classe <code>Optional</code>: Tratando a Ausência de Valor com Elegância</strong></h2>
+<p>Um dos erros mais comuns em Java é o <code>NullPointerException</code>. Ele ocorre quando tentamos usar um membro de uma referência de objeto que é <code>null</code>. A classe <code>Optional&lt;T&gt;</code> foi introduzida para fornecer uma solução de tipo seguro para representar a presença ou ausência de um valor.</p>
+<p><code>Optional</code> é um <strong>container</strong>: um objeto que pode ou não conter um valor não nulo. Ele nos força a pensar sobre o caso em que o valor não está presente.</p>
+<h3><strong>4.1. Criando um <code>Optional</code></strong></h3>
+<p>Existem três maneiras principais de criar uma instância de <code>Optional</code>, cada uma adequada a um cenário diferente. Entender qual usar é o primeiro passo para escrever um código mais seguro.</p>
+<h4><strong>1. <code>Optional.of(valor)</code></strong></h4>
+<ul>
+<li><p><strong>Quando usar:</strong> Quando você tem um valor que, por contrato, <strong>você tem certeza de que não é nulo</strong>.</p>
+</li>
+<li><p><strong>Comportamento:</strong> Cria um <code>Optional</code> que &quot;envolve&quot; o seu objeto. Se você tentar passar <code>null</code> para <code>Optional.of()</code>, ele falhará imediatamente (<em>fail-fast</em>) com um <code>NullPointerException</code>. Isso é útil para validar suas próprias premissas no código.</p>
+<pre><code class="language-java">// Cenário: Você acabou de criar um novo objeto. Ele NUNCA será nulo.
+User newUser = new User(&quot;Ana&quot;);
+Optional&lt;User&gt; userOptional = Optional.of(newUser); // Correto e seguro.
+
+User userNulo = null;
+// A linha abaixo lançaria um NullPointerException, protegendo o resto do código.
+// Optional&lt;User&gt; userNuloOptional = Optional.of(userNulo);
+</code></pre>
+</li>
+</ul>
+<h4><strong>2. <code>Optional.ofNullable(valor)</code></strong></h4>
+<ul>
+<li><p><strong>Quando usar:</strong> Este é o método mais seguro e comum. Use-o quando você está lidando com um valor que <strong>pode ser nulo</strong>, como o retorno de um método de busca ou de um mapa.</p>
+</li>
+<li><p><strong>Comportamento:</strong> Se o valor fornecido não for nulo, ele o envolve em um <code>Optional</code>. Se o valor for <code>null</code>, ele cria um <code>Optional</code> vazio (<code>Optional.empty()</code>). Este método <strong>nunca lança <code>NullPointerException</code></strong>.</p>
+<pre><code class="language-java">// Cenário: Buscando um usuário que pode ou não existir em um repositório.
+// O método findById pode retornar um User ou null.
+User foundUser = userRepository.findById(1L);
+Optional&lt;User&gt; userOptional = Optional.ofNullable(foundUser); // Forma segura de lidar com o resultado.
+</code></pre>
+</li>
+</ul>
+<h4><strong>3. <code>Optional.empty()</code></strong></h4>
+<ul>
+<li><p><strong>Quando usar:</strong> Quando você precisa representar explicitamente a ausência de um valor. É frequentemente usado como valor de retorno em métodos que podem não encontrar o que procuram.</p>
+</li>
+<li><p><strong>Comportamento:</strong> Retorna uma instância de <code>Optional</code> que está garantidamente vazia.</p>
+<pre><code class="language-java">// Cenário: Um método que retorna um Optional&lt;User&gt;, mas uma validação inicial falha.
+public Optional&lt;User&gt; findUser(Long id) {
+    if (id &lt;= 0) {
+        return Optional.empty(); // Retorna &quot;nada&quot; de forma segura e explícita.
+    }
+    // ... continua a lógica de busca ...
+    return Optional.ofNullable(userRepository.findById(id));
 }
 </code></pre>
-            <p>Isso significa que <code>SalariedEmployee</code> automaticamente <strong>herda</strong> os atributos
-                <code>firstName</code>, <code>lastName</code> e <code>socialSecurityNumber</code>, definidos em
-                <code>Employee</code>.
-            </p>
-            <p>O método <code>toString()</code> na superclasse <code>Employee</code> também pode ser reutilizado pelas
-                subclasses:</p>
-            <pre><code class="language-java">@Override
-public String toString() {
-   return String.format(&quot;%s %s%nsocial security number: %s&quot;, 
-      getFirstName(), getLastName(), getSocialSecurityNumber());
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Quando Usar</th>
+<th>Comportamento com <code>null</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Optional.of(obj)</code></td>
+<td>Quando <code>obj</code> <strong>não pode</strong> ser nulo.</td>
+<td>Lança <code>NullPointerException</code>.</td>
+</tr>
+<tr>
+<td><code>Optional.ofNullable(obj)</code></td>
+<td>Quando <code>obj</code> <strong>pode</strong> ser nulo.</td>
+<td>Retorna <code>Optional.empty()</code>.</td>
+</tr>
+<tr>
+<td><code>Optional.empty()</code></td>
+<td>Para retornar explicitamente um valor ausente.</td>
+<td>N/A (já retorna um <code>Optional</code> vazio).</td>
+</tr>
+</tbody></table>
+<h3><strong>4.2. Usando <code>Optional</code> de Forma Segura</strong></h3>
+<p>A maneira errada de usar <code>Optional</code> é simplesmente chamar <code>.get()</code> sem verificar se o valor está presente, pois isso pode lançar uma <code>NoSuchElementException</code>.</p>
+<p>Para entender o motivo, precisamos pensar na proposta do <code>Optional</code>: ele é um <strong>contrato</strong> que diz &quot;este container pode ou não ter um valor&quot;. O método <code>.get()</code> foi projetado para ser a forma mais direta de extrair o valor, mas ele opera sob uma premissa perigosa: ele <strong>assume que o valor existe</strong>.</p>
+<p>Quando o <code>Optional</code> está vazio, o contrato do método <code>.get()</code> é lançar a exceção <code>NoSuchElementException</code>. Este é o seu comportamento esperado.</p>
+<p><strong>O problema:</strong> <code>NoSuchElementException</code> é uma <code>RuntimeException</code> (uma exceção não checada). Isso significa que o compilador Java <strong>não obriga você a tratá-la</strong> com um bloco <code>try-catch</code>. Se você chamar <code>.get()</code> em um <code>Optional</code> vazio sem uma verificação prévia, e não houver um tratamento de exceção, sua aplicação irá quebrar em tempo de execução.</p>
+<p><strong>Exemplo prático do erro:</strong></p>
+<pre><code class="language-java">// Cenário: Buscamos um produto que não existe no banco de dados.
+Optional&lt;Product&gt; productOptional = productRepository.findById(999L); // Retorna Optional.empty()
+
+// Tentativa errada de extrair o valor
+try {
+    Product product = productOptional.get(); // &lt;&lt;-- ISTO VAI LANÇAR A EXCEÇÃO
+    System.out.println(&quot;Produto encontrado: &quot; + product.getName());
+} catch (NoSuchElementException e) {
+    System.err.println(&quot;ERRO: O produto não foi encontrado. A aplicação quebrou aqui!&quot;);
+    // Em uma API REST, isso resultaria em um erro 500 (Internal Server Error)
+    // se não fosse tratado, o que é uma péssima experiência para o usuário.
 }
 </code></pre>
-            <p>Como resultado, qualquer classe que <strong>herde</strong> <code>Employee</code> terá esse método sem
-                precisar reescrevê-lo.</p>
-            <p>Assim, no exemplo <code>PayrollSystemTest.java</code>, um array de <code>Employee[]</code> contém
-                diferentes tipos de funcionários, mas todos podem ser tratados genericamente.</p>
-            <pre><code class="language-java">Employee[] employees = new Employee[4];
-employees[0] = salariedEmployee;
-employees[1] = hourlyEmployee;
-employees[2] = commissionEmployee;
-employees[3] = basePlusCommissionEmployee;
+<p>Essencialmente, chamar <code>.get()</code> sem uma verificação (<code>.isPresent()</code>) é trocar um risco (<code>NullPointerException</code>) por outro (<code>NoSuchElementException</code>), o que não resolve o problema fundamental de lidar com a ausência de valor.</p>
+<p>É por isso que as formas idiomáticas (<code>ifPresent</code>, <code>orElse</code>, <code>orElseThrow</code>, etc.) são preferíveis: elas <strong>forçam o desenvolvedor a lidar explicitamente com o caso em que o <code>Optional</code> está vazio</strong>, resultando em um código mais seguro, robusto e previsível.</p>
+<p><strong>As formas seguras e idiomáticas de usar <code>Optional</code> são as seguintes:</strong></p>
+<ul>
+<li><p><strong><code>ifPresent(Consumer&lt;T&gt;)</code></strong>: Executa uma ação somente se o valor estiver presente.</p>
+<pre><code class="language-java">Optional&lt;User&gt; user = userRepository.findById(1L);
+user.ifPresent(u -&gt; System.out.println(&quot;Usuário encontrado: &quot; + u.getName()));
 </code></pre>
-            <p>Depois, podemos percorrer esse array e chamar <code>earnings()</code> sem precisar saber o tipo exato de
-                funcionário:</p>
-            <pre><code class="language-java">for (Employee currentEmployee : employees) {
-   System.out.printf(&quot;earned $%,.2f%n%n&quot;, currentEmployee.earnings());
+</li>
+<li><p><strong><code>orElse(T other)</code></strong>: Retorna o valor se presente, senão retorna um valor padrão.</p>
+<pre><code class="language-java">String username = user.map(User::getName).orElse(&quot;Usuário Padrão&quot;);
+</code></pre>
+</li>
+<li><p><strong><code>orElseThrow(Supplier&lt;X&gt; exceptionSupplier)</code></strong>: Retorna o valor se presente, senão lança uma exceção. <strong>Esta é a forma mais comum em APIs REST.</strong></p>
+<pre><code class="language-java">Contact contact = contactRepository.findById(id)
+    .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Contato não encontrado: &quot; + id));
+</code></pre>
+</li>
+</ul>
+<h3><strong>4.3. Cuidado: <code>orElse()</code> vs. <code>orElseGet()</code></strong></h3>
+<p><strong>Existe uma diferença de performance sutil, mas importante, entre <code>orElse()</code> e <code>orElseGet()</code>.</strong></p>
+<ul>
+<li><strong><code>orElse(valorPadrao)</code></strong>: O <code>valorPadrao</code> é <strong>sempre</strong> calculado, mesmo que o <code>Optional</code> contenha um valor.</li>
+<li><strong><code>orElseGet(supplier)</code></strong>: O <code>supplier</code> (uma lambda) só é executado se o <code>Optional</code> estiver vazio.</li>
+</ul>
+<p><strong>Exemplo:</strong></p>
+<pre><code class="language-java">// Método custoso que busca um nome padrão no banco de dados
+public String getNomePadraoSistema() {
+    System.out.println(&quot;Executando método custoso...&quot;);
+    // ...lógica de banco...
+    return &quot;Admin&quot;;
+}
+
+Optional&lt;String&gt; nomeUsuario = Optional.of(&quot;Ana&quot;);
+
+// Mau uso: o método custoso será executado desnecessariamente.
+String nome1 = nomeUsuario.orElse(getNomePadraoSistema()); 
+// Console imprime: &quot;Executando método custoso...&quot;
+
+// Bom uso: o método custoso NÃO será executado.
+String nome2 = nomeUsuario.orElseGet(this::getNomePadraoSistema);
+// Console não imprime nada.
+</code></pre>
+<p><strong>Regra geral:</strong> Se o valor padrão for uma constante simples, use <code>orElse()</code>. Se a criação do valor padrão for custosa (envolve I/O, cálculo, etc.), use <code>orElseGet()</code>. Vejamos abaixo uma tabela comparativa entre esses dois método.</p>
+<h3>Tabela Comparativa: <code>orElse()</code> vs. <code>orElseGet()</code></h3>
+<table>
+<thead>
+<tr>
+<th>Característica</th>
+<th><code>orElse(T valor)</code></th>
+<th><code>orElseGet(Supplier&lt;T&gt; supplier)</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Argumento que Aceita</strong></td>
+<td>Um valor (<code>T</code>) já criado ou uma constante.</td>
+<td>Uma função/lambda (<code>Supplier&lt;T&gt;</code>) que sabe como criar o valor.</td>
+</tr>
+<tr>
+<td><strong>Custo da Operação Padrão</strong></td>
+<td>O valor padrão é calculado <strong>sempre</strong>, mesmo se o <code>Optional</code> contiver um valor.</td>
+<td>A função para criar o valor padrão é executada <strong>apenas se o <code>Optional</code> estiver vazio</strong>.</td>
+</tr>
+<tr>
+<td><strong>Cenário Ideal</strong></td>
+<td>Usar com valores constantes ou objetos que já existem e são baratos de obter.</td>
+<td>Usar quando a criação do valor padrão exige cálculo, I/O ou chamadas a outros métodos custosos.</td>
+</tr>
+</tbody></table>
+<p>O exemplo abaixo exemplifica novamente os conceitos, para não deixarmos nenhuma dúvida sobre quando usar um ou outro. 🤓</p>
+<h3>Mais um exemplo de Código Prático</h3>
+<p>Imagine que estamos buscando uma configuração em um mapa. Se a configuração não existir, precisamos obter um valor padrão de um método que simula uma operação lenta (como uma consulta ao banco).</p>
+<pre><code class="language-java">import java.util.Map;
+import java.util.Optional;
+
+public class OptionalExample {
+
+    // Método que simula uma operação custosa (ex: acesso a banco, chamada de API)
+    public static String getExpensiveDefaultValue() {
+        System.out.println(&quot;&gt;&gt;&gt; Executando método custoso para obter valor padrão...&quot;);
+        // Simula um delay
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return &quot;default_value&quot;;
+    }
+
+    public static void main(String[] args) {
+        Map&lt;String, String&gt; configs = Map.of(&quot;key1&quot;, &quot;value1&quot;);
+
+        System.out.println(&quot;--- Teste com um Optional que contém valor ---&quot;);
+        Optional&lt;String&gt; optionalWithValue = Optional.of(&quot;value1&quot;);
+
+        // Usando orElse(): O método custoso SERÁ chamado desnecessariamente.
+        System.out.println(&quot;Usando orElse():&quot;);
+        String value1 = optionalWithValue.orElse(getExpensiveDefaultValue());
+        System.out.println(&quot;Resultado: &quot; + value1);
+
+        System.out.println(&quot;\n&quot;); // Separador
+
+        // Usando orElseGet(): O método custoso NÃO será chamado.
+        System.out.println(&quot;Usando orElseGet():&quot;);
+        String value2 = optionalWithValue.orElseGet(() -&gt; getExpensiveDefaultValue()); // ou OptionalExample::getExpensiveDefaultValue
+        System.out.println(&quot;Resultado: &quot; + value2);
+
+        System.out.println(&quot;\n--- Teste com um Optional vazio ---&quot;);
+        Optional&lt;String&gt; emptyOptional = Optional.empty();
+
+        // Com Optional vazio, ambos chamarão o método, mas orElseGet() continua sendo a prática mais segura.
+        System.out.println(&quot;Usando orElse() com Optional vazio:&quot;);
+        String value3 = emptyOptional.orElse(getExpensiveDefaultValue());
+        System.out.println(&quot;Resultado: &quot; + value3);
+    }
 }
 </code></pre>
-            <p>Isso é possível porque todas as classes herdam de <code>Employee</code> e <strong>sobrescrevem</strong> o
-                método <code>earnings()</code>. Isso é chamado de <em><strong>Polimorfismo de tempo de
-                        execução</strong></em> ou <em><strong>Polimorfismo Dinâmico</strong></em>, uma vez que a chamada
-                para um mesmo método produz resultados distintos dependendo do objeto que é chamado. </p>
-            <p>O <strong>polimorfismo de tempo de execução</strong> ocorre quando uma <strong>superclasse</strong>
-                define um método, e uma <strong>subclasse</strong> fornece sua própria implementação desse método.
-                Quando um objeto de uma subclasse é referenciado por uma variável da superclasse, a versão do método
-                executada será aquela definida na <strong>subclasse</strong> e <strong>não</strong> na superclasse.</p>
-            <p>Isso é possível graças à <strong>sobrescrita de métodos (method overriding)</strong>, que permite
-                redefinir um método herdado.</p>
-            <p>No exemplo da folha de pagamento, a classe abstrata <code>Employee</code> define um método abstrato
-                <code>earnings()</code>:
-            </p>
-            <pre><code class="language-java">public abstract class Employee {
-   public abstract double earnings();
+<p><strong>Saída do Código:</strong></p>
+<pre><code>--- Teste com um Optional que contém valor ---
+Usando orElse():
+&gt;&gt;&gt; Executando método custoso para obter valor padrão...
+Resultado: value1
+
+Usando orElseGet():
+Resultado: value1
+
+--- Teste com um Optional vazio ---
+Usando orElse() com Optional vazio:
+&gt;&gt;&gt; Executando método custoso para obter valor padrão...
+Resultado: default_value
+</code></pre>
+<p>Como o resultado demonstra, <code>orElseGet()</code> evitou a execução desnecessária do método custoso quando o <code>Optional</code> já continha um valor, otimizando a performance da aplicação.</p>
+<p>Passemos agora a um uso prático do <code>Optional</code>.</p>
+<h3><strong>4.4. Exemplo Prático: Usando <code>Optional</code> para Conectar Camadas</strong></h3>
+<p>Agora que conhecemos as ferramentas, vamos aplicá-las em um cenário realista. Imagine a estrutura de uma aplicação comercial dividida em camadas:</p>
+<ul>
+<li><strong>Repository:</strong> Responsável por acessar os dados (simularemos um banco em memória).</li>
+<li><strong>Service:</strong> Onde mora a lógica de negócio.</li>
+<li><strong>Controller:</strong> A porta de entrada que recebe as requisições (simularemos com uma classe <code>main</code>).</li>
+</ul>
+<p>Nossa tarefa é criar um método que atualiza o e-mail de um usuário, mas apenas se o usuário existir e se o novo e-mail for válido. Veja como o <code>Optional</code> cria um contrato seguro e elegante entre essas camadas (lembrando que o código-fonte abaixo é simplificado para fins didáticos!).</p>
+<h4><strong>Camada 1: O Repositório (Simulando o acesso a dados)</strong></h4>
+<p>Primeiro, nosso <code>UserRepository</code> simula a busca no banco. Note como ele já retorna um <code>Optional</code>, protegendo o resto da aplicação desde a fonte dos dados.</p>
+<pre><code class="language-java">// Simula uma entidade do banco de dados
+class User {
+    private Long id;
+    private String name;
+    private String email;
+    // Construtores, Getters e Setters...
+    public User(Long id, String name, String email) { this.id = id; this.name = name; this.email = email; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    @Override public String toString() { return &quot;User{id=&quot; + id + &quot;, name=&#39;&quot; + name + &quot;&#39;, email=&#39;&quot; + email + &quot;&#39;}&quot;; }
+}
+
+// Simula a classe que acessa o banco de dados
+class UserRepository {
+    // Um mapa para simular nossa tabela de usuários no banco
+    private final Map&lt;Long, User&gt; database = new HashMap&lt;&gt;();
+
+    public UserRepository() {
+        // Populando o &quot;banco&quot; com dados iniciais
+        database.put(1L, new User(1L, &quot;Ana&quot;, &quot;ana@email.com&quot;));
+        database.put(2L, new User(2L, &quot;Carlos&quot;, &quot;carlos@email.com&quot;));
+    }
+
+    // O método de busca já retorna um Optional, como faz o Spring Data JPA
+    public Optional&lt;User&gt; findById(Long id) {
+        return Optional.ofNullable(database.get(id));
+    }
+
+    public User save(User user) {
+        database.put(user.id, user);
+        return user;
+    }
 }
 </code></pre>
-            <p>Todas as classes que herdam <code>Employee</code> são <strong>obrigadas</strong> a fornecer uma
-                implementação para <code>earnings()</code>, pois <code>Employee</code> é abstrata.</p>
-            <h3><strong>Sobrescrita em Subclasses</strong></h3>
-            <p>Cada tipo de funcionário tem uma maneira diferente de calcular os ganhos:</p>
-            <h4><strong>Funcionário Assalariado (<code>SalariedEmployee</code>)</strong></h4>
-            <pre><code class="language-java">@Override
-public double earnings() {
-   return getWeeklySalary();
+<h4><strong>Camada 2: O Serviço (Onde a lógica de negócio acontece)</strong></h4>
+<p>O <code>UserService</code> recebe o <code>UserRepository</code> e usa o <code>Optional</code> para criar um fluxo seguro de validação e atualização.</p>
+<pre><code class="language-java">// Simula a camada de serviço com a lógica de negócio
+class UserService {
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public Optional&lt;User&gt; updateUserEmail(Long userId, String newEmail) {
+        // 1. Busca o usuário. O retorno já é um Optional&lt;User&gt;.
+        return userRepository.findById(userId)
+                .filter(user -&gt; isEmailValid(newEmail)) // 2. Continua apenas se o email for válido.
+                .map(user -&gt; {                          // 3. Se tudo estiver ok, transforma o objeto.
+                    user.setEmail(newEmail);
+                    return userRepository.save(user);   // 4. Salva e retorna o usuário atualizado.
+                });
+    }
+
+    private boolean isEmailValid(String email) {
+        return email != null &amp;&amp; email.contains(&quot;@&quot;);
+    }
 }
 </code></pre>
-            <p>Aqui, o salário é fixo por semana.</p>
-            <h4><strong>Funcionário Horista (<code>HourlyEmployee</code>)</strong></h4>
-            <pre><code class="language-java">@Override
-public double earnings() {
-   if (getHours() &lt;= 40) 
-      return getWage() * getHours();
-   else
-      return 40 * getWage() + (getHours() - 40) * getWage() * 1.5;
+<ul>
+<li>Aqui buscamos o <code>Optional</code>, filtramos, e mapeamos para a nova versão salva. Se em qualquer ponto o <code>Optional</code> ficar vazio (usuário não encontrado ou e-mail inválido), as operações seguintes são simplesmente ignoradas.</li>
+</ul>
+<h4><strong>Camada 3: O &quot;Controller&quot; e a Execução (<code>main</code>)</strong></h4>
+<p>Finalmente, nossa classe <code>main</code> simula a &quot;requisição&quot; do cliente e mostra como o <code>Controller</code> interpretaria a resposta segura vinda do <code>Service</code>.</p>
+<pre><code class="language-java">// Simula a camada que recebe as &quot;requisições&quot;
+class UserController {
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    public String handleUpdateEmailRequest(Long id, String newEmail) {
+        // O &quot;Controller&quot; chama o serviço e lida com o Optional retornado.
+        return userService.updateUserEmail(id, newEmail)
+                .map(user -&gt; &quot;200 OK - Usuário atualizado: &quot; + user.toString()) // Se sucesso, formata a resposta OK.
+                .orElse(&quot;404 Not Found - Usuário não encontrado ou email inválido.&quot;); // Se vazio, formata a resposta de erro.
+    }
+}
+
+// Ponto de entrada da nossa aplicação simulada
+public class MainApplication {
+    public static void main(String[] args) {
+        // Injeção de dependência manual: criamos e conectamos as camadas.
+        UserRepository userRepository = new UserRepository();
+        UserService userService = new UserService(userRepository);
+        UserController userController = new UserController(userService);
+
+        // --- Simulação das Requisições ---
+
+        // Teste 1: Caso de sucesso
+        System.out.println(&quot;Tentativa 1: Atualizando usuário com ID 1...&quot;);
+        String response1 = userController.handleUpdateEmailRequest(1L, &quot;ana.nova@email.com&quot;);
+        System.out.println(&quot;Resposta: &quot; + response1);
+        System.out.println(&quot;--------------------&quot;);
+
+        // Teste 2: Caso de falha (usuário não existe)
+        System.out.println(&quot;Tentativa 2: Atualizando usuário com ID 99...&quot;);
+        String response2 = userController.handleUpdateEmailRequest(99L, &quot;fantasma@email.com&quot;);
+        System.out.println(&quot;Resposta: &quot; + response2);
+    }
 }
 </code></pre>
-            <p>Aqui, o cálculo depende do número de horas trabalhadas, com pagamento extra para horas acima de 40.</p>
-            <h4><strong>Funcionário Comissionado (<code>CommissionEmployee</code>)</strong></h4>
-            <pre><code class="language-java">@Override
-public double earnings() {
-   return getCommissionRate() * getGrossSales();
-}
+<p>Este exemplo de ponta a ponta, mesmo sem uso de framework, demonstra o poder do <code>Optional</code>: ele atua como um <strong>contrato seguro entre as camadas</strong>, eliminando a necessidade de verificações de nulo e permitindo a criação de fluxos de dados robustos e declarativos, que são fáceis de ler e manter.</p>
+<hr>
+<h2><strong>5. Method References: &quot;Sintaxe Açucarada&quot; para Lambdas</strong></h2>
+<p>Em muitos casos, uma expressão lambda apenas chama um método existente. As <strong>referências de método (Method References)</strong> são uma sintaxe compacta para esses casos.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Tipo de Referência</th>
+<th align="left">Exemplo Lambda</th>
+<th align="left">Exemplo Method Reference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Método Estático</strong></td>
+<td align="left"><code>str -&gt; Integer.parseInt(str)</code></td>
+<td align="left"><code>Integer::parseInt</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Método de Instância (objeto específico)</strong></td>
+<td align="left"><code>() -&gt; expensiveObject.get()</code></td>
+<td align="left"><code>expensiveObject::get</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Método de Instância (objeto arbitrário)</strong></td>
+<td align="left"><code>s -&gt; s.toUpperCase()</code></td>
+<td align="left"><code>String::toUpperCase</code></td>
+</tr>
+<tr>
+<td align="left"><strong>Construtor</strong></td>
+<td align="left"><code>() -&gt; new ArrayList&lt;&gt;()</code></td>
+<td align="left"><code>ArrayList::new</code></td>
+</tr>
+</tbody></table>
+<p><strong>Exemplo Prático:</strong></p>
+<p>A atualização parcial de um contato usava <code>.ifPresent()</code>:</p>
+<pre><code class="language-java">// Com lambda
+dto.getNome().ifPresent(nome -&gt; existingContact.setNome(nome));
+
+// Com method reference (mais limpo e preferível)
+dto.getNome().ifPresent(existingContact::setNome);
 </code></pre>
-            <p>Aqui, o pagamento depende das vendas realizadas.</p>
-            <hr>
-            <h2><strong>Como o Polimorfismo Funciona no Código</strong></h2>
-            <p>O polimorfismo acontece quando os objetos são manipulados através de uma variável de <strong>tipo da
-                    superclasse (<code>Employee</code>)</strong>, mas a versão do método executada <strong>é aquela
-                    definida na subclasse real do objeto</strong>.</p>
-            <p>Veja o trecho de código no arquivo <code>PayrollSystemTest.java</code>:</p>
-            <pre><code class="language-java">Employee[] employees = new Employee[4];
+<p>Ambas as linhas fazem a mesma coisa, mas a referência de método é mais expressiva e fácil de ler.</p>
+<hr>
+<h2><strong>Concluindo...</strong></h2>
+<p>Entender Lambdas, Streams e Optionals eleva seu código Java a um novo patamar de clareza e eficiência. Essas ferramentas representam uma mudança de paradigma para um estilo mais declarativo e funcional.</p>
+<p>Com essa base sólida, estamos agora mais preparados para construir os componentes de nossas APIS com Spring Boot. Você verá como esses recursos tornam o código em Controllers, Services e Repositories muito mais enxuto e expressivo.</p>
+<p>Mas antes, vamos exercitar esse conceitos com...</p>
+<hr>
+<h2><strong>Exercícios ⚒️</strong></h2>
+<p>Elabore os exercícios e o desafio abaixo.</p>
+<p>A entrega deverá ser feita individualmente via Moodle.</p>
+<p>Crie uma classe <code>Produto</code> com os atributos: <code>nome</code> (String), <code>preco</code> (double) e <code>categoria</code> (String). As categorias devem ser, pelo menos, &quot;Eletrônicos&quot; e &quot;Livros&quot;. Em uma classe de teste, crie uma <code>List&lt;Produto&gt;</code> com pelo menos 8 produtos de diferentes categorias e preços, incluindo alguns com a mesma categoria. Após isso:</p>
+<ul>
+<li><p>a. Use <code>forEach</code> e uma estrutura <code>if</code> tradicional para imprimir o nome de todos os produtos da categoria &quot;Eletrônicos&quot;. Em seguida, refaça o mesmo exercício usando <code>stream()</code> e a operação <code>filter()</code>.</p>
+</li>
+<li><p>b. Crie uma nova lista contendo apenas os preços de todos os produtos cujo preço seja maior que 500.0. Use as operações <code>filter()</code> e <code>map()</code>. Imprima a lista de preços.</p>
+</li>
+<li><p>c. Calcule o valor total do estoque de produtos da categoria &quot;Livros&quot;. Use <code>filter()</code> para selecionar os produtos da categoria correta e, em seguida, use <code>mapToDouble()</code> e <code>sum()</code> para calcular o total.</p>
+</li>
+<li><p>d. Escreva um método <code>buscarProdutoPorNome(List&lt;Produto&gt; produtos, String nome)</code> que retorna um <code>Optional&lt;Produto&gt;</code>. Use a Stream API (<code>filter</code> e <code>findFirst</code>).</p>
+</li>
+<li><p>e. No seu método <code>main</code>, chame o <code>buscarProdutoPorNome</code>: Primeiro, com um nome de produto que existe. Use <code>ifPresent()</code> para imprimir os detalhes do produto; Depois, com um nome que não existe. Use <code>orElseThrow()</code> para lançar uma <code>RuntimeException</code> com a mensagem &quot;Produto não encontrado!&quot;.</p>
+</li>
+<li><p>f.  Crie um <code>stream</code> a partir da sua lista de produtos e use <code>.map()</code> para obter uma <code>List&lt;String&gt;</code> contendo apenas os nomes dos produtos. Primeiro, faça isso com uma expressão lambda (<code>p -&gt; p.getNome()</code>) e depois refatore para usar uma referência de método (<code>Produto::getNome</code>).</p>
+</li>
+</ul>
+<h2><strong>Desafio - Plataforma de Cursos Online &quot;AcademiaDev&quot;</strong></h2>
+<p>A startup de tecnologia educacional <strong>AcademiaDev</strong> está lançando sua nova plataforma de cursos online. Seu modelo de negócio é baseado em um sistema de assinaturas que dá aos alunos acesso a um catálogo de cursos de alta qualidade, focados no desenvolvimento de software.</p>
+<p>Para validar sua proposta de negócio, a AcademiaDev contratou sua equipe para desenvolver um protótipo inicial da aplicação. Por um infortúnio do destino, parte de sua equipe foi hospitalizada após a ingestão de dezenas de torresmos no Bar do Bigode ao comemorar mais uma vitória do Corinthians sobre o Palmeiras.</p>
+<p>Dessa forma, cabe a você, o(a) único(a) desenvolvedor(a) <em>geração saúde</em> da equipe, trabalhar na implementação desse protótipo inicial utilizando todos os conceitos que foram relembrados na Aula 01 e vistos na Aula 02. Nesse protótipo os requisitos são focados na implementação da lógica de negócio principal, utilizando um conjunto de dados já existente.</p>
+<p>Para focar na lógica principal da aplicação, <strong>não será necessário implementar as funcionalidades de CRUD completas</strong>. Em vez disso, sua aplicação deve iniciar com um conjunto de dados pré-cadastrado. Crie uma classe utilitária (ex: <code>InitialData</code>) que popule suas estruturas de dados em memória assim que a aplicação iniciar. Ou seja, não é necessário criar um CRUD completo de <code>Courses</code> ou <code>Users</code> - apenas o suficiente para validar a lógica de negócio.</p>
+<p>Nesse sentido, o protótipo deverá implementar funcionalidades para:</p>
+<ul>
+<li>Gerenciamento do catálogo de <code>Courses</code> (cursos);</li>
+<li>Gerenciamento de <code>Users</code> (usuários) e seus respectivos planos de assinatura;</li>
+<li>Sistema de <code>Enrollments</code> (matrículas) e acompanhamento de progresso dos alunos;</li>
+<li>Um sistema de fila para atendimento de <code>Support Tickets</code>;</li>
+<li>Geração de relatórios e exportação de dados da plataforma.</li>
+</ul>
+<p>A equipe de analistas da sua empresa, a partir de reuniões com os fundadores da AcademiaDev, já havia determinado os requisitos a seguir.</p>
+<h4><strong>Requisitos Funcionais</strong></h4>
+<p><strong>1) Gerenciamento do Catálogo de <code>Courses</code></strong>
+Os cursos da plataforma devem possuir as seguintes características:</p>
+<ul>
+<li><code>title</code> e <code>description</code>. O <code>title</code> de cada curso deve ser único na plataforma.</li>
+<li><code>instructorName</code>.</li>
+<li><code>durationInHours</code> (carga horária).</li>
+<li><code>difficultyLevel</code>, que pode ser <code>BEGINNER</code>, <code>INTERMEDIATE</code> ou <code>ADVANCED</code>.</li>
+<li><code>status</code>, que pode ser <code>ACTIVE</code> ou <code>INACTIVE</code>. Um curso com status <code>INACTIVE</code> não pode receber novas matrículas.</li>
+</ul>
+<p><strong>2) <code>Users</code> e <code>Subscription Plans</code></strong>
+Os usuários da plataforma podem pertencer a dois perfis:</p>
+<ul>
+<li><code>Admin</code>: Possui <code>name</code> e <code>email</code>. Tem permissão para gerenciar o catálogo de cursos e usuários.</li>
+<li><code>Student</code>: Possui <code>name</code>, <code>email</code> e um <code>subscriptionPlan</code>.</li>
+<li>O <code>email</code> de cada usuário (seja <code>Student</code> ou <code>Admin</code>) deve ser único.</li>
+</ul>
+<p>Os planos de assinatura (<code>SubscriptionPlan</code>) disponíveis para alunos são:</p>
+<ul>
+<li><code>BasicPlan</code>: Permite que o aluno esteja matriculado em, no máximo, <strong>3 cursos ativos</strong> simultaneamente.</li>
+<li><code>PremiumPlan</code>: Permite que o aluno se matricule em um <strong>número ilimitado</strong> de cursos.</li>
+</ul>
+<p><strong>3) Sistema de <code>Enrollments</code> e <code>Progress</code></strong></p>
+<ul>
+<li>Um aluno só pode se matricular em um curso (<code>Course</code>) se o seu plano de assinatura permitir e se o curso estiver com o status <code>ACTIVE</code>.</li>
+<li>Ao se matricular em um curso, o progresso (<code>progress</code>) do aluno é iniciado em 0%.</li>
+<li>O sistema deve permitir que um aluno atualize o seu percentual de progresso (0 a 100) em qualquer curso no qual esteja matriculado.</li>
+</ul>
+<p><strong>4) Fila de Suporte ao <code>User</code></strong></p>
+<ul>
+<li>Qualquer usuário da plataforma pode abrir um <code>SupportTicket</code>, contendo um <code>title</code> e uma <code>message</code>.</li>
+<li>Os tickets devem ser armazenados em uma fila de atendimento para serem processados pela equipe de administradores. O atendimento deve seguir rigorosamente a <strong>ordem de chegada</strong> (FIFO - First-In, First-Out).</li>
+</ul>
+<p><strong>5) Relatórios e Análises da Plataforma</strong>
+O sistema deve ser capaz de gerar as seguintes informações analíticas:</p>
+<ul>
+<li>Uma lista de cursos pertencentes a um determinado <code>difficultyLevel</code>, <strong>ordenada alfabeticamente</strong> pelo <code>title</code> do curso.</li>
+<li>Uma relação de todos os <strong>instrutores únicos</strong> que ministram cursos ativos na plataforma, sem nomes repetidos.</li>
+<li>Um relatório que agrupe os alunos de acordo com seu <code>subscriptionPlan</code>.</li>
+<li>O cálculo da <strong>média geral de <code>progress</code></strong>, considerando todas as matrículas de todos os alunos.</li>
+<li>A identificação do <strong>aluno com o maior número de matrículas</strong> ativas.</li>
+<li><strong>Exportação de Dados para CSV:</strong> A plataforma precisa de uma funcionalidade de exportação que permita a um administrador gerar um arquivo CSV a partir de qualquer lista de dados (seja de <code>Courses</code>, <code>Students</code>, etc.). O administrador deve poder <strong>escolher dinamicamente quais colunas (campos) quer no arquivo</strong> no momento da exportação. <strong>Nesse momento, não é necessário gerar um arquivo <code>.csv</code> físico: a função deve apenas retornar e exibir a estrutura do CSV formatada como uma <code>String</code> no console.</strong></li>
+</ul>
+<h4><strong>Funcionalidades da Aplicação (Interface de Linha de Comando)</strong></h4>
+<p>A aplicação deve ser desenvolvida como um sistema de linha de comando, com um menu que ofereça, no mínimo, as seguintes funcionalidades:</p>
+<ol>
+<li><p><strong>Operações de Administrador (<code>Admin</code>)</strong></p>
+<ul>
+<li><strong>Gerenciar Status de Cursos:</strong> Ativar/inativar cursos existentes (não precisa implementar CRUD completo).</li>
+<li><strong>Gerenciar Planos de Alunos:</strong> Alterar o plano de assinatura de um aluno existente.</li>
+<li><strong>Atender Tickets de Suporte:</strong> Processar tickets da fila em ordem FIFO.</li>
+<li><strong>Gerar Relatórios e Análises:</strong> Acessar todos os relatórios da plataforma.</li>
+<li><strong>Exportar Dados:</strong> Gerar a <code>String</code> CSV com colunas selecionáveis dinamicamente.</li>
+</ul>
+</li>
+<li><p><strong>Operações do Aluno (<code>Student</code>)</strong></p>
+<ul>
+<li><strong>Matricular-se em Curso:</strong> Desde que o plano permita e o curso esteja <code>ACTIVE</code>.</li>
+<li><strong>Consultar Matrículas:</strong> Ver todos os cursos em que está matriculado e seu progresso.</li>
+<li><strong>Atualizar Progresso:</strong> Modificar o percentual de conclusão de um curso.</li>
+<li><strong>Cancelar Matrícula:</strong> Remover-se de um curso (libera vaga para planos básicos).</li>
+</ul>
+</li>
+<li><p><strong>Operações Gerais (Qualquer Usuário):</strong></p>
+<ul>
+<li><strong>Consultar Catálogo de Cursos:</strong> Listar cursos ativos disponíveis.</li>
+<li><strong>Abrir Ticket de Suporte:</strong> Criar um novo ticket para a fila de atendimento.</li>
+<li><strong>Autenticação Simples:</strong> Sistema básico de login por email para distinguir entre Admin e Student. Não é necessário que o usuário tenha senha, apenas o e-mail é suficiente para autenticação. Você poderá elaborar duas telas distintas ou simplesmente atribuir papeis aos usuários e fazer a verificação de permissão.</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Lógica de Negócio e Regras</strong></h4>
+<p>A partir dos requisitos acima, foram destacadas as seguintes regras de negócio que devem ser consideradas no processo de implementação.</p>
+<p><strong>Sistema de Matrículas (<code>Enrollments</code>)</strong></p>
+<ul>
+<li>Um <code>Student</code> só pode se matricular em um <code>Course</code> se:<ul>
+<li>Seu plano de assinatura permitir (BasicPlan: máximo 3 matrículas ativas).</li>
+<li>O curso estiver com status <code>ACTIVE</code>.</li>
+<li>Não estiver já matriculado no mesmo curso.</li>
+</ul>
+</li>
+<li>O progresso inicia em 0% e pode ser atualizado de 0 a 100%.</li>
+</ul>
+<p><strong>Fila de Suporte</strong></p>
+<ul>
+<li>Tickets são processados em ordem FIFO (First-In, First-Out).</li>
+<li>Qualquer usuário pode abrir tickets, mas apenas <code>Admin</code> pode processá-los.</li>
+</ul>
+<p><strong>Relatórios e Análises</strong>
+O sistema deve gerar as seguintes informações utilizando <strong>Stream API</strong>:</p>
+<ul>
+<li>Lista de cursos por <code>difficultyLevel</code>, ordenada alfabeticamente.</li>
+<li>Relação de instrutores únicos que ministram cursos <code>ACTIVE</code>.</li>
+<li>Agrupamento de alunos por <code>subscriptionPlan</code>.</li>
+<li>Média geral de progresso de todas as matrículas.</li>
+<li>Aluno com maior número de matrículas ativas (retorno: <code>Optional&lt;Student&gt;</code>).</li>
+</ul>
+<h4><strong>Requisitos de Implementação e Ferramentas</strong></h4>
+<p>Para este protótipo, as seguintes ferramentas e abordagens devem ser utilizadas:</p>
+<ol>
+<li><strong>Persistência em Memória:</strong> Toda a persistência de dados deve ser simulada em memória utilizando as <strong>Collections do Java</strong>. Não é necessário usar um banco de dados real.</li>
+<li><strong>Estruturas de Dados Específicas:</strong><ul>
+<li>Para garantir a unicidade e a busca eficiente de <code>Courses</code> por <code>title</code> e <code>Users</code> por <code>email</code>, utilize a interface <code>Map</code>.</li>
+<li>Para a listagem de <code>instructors</code> únicos no relatório, utilize a interface <code>Set</code>.</li>
+<li>Para a fila de <code>Support Tickets</code>, utilize uma implementação da interface <code>Queue</code> (como <code>LinkedList</code> ou <code>ArrayDeque</code>) para garantir o comportamento FIFO.</li>
+</ul>
+</li>
+<li><strong>Programação Funcional com Java 8+:</strong><ul>
+<li>Todos os relatórios e análises descritos devem ser implementados utilizando a <strong>Stream API</strong> e <strong>Expressões Lambda</strong>.</li>
+<li>Reforçando: a função que busca o aluno com mais matrículas deve obrigatoriamente retornar um <code>Optional&lt;Student&gt;</code> para tratar o caso de não haver alunos.</li>
+</ul>
+</li>
+<li><strong>Reflection e Anotações:</strong><ul>
+<li>A funcionalidade de <strong>Exportação de Dados para CSV</strong> deve ser implementada de forma genérica. Crie uma classe utilitária <code>GenericCsvExporter</code> que utilize <strong>Reflection</strong> para ler os campos de qualquer lista de objetos e gerar uma String no formato CSV.</li>
+</ul>
+</li>
+<li><strong>Tratamento de exceções:</strong><ul>
+<li>Operações que violem regras de negócio (por exemplo, a tentativa de matricular um <code>Student</code> com <code>BasicPlan</code> no quarto curso, ou em um curso <code>INACTIVE</code>) devem lançar exceções customizadas (ex: <code>EnrollmentException</code>). A interface com o usuário deve capturar essas exceções e exibir uma mensagem de erro amigável.</li>
+</ul>
+</li>
+<li><strong>Modelagem implícita:</strong><ul>
+<li>Você notará que o conceito de &quot;matrícula&quot; (<code>Enrollment</code>) é central para o sistema, pois conecta <code>Student</code> e <code>Course</code> e armazena o <code>progress</code>. No entanto, os atributos e a estrutura exata dessa classe não foram detalhados pela sua equipe. Você deverá modelar essa classe de associação, definindo os campos e métodos necessários para que todas as regras de negócio de matrícula, cancelamento e progresso funcionem corretamente. Sinta-se à vontade para criar outras classes de suporte que julgar necessárias para uma boa organização e para cumprir os requisitos. Caso perceba alguma lacuna, você poderá completá-la como julgar melhor, já que o restante de sua equipe está hospitalizada.</li>
+</ul>
+</li>
+</ol>
+<h4><strong>Modelagem da Solução</strong></h4>
+<p>Para implementar a aplicação, utilize conceitos da Programação Orientada a Objetos (POO) com Java, incluindo:</p>
+<ul>
+<li><strong>Encapsulamento</strong> - Para garantir que os dados dos objetos sejam acessados de forma segura e controlada.</li>
+<li><strong>Herança</strong> - Para modelar os diferentes tipos de usuários, se julgar apropriado.</li>
+<li><strong>Polimorfismo</strong> - Para permitir o tratamento genérico de diferentes entidades, como os planos de assinatura.</li>
+<li><strong>Classes Abstratas e Interfaces</strong> - Para estruturar a hierarquia de suas classes de forma coesa e flexível.</li>
+</ul>
+<p>Além da implementação do código, elabore um <strong>Diagrama de Classes UML</strong> que represente a estrutura do sistema, demonstrando as relações entre as classes (<code>User</code>, <code>Student</code>, <code>Admin</code>, <code>Course</code>, <code>SubscriptionPlan</code>, <code>Enrollment</code>, etc.). Entregue juntamente com o diagrama uma <strong>justificativa para suas escolhas de design</strong> do protótipo.</p>
+<p>Esse exercício poderá ser feito em duplas.</p>
+<h1><strong>Mãos à obra! ⚒️</strong></h1>
 
-employees[0] = new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
-employees[1] = new HourlyEmployee(&quot;Karen&quot;, &quot;Price&quot;, &quot;222-22-2222&quot;, 16.75, 40);
-employees[2] = new CommissionEmployee(&quot;Sue&quot;, &quot;Jones&quot;, &quot;333-33-3333&quot;, 10000, .06);
-employees[3] = new BasePlusCommissionEmployee(&quot;Bob&quot;, &quot;Lewis&quot;, &quot;444-44-4444&quot;, 5000, .04, 300);
-</code></pre>
-            <p>Aqui, criamos um <strong>array de <code>Employee</code></strong>, mas ele contém diferentes tipos de
-                funcionários.</p>
-            <p>Depois, processamos cada funcionário de forma genérica:</p>
-            <pre><code class="language-java">for (Employee currentEmployee : employees) {
-   System.out.printf(&quot;earned $%,.2f%n%n&quot;, currentEmployee.earnings());
-}
-</code></pre>
-            <p>Mesmo que <code>currentEmployee</code> seja do tipo <code>Employee</code>, o método
-                <code>earnings()</code> chamado <strong>é o da subclasse real do objeto</strong>.
-            </p>
-            <p>Isso ocorre porque <strong>Java usa ligação dinâmica (dynamic binding)</strong>, ou seja, só decide qual
-                versão do método executar <strong>durante a execução do programa</strong>.</p>
-            <p>Esse uso de polimorfismo torna o código mais <strong>flexível, extensível e modular</strong>, permitindo
-                adicionar novos tipos de <code>Employee</code> sem modificar o código que processa os pagamentos.</p>
-            <h2><strong>Classe Abstrata no Contexto do Exemplo do Sistema de Folha de Pagamento</strong></h2>
-            <p>No exemplo do <strong>sistema de folha de pagamento</strong>, a <strong>classe abstrata</strong>
-                utilizada é, como mencionado, <code>Employee</code>. Ela serve como uma <strong>superclasse
-                    genérica</strong> para diferentes tipos de funcionários:</p>
-            <ul>
-                <li><code>SalariedEmployee</code> (funcionário assalariado)</li>
-                <li><code>HourlyEmployee</code> (funcionário horista)</li>
-                <li><code>CommissionEmployee</code> (funcionário comissionado)</li>
-                <li><code>BasePlusCommissionEmployee</code> (funcionário com salário base + comissão)</li>
-            </ul>
-            <p>O uso de uma <strong>classe abstrata</strong> permite definir um <strong>modelo comum</strong> para todas
-                essas classes, <strong>evitando duplicação de código e garantindo uma estrutura uniforme</strong>.</p>
-            <hr>
-            <h2><strong>O que é uma Classe Abstrata?</strong></h2>
-            <p>Uma <strong>classe abstrata</strong> em Java é uma classe que <strong>não pode ser instanciada
-                    diretamente</strong> e que pode conter <strong>métodos abstratos</strong> (métodos sem
-                implementação, que devem ser implementados por suas subclasses).</p>
-            <p>Ela é usada quando <strong>há um comportamento comum entre várias classes</strong>, mas a implementação
-                exata desse comportamento <strong>depende de cada subclasse</strong>.</p>
-            <h3><strong>Definição da Classe Abstrata <code>Employee</code></strong></h3>
-            <p>No código do exemplo, a classe <code>Employee</code> é definida assim:</p>
-            <pre><code class="language-java">// Classe abstrata Employee
-public abstract class Employee {
-   private final String firstName;
-   private final String lastName;
-   private final String socialSecurityNumber;
 
-   // Construtor da classe abstrata
-   public Employee(String firstName, String lastName, String socialSecurityNumber) {
-      this.firstName = firstName;
-      this.lastName = lastName;
-      this.socialSecurityNumber = socialSecurityNumber;
-   }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            </div>
 
-   // Métodos concretos (com implementação)
-   public String getFirstName() { return firstName; }
-   public String getLastName() { return lastName; }
-   public String getSocialSecurityNumber() { return socialSecurityNumber; }
 
-   // Método abstrato - deve ser implementado pelas subclasses
-   public abstract double earnings();
 
-   @Override
-   public String toString() {
-      return String.format(&quot;%s %s%nsocial security number: %s&quot;, 
-         getFirstName(), getLastName(), getSocialSecurityNumber());
-   }
-}
-</code></pre>
-            <hr>
-            <h2><strong>Por que <code>Employee</code> é Abstrata?</strong></h2>
-            <p>A classe <code>Employee</code> <strong>não representa um funcionário específico</strong>, mas sim um
-                modelo genérico para funcionários. Cada tipo de funcionário calcula seus ganhos
-                (<code>earnings()</code>) de uma maneira diferente. </p>
-            <p>Por isso, o método <code>earnings()</code> <strong>é abstrato</strong>:</p>
-            <pre><code class="language-java">public abstract double earnings();
-</code></pre>
-            <p>Isso significa que <strong>todas as subclasses de <code>Employee</code> DEVEM implementar esse
-                    método</strong>, pois cada tipo de funcionário tem uma forma diferente de calcular seu pagamento.
-            </p>
-            <h3><strong>Benefícios do Uso de uma Classe Abstrata</strong></h3>
-            <p>O uso de <code>Employee</code> como <strong>classe abstrata</strong> traz várias vantagens:</p>
-            <h4>✅ <strong>1. Garante uma Estrutura Comum</strong></h4>
-            <p>Todas as subclasses <strong>devem implementar <code>earnings()</code></strong>, garantindo que cada tipo
-                de funcionário tenha um método para calcular seus ganhos.</p>
-            <h4>✅ <strong>2. Facilita o Polimorfismo</strong></h4>
-            <p>Podemos tratar diferentes tipos de funcionários <strong>de forma genérica</strong>, como no exemplo:</p>
-            <pre><code class="language-java">Employee[] employees = new Employee[4];
-employees[0] = new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
-employees[1] = new HourlyEmployee(&quot;Karen&quot;, &quot;Price&quot;, &quot;222-22-2222&quot;, 16.75, 40);
-employees[2] = new CommissionEmployee(&quot;Sue&quot;, &quot;Jones&quot;, &quot;333-33-3333&quot;, 10000, .06);
-employees[3] = new BasePlusCommissionEmployee(&quot;Bob&quot;, &quot;Lewis&quot;, &quot;444-44-4444&quot;, 5000, .04, 300);
-</code></pre>
-            <p>Aqui, todos os objetos são tratados como <code>Employee</code>, mas cada um executa
-                <code>earnings()</code> de acordo com sua classe específica (explicação detalhada fornecida acima).
-            </p>
-            <h4>✅ <strong>3. Evita Duplicação de Código</strong></h4>
-            <p>O código <strong>comum</strong> a todos os funcionários (como <code>firstName</code>,
-                <code>lastName</code> e <code>socialSecurityNumber</code>) fica <strong>centralizado</strong> na classe
-                <code>Employee</code>, evitando repetição em cada subclasse.
-            </p>
-            <h3><strong>Ou seja...</strong></h3>
-            <p>🔹 <strong><code>Employee</code> foi definida como uma classe abstrata</strong> porque <strong>não faz
-                    sentido instanciar diretamente um &quot;funcionário genérico&quot;</strong>.<br>🔹 <strong>O método
-                    <code>earnings()</code> foi definido como abstrato</strong> para forçar cada subclasse a implementar
-                seu próprio cálculo de pagamento.<br>🔹 <strong>Isso torna o código mais organizado, modular e
-                    extensível</strong>, permitindo adicionar novos tipos de funcionários no futuro sem modificar o
-                código existente. </p>
-            <hr>
-            <h2><strong>5. Interfaces</strong></h2>
-            <p>Uma <strong>interface</strong> em Java é uma estrutura que define um <strong>contrato</strong> para
-                classes. Esse contrato estabelece um conjunto de métodos que <strong>as classes que implementam essa
-                    interface devem fornecer</strong>. </p>
-            <p>Diferente das <strong>classes abstratas</strong>, uma interface <strong>não pode conter atributos de
-                    instância</strong> (exceto constantes <code>static final</code>) e <strong>não pode conter
-                    implementações de métodos</strong> (até Java 8, que introduziu métodos <code>default</code>). As
-                interfaces são frequentemente usadas para garantir que diferentes classes compartilhem um comportamento
-                comum, <strong>independentemente da hierarquia de herança</strong>.</p>
-            <h3><strong>Interface <code>Payable</code> no Código de Exemplo</strong></h3>
-            <p>No sistema de folha de pagamento, foi definida a seguinte interface:</p>
-            <pre><code class="language-java">// Interface Payable
-public interface Payable {
-   double getPaymentAmount(); // Método abstrato sem implementação
-}
-</code></pre>
-            <p>Essa interface estabelece que <strong>qualquer classe que a implemente DEVE fornecer um método
-                    <code>getPaymentAmount()</code></strong>.</p>
-            <p>A ideia central é permitir que <strong>diferentes tipos de entidades</strong> (como
-                <strong>empregados</strong> e <strong>faturas</strong>) possam ser processadas de forma uniforme, já que
-                todas elas fornecem um valor a ser pago.
-            </p>
-            <hr>
-            <h2><strong>Implementações da Interface <code>Payable</code></strong></h2>
-            <p>A interface <code>Payable</code> é implementada por <strong>duas categorias diferentes de
-                    classes</strong>:</p>
-            <ol>
-                <li><strong>A classe <code>Invoice</code></strong>, que representa <strong>faturas de
-                        fornecedores</strong>.</li>
-                <li><strong>A classe <code>Employee</code> e suas subclasses</strong>, que representam
-                    <strong>diferentes tipos de funcionários</strong>.
-                </li>
-            </ol>
-            <h3><strong>1️⃣ Classe <code>Invoice</code> Implementando <code>Payable</code></strong></h3>
-            <p>A classe <code>Invoice</code> representa uma <strong>fatura de um fornecedor</strong>. Como uma fatura
-                não é um funcionário, ela <strong>não poderia herdar de <code>Employee</code></strong>, mas pode
-                <strong>implementar <code>Payable</code></strong> para ser processada de maneira uniforme com
-                funcionários.
-            </p>
-            <h4><code>Invoice</code></h4>
-            <pre><code class="language-java">// Classe Invoice que implementa Payable
-public class Invoice implements Payable {
-   private final String partNumber;
-   private final String partDescription;
-   private int quantity;
-   private double pricePerItem;
 
-   public Invoice(String partNumber, String partDescription, int quantity, double pricePerItem) {
-      if (quantity &lt; 0) 
-         throw new IllegalArgumentException(&quot;Quantity must be &gt;= 0&quot;);
 
-      if (pricePerItem &lt; 0.0) 
-         throw new IllegalArgumentException(&quot;Price per item must be &gt;= 0&quot;);
 
-      this.partNumber = partNumber;
-      this.partDescription = partDescription;
-      this.quantity = quantity;
-      this.pricePerItem = pricePerItem;
-   }
 
-   // Implementação do método getPaymentAmount() da interface Payable
-   @Override
-   public double getPaymentAmount() {
-      return getQuantity() * getPricePerItem(); // O valor total da fatura
-   }
 
-   @Override
-   public String toString() {
-      return String.format(&quot;invoice: %npart number: %s (%s) %nquantity: %d %nprice per item: $%,.2f&quot;,
-         getPartNumber(), getPartDescription(), getQuantity(), getPricePerItem());
-   }
-}
-</code></pre>
-            <h3><strong>📌 O que acontece aqui?</strong></h3>
-            <ul>
-                <li>A classe <code>Invoice</code> <strong>implementa <code>Payable</code></strong>, o que a obriga a
-                    fornecer uma implementação para <code>getPaymentAmount()</code>.</li>
-                <li><code>getPaymentAmount()</code> calcula o <strong>valor total da fatura</strong>
-                    (<code>quantidade * preço por item</code>).</li>
-                <li>Isso permite que uma <strong>fatura seja tratada de forma semelhante a um empregado</strong> dentro
-                    do sistema de folha de pagamento.</li>
-            </ul>
-            <hr>
-            <h3><strong>2️⃣ Classe <code>Employee</code> e Subclasses Implementando <code>Payable</code></strong></h3>
-            <p>Como <code>Employee</code> representa diferentes tipos de funcionários, e <strong>cada funcionário tem um
-                    valor a ser pago</strong>, <code>Employee</code> também implementa <code>Payable</code>:</p>
-            <pre><code class="language-java">// Classe abstrata Employee que implementa Payable
-public abstract class Employee implements Payable {
-   private final String firstName;
-   private final String lastName;
-   private final String socialSecurityNumber;
 
-   public Employee(String firstName, String lastName, String socialSecurityNumber) {
-      this.firstName = firstName;
-      this.lastName = lastName;
-      this.socialSecurityNumber = socialSecurityNumber;
-   }
 
-   @Override
-   public String toString() {
-      return String.format(&quot;%s %s%nsocial security number: %s&quot;, 
-         getFirstName(), getLastName(), getSocialSecurityNumber());
-   }
-}
-</code></pre>
-            <h4><strong>Subclasses de <code>Employee</code> Sobrescrevendo <code>getPaymentAmount()</code></strong></h4>
-            <p>Cada subclasse de <code>Employee</code> implementa <code>getPaymentAmount()</code> de acordo com sua
-                forma específica de cálculo de pagamento.</p>
-            <h4><strong>Funcionário Assalariado (<code>SalariedEmployee</code>)</strong></h4>
-            <pre><code class="language-java">public class SalariedEmployee extends Employee {
-   private double weeklySalary;
 
-   public SalariedEmployee(String firstName, String lastName, String socialSecurityNumber, double weeklySalary) {
-      super(firstName, lastName, socialSecurityNumber);
-      if (weeklySalary &lt; 0.0)
-         throw new IllegalArgumentException(&quot;Weekly salary must be &gt;= 0.0&quot;);
-      this.weeklySalary = weeklySalary;
-   }
 
-   @Override
-   public double getPaymentAmount() {
-      return getWeeklySalary();
-   }
-}
-</code></pre>
-            <h4><strong>Funcionário Horista (<code>HourlyEmployee</code>)</strong></h4>
-            <pre><code class="language-java">public class HourlyEmployee extends Employee {
-   private double wage;
-   private double hours;
 
-   public HourlyEmployee(String firstName, String lastName, String socialSecurityNumber, double wage, double hours) {
-      super(firstName, lastName, socialSecurityNumber);
-      this.wage = wage;
-      this.hours = hours;
-   }
 
-   @Override
-   public double getPaymentAmount() {
-      if (hours &lt;= 40)
-         return wage * hours;
-      else
-         return 40 * wage + (hours - 40) * wage * 1.5;
-   }
-}
-</code></pre>
-            <hr>
-            <h3><strong>O Poder do Polimorfismo com Interfaces</strong></h3>
-            <p>Agora que <strong><code>Invoice</code> e <code>Employee</code> implementam <code>Payable</code></strong>,
-                podemos armazenar <strong>tanto funcionários quanto faturas no mesmo array e processá-los de maneira
-                    uniforme</strong>.</p>
-            <h4><strong>Trecho de código do <code>PayrollSystemTest.java</code></strong></h4>
-            <pre><code class="language-java">// Criando um array de Payable para armazenar diferentes tipos de objetos
-Payable[] payableObjects = new Payable[4];
 
-payableObjects[0] = new Invoice(&quot;01234&quot;, &quot;seat&quot;, 2, 375.00);
-payableObjects[1] = new Invoice(&quot;56789&quot;, &quot;tire&quot;, 4, 79.95);
-payableObjects[2] = new SalariedEmployee(&quot;John&quot;, &quot;Smith&quot;, &quot;111-11-1111&quot;, 800.00);
-payableObjects[3] = new SalariedEmployee(&quot;Lisa&quot;, &quot;Barnes&quot;, &quot;888-88-8888&quot;, 1200.00);
 
-System.out.println(&quot;Invoices and Employees processed polymorphically:&quot;);
 
-for (Payable currentPayable : payableObjects) {
-   System.out.printf(&quot;%n%s %n%s: $%,.2f%n&quot;, 
-      currentPayable.toString(), 
-      &quot;payment due&quot;, currentPayable.getPaymentAmount());
-}
-</code></pre>
-            <h3><strong>📌E aqui, o que acontece?</strong></h3>
-            <ul>
-                <li>Criamos um <strong>array de <code>Payable</code></strong> contendo <strong>faturas
-                        (<code>Invoice</code>) e funcionários (<code>SalariedEmployee</code>)</strong>.</li>
-                <li>Usamos <strong>polimorfismo</strong> para tratar <strong>todos os objetos como
-                        <code>Payable</code></strong>, independentemente de serem faturas ou funcionários.</li>
-                <li>Chamamos <code>getPaymentAmount()</code> sem nos preocuparmos com o tipo exato do objeto, pois
-                    sabemos que <strong>todos os objetos no array implementam <code>Payable</code></strong>.</li>
-            </ul>
-            <p>Ou seja, a interface <code>Payable</code> foi usada para <strong>padronizar o cálculo de valores a serem
-                    pagos</strong> a diferentes entidades (<code>Invoice</code> e <code>Employee</code>). Isso nos
-                fornece diversas vantagens:</p>
-            <ul>
-                <li>Permite <strong>tratar faturas e funcionários de forma uniforme</strong>, simplificando o código.
-                </li>
-                <li>Facilita a <strong>expansão do sistema</strong>, pois novos tipos de <code>Payable</code> podem ser
-                    adicionados sem alterar o código existente. </li>
-                <li><strong>Reduz o acoplamento</strong>, pois <code>Invoice</code> e <code>Employee</code> <strong>não
-                        precisam estar na mesma hierarquia de classes</strong> para serem processados de maneira
-                    semelhante.</li>
-            </ul>
-            <p>Esse é um <strong>ótimo exemplo de polimorfismo e boas práticas de POO</strong>, demonstrando como
-                interfaces tornam um sistema <strong>mais flexível, extensível e reutilizável</strong>! 🚀</p>
-            <hr>
-            <h2>Conclusão</h2>
-            <p>Esses conceitos basilares nos permitem criar aplicações que seguem os bons padrões da programação
-                orientada a objetos, permitindo extensibilidade e reúso de código-fonte.</p>
-            <p>📌 Lembrem-se: o mais importante é buscarmos alta coesão e baixo acoplamento. Para isso, devemos nos
-                valer das possibilidades que são proporcionadas pelo paradigma da POO.</p>
 
-        </div>
+
+
+
 
     </div>
 
