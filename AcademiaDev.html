@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/prism.css">
+
+    <title>APIs e Microsserviços - Aula 08 - Autenticação com JWT</title>
+</head>
+
+<body>
+    <div class="wrapper d-flex align-items-stretch">
+        <nav id="sidebar">
+            <div class="custom-menu">
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <i class="fa fa-bars"></i>
+                    <span class="sr-only">Toggle Menu</span>
+                </button>
+            </div>
+            <h1><a href="index.html" class="logo text-center">AULAS</a></h1>
+            <ul class="list-unstyled components mb-5">
+                <li>
+                    <a href="Aula01.html"><span class="mr-1"></span>01 - Revisão</a>
+                </li>
+                <li>
+                    <a href="Aula02.html"><span class="mr-0"></span>02 - Revisão II</a>
+                </li>
+                <li>
+                    <a href="Aula03.html"><span class="mr-0"></span>03 - REST I</a>
+                </li>
+                <li>
+                    <a href="Aula04.html"><span class="mr-0"></span>04 - REST II</a>
+                </li>
+                <li>
+                    <a href="Aula05.html"><span class="mr-0"></span>05 - REST III</a>
+                </li>
+                <li>
+                    <a href="Aula06.html"><span class="mr-0"></span>06 - REST IV</a>
+                </li>
+                <li>
+                    <a href="Aula07.html"><span class="mr-0"></span>07 - Exercício I</a>
+                </li>
+                <li>
+                    <a href="Aula08.html"><span class="mr-0"></span>08 - REST V</a>
+                </li>
+                <li>
+                    <a href="Aula09.html"><span class="mr-0"></span>09 - Microsserviços I</a>
+                </li>
+                <li>
+                    <a href="Aula10.html"><span class="mr-0"></span>10 - Microsserviços II</a>
+                </li>
+                <li class="active">
+                    <a href="Aula11.html"><span class="mr-0"></span>11 - Microsserviços III</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>12 - Microsserviços IV</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>13 - Microsserviços V</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>14 - Microsserviços VI</a>
+                </li>
+                <li>
+                    <a href="#"><span class="mr-0"></span>15 - Microsserviços VII</a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content" class="p-4 p-md-5 pt-5">
+
+
+
+            <h1><strong>Aula - Breve visão geral da Arquitetura da AcademiaDev</strong></h1>
+            <p>Nas Aulas 01 e 02, revisamos os pilares da Programação Orientada a Objetos e exploramos os recursos
+                modernos do Java, como Lambdas, Streams, Optionals e Reflection. Após isso, tivemos uma série de
+                exercícios, em particular um Desafio mais completo: a <strong>AcademiaDev</strong>, uma plataforma de
+                cursos online para a qual deveríamos implementar um protótipo funcional.</p>
+            <p>O objetivo desta aula é mostrar uma possível solução para a arquitetura da AcademiaDev, entender como
+                suas camadas se comunicam e ver as escolhas de design que foram adotadas de forma a produzirmos um
+                protótipo funcional relativamente coeso. O repositório para o código descrito abaixo está linkado no
+                Moodle.</p>
+            <h2><strong>1. Visão Geral da Arquitetura: A Separação em Camadas</strong></h2>
+            <p>A nossa solução da AcademiaDev foi projetada seguindo uma arquitetura em camadas, um dos padrões mais
+                consolidados na engenharia de software. A arquitetura em camada mais comum, que inclusive vocês já
+                conhecem, é o Modelo MVC (Model-View-Controller). Usamos essa abordagem de forma a organizar o código em
+                blocos lógicos, onde cada camada tem uma responsabilidade bem definida. </p>
+            <p>A motivação para o uso de arquitetura em camadas está na manutenibilidade e compreensibilidade da base de
+                código. Por exemplo, um Software com lógica de negócio na camada de apresentação - pense em uma página
+                PHP que se conecta a um banco de dados, faz uma query, trata esses de dados e depois disso lida com toda
+                a lógica de apresentação deles - é claramente um anti-padrão. Isso facilmente leva ao código espaguete e
+                torna a manutenção da aplicação em algo tenebroso a longo prazo. </p>
+            <p>Portanto, como queremos evitar isso, adotar um modelo em camadas torna o sistema mais fácil de entender,
+                manter e testar, já que tendemos a manter responsabilidades relacionadas nas mesmas camadas e evitar um
+                grande acoplamento entre as diferentes partes do sistema.</p>
+            <p>Para solucionar o desafio AcademiaDev fiz a divisão a partir das seguintes camadas:</p>
+            <ol>
+                <li><strong>View (Apresentação):</strong> A interface com o usuário. No caso, é uma interface de linha
+                    de comando (<code>console</code>) mas poderia ser tranquilamente substituída por uma interface
+                    gráfica com Swing ou SWT, ou mesmo uma interface web implementada por um conjunto de Servlets.</li>
+                <li><strong>Controller (Controle):</strong> O maestro que recebe as requisições da View e orquestra as
+                    chamadas para a camada de serviço.</li>
+                <li><strong>Service (Serviço):</strong> O cérebro da aplicação, onde reside toda a lógica de negócio.
+                </li>
+                <li><strong>Repository (Repositório):</strong> A camada de acesso a dados, que abstrai a forma como as
+                    informações são armazenadas e recuperadas.</li>
+                <li><strong>Model (Modelo):</strong> As classes que representam os dados do nosso domínio (usuários,
+                    cursos, etc.).</li>
+            </ol>
+            <p>Vamos analisar o papel de cada uma.</p>
+            <h3><strong>1.1. Camada de Apresentação (View)</strong></h3>
+            <p>A camada <code>view</code> (<code>AdminView</code>, <code>StudentView</code>, <code>MainView</code>) é a
+                única parte do sistema com a qual o usuário interage diretamente. Sua responsabilidade é simples:</p>
+            <ul>
+                <li>Exibir menus e informações.</li>
+                <li>Capturar a entrada do usuário (via <code>Scanner</code>).</li>
+                <li>Delegar a ação do usuário para o <code>Controller</code> apropriado.</li>
+            </ul>
+            <p><strong>Importante:</strong> A View não contém nenhuma lógica de negócio. Ela não sabe <em>como</em>
+                matricular um aluno ou <em>como</em> gerar um relatório. Ela apenas sabe que, para uma determinada ação
+                do usuário, deve chamar um método específico no <code>Controller</code>.</p>
+            <h3><strong>1.2. Camada de Controle (Controller)</strong></h3>
+            <p>A camada <code>controller</code> (<code>AdminController</code>, <code>StudentController</code>) atua como
+                uma intermediária. Ela recebe as solicitações da View, mas não executa a lógica diretamente. Em vez
+                disso, ela:</p>
+            <ol>
+                <li>Recebe os dados brutos da View (ex: email do aluno, título do curso).</li>
+                <li>Chama os métodos apropriados na camada de <code>Service</code> para executar a lógica de negócio.
+                </li>
+                <li>Recebe uma resposta do <code>Service</code> e a empacota em um formato padronizado
+                    (<code>ControllerResponse</code>) para ser exibida pela View.</li>
+            </ol>
+            <p>A classe <code>ControllerResponse</code> é um DTO (Data Transfer Object) simples que padroniza a
+                comunicação de volta para a View, informando se a operação foi um sucesso (<code>success</code>) e uma
+                mensagem (<code>message</code>) a ser exibida. Em uma abordagem mais robusta, poderíamos ter múltiplos
+                DTOs para representar as diferentes transições de mensagem entre camadas, mas não é nosso foco agora.
+            </p>
+            <h3><strong>1.3. Camada de Serviço (Service)</strong></h3>
+            <p>Esta é a camada mais importante, pois contém as <strong>regras de negócio</strong> da AcademiaDev.
+                Classes como <code>EnrollmentService</code> e <code>ReportService</code> são o coração da aplicação.</p>
+            <ul>
+                <li><strong><code>EnrollmentService</code>:</strong> Valida se um aluno pode se matricular em um curso,
+                    verificando regras como o status do curso e o plano de assinatura do aluno.</li>
+                <li><strong><code>ReportService</code>:</strong> Contém a lógica complexa para gerar relatórios, como
+                    agrupar alunos por plano ou encontrar o instrutor com mais cursos.</li>
+                <li><strong><code>UserService</code>:</strong> Gerencia operações específicas do usuário, como alterar
+                    seu plano de assinatura.</li>
+            </ul>
+            <p>É nesta camada que vemos o uso intensivo da Stream API e de <code>Optional</code> para manipular coleções
+                e tratar a ausência de dados de forma segura. Ao analisar o código, reparem que deixamos as regras na
+                camada de Service e a orquestração das chamdas nos nossos Controllers. Esse é um padrão muito comum de
+                design!</p>
+            <h3><strong>1.4. Camada de Repositório (Repository)</strong></h3>
+            <p>A camada <code>repository</code> (<code>UserRepository</code>, <code>CourseRepository</code>, etc.) tem a
+                responsabilidade de <strong>abstrair o acesso aos dados</strong>. Ela define uma interface (um contrato)
+                com os métodos necessários para persistir e consultar os dados, como <code>save</code>,
+                <code>findByEmail</code> ou <code>findAll</code>.</p>
+            <p>Para este protótipo, utilizamos implementações em memória (<code>InMemoryUserRepository</code>). Essa é
+                uma escolha de design estratégica:</p>
+            <ul>
+                <li><strong>Simplicidade:</strong> Não precisamos configurar um banco de dados real, acelerando o
+                    desenvolvimento.</li>
+                <li><strong>Flexibilidade:</strong> Se no futuro quisermos usar um banco de dados como MySQL, basta
+                    criar uma nova implementação da interface (<code>MySqlUserRepository</code>) sem precisar alterar
+                    nenhuma outra camada do sistema.</li>
+            </ul>
+            <p> escolha das estruturas de dados nas implementações em memória também foi intencional:</p>
+            <ul>
+                <li><code>Map&lt;String, User&gt;</code> em <code>InMemoryUserRepository</code>: Usa o e-mail como chave
+                    para garantir buscas ultra-rápidas e unicidade, que é um requisito do sistema.</li>
+                <li><code>Queue&lt;SupportTicket&gt;</code> em <code>InMemorySupportTicketRepository</code>: Utiliza uma
+                    fila para garantir o atendimento dos tickets de suporte em ordem de chegada (FIFO - First-In,
+                    First-Out).</li>
+            </ul>
+            <p>Aqui é importante reforçar que lembrem-se da máxima: programe para uma interface, não para uma
+                implementação concreta! Essa ideia ajuda a pensar em uma camada de indireção de acoplamento e fazer com
+                que nossa implementação seja mais flexível. Futuramente na disciplina conversaremos mais sobre essas
+                questões de acoplamento e como essa é a discussão central do ponto de vista de arquitetura e design de
+                sistemas.</p>
+            <h3><strong>1.5. Camada de Modelo (Model)</strong></h3>
+            <p>A camada <code>model</code> (<code>User</code>, <code>Course</code>, <code>Enrollment</code>) contém as
+                classes POJO (Plain Old Java Objects) que representam as entidades do nosso sistema. Elas são estruturas
+                de dados simples, com atributos e métodos <code>getters/setters</code>, que transitam entre todas as
+                outras camadas.</p>
+            <p>Aqui não há segredo nenhum.</p>
+            <h2><strong>2. Injeção de Dependência Manual no <code>App.java</code></strong></h2>
+            <p>O arquivo <code>App.java</code> serve como o <strong>Ponto de Composição (Composition Root)</strong> da
+                nossa aplicação. É aqui que o princípio de <strong>Inversão de Controle (IoC)</strong> é aplicado
+                manualmente.</p>
+            <p>Em vez de cada classe criar suas próprias dependências (ex: <code>UserService</code> criando um
+                <code>new UserRepository()</code>), nós instanciamos todos os objetos no <code>main</code> e os
+                &quot;injetamos&quot; através dos construtores. O processo ocorre de dentro para fora:</p>
+            <ol>
+                <li><strong>Repositórios</strong> são criados primeiro, pois não têm dependências.</li>
+                <li><strong>Serviços</strong> são criados em seguida, recebendo as instâncias dos repositórios de que
+                    precisam.</li>
+                <li><strong>Controllers</strong> são criados, recebendo as instâncias dos serviços.</li>
+                <li><strong>Views</strong> são criadas por último, recebendo os controllers.</li>
+            </ol>
+            <p>Essa abordagem, chamada de <strong>Injeção de Dependência</strong>, desacopla fortemente nossas classes,
+                tornando o sistema muito mais modular e fácil de testar. </p>
+            <h2><strong>3. Uso do Java na construção da aplicação</strong></h2>
+            <p>Vamos aproveitar que já estamos aqui e conectar o código da AcademiaDev com os conceitos das Aulas 01 e
+                02.</p>
+            <h3><strong>3.1. Tratando a Ausência de Valor com <code>Optional</code></strong></h3>
+            <p>O <code>NullPointerException</code> é um dos erros mais comuns em Java. A classe <code>Optional</code>,
+                como vimos na Aula 02, nos força a lidar com a possibilidade de um valor não existir.</p>
+            <p>No nosso código, os repositórios usam <code>Optional</code> em métodos de busca para indicar que um
+                objeto pode ou não ser encontrado:</p>
+            <pre><code class="language-java">// Em UserRepository.java
+Optional&lt;User&gt; findByEmail(String email);
+</code></pre>
+            <p>Na camada de serviço, consumimos esse <code>Optional</code> de forma segura. Em vez de verificar se o
+                resultado é <code>null</code>, usamos <code>.orElseThrow()</code>:</p>
+            <pre><code class="language-java">// Em UserService.java
+public User changeStudentPlan(String studentEmail, EnrollmentPolicy newPolicy) {
+    User user = userRepository.findByEmail(studentEmail)
+            .orElseThrow(() -&gt; new UserNotFoundException(&quot;User with email &#39;&quot; + studentEmail + &quot;&#39; not found.&quot;)); // [1]
+    // ...
+}
+</code></pre>
+            <p>Ou seja, se <code>findByEmail</code> retornar um <code>Optional</code> vazio, o código lança
+                imediatamente uma <code>UserNotFoundException</code> com uma mensagem clara. Se o <code>Optional</code>
+                contiver um <code>User</code>, ele é extraído e atribuído à variável <code>user</code>. Isso torna o
+                código mais limpo e robusto.</p>
+            <p>Outro exemplo disso está no <code>SupportService</code>, que processa tickets de uma fila. O método
+                <code>getNextTicket</code> retorna um <code>Optional&lt;SupportTicket&gt;</code>, tratando o caso de a
+                fila estar vazia.</p>
+            <h3><strong>3.2. Processamento de Dados com Lambdas e a Stream API</strong></h3>
+            <p>A nossa classe <code>ReportService</code> é um exemplo do poder da programação funcional em Java,
+                conceito que vimos na Aula 02. Em vez de usar laços <code>for</code> e <code>if</code> (estilo
+                imperativo), usamos a Stream API para descrever <em>o que</em> queremos (estilo declarativo).</p>
+            <p><strong>Exemplo 1: Buscando Instrutores Únicos e Ativos</strong></p>
+            <pre><code class="language-java">// Em ReportService.java
+public Set&lt;String&gt; getUniqueActiveInstructors() {
+    return courseRepository.findAll().stream() // 1. Cria um stream de cursos
+            .filter(course -&gt; course.getStatus() == CourseStatus.ACTIVE) // 2. Filtra apenas os ativos
+            .map(Course::getInstructorName) // 3. Mapeia cada curso para o nome do instrutor
+            .collect(Collectors.toSet()); // 4. Coleta os nomes em um Set para garantir unicidade
+}
+</code></pre>
+            <p>Essa &quot;linha de montagem&quot; de dados é concisa e expressiva. A mesma lógica com <code>for</code>
+                seria muito mais verbosa.</p>
+            <p><strong>Exemplo 2: O Aluno com Mais Matrículas</strong></p>
+            <p>Este é um exemplo mais complexo que demonstra o poder de encadeamento da Stream API:</p>
+            <pre><code class="language-java">// Em ReportService.java
+public Optional&lt;User&gt; getStudentWithMostEnrollments() {
+    return enrollmentRepository.findAll().stream()
+            // Agrupa as matrículas por aluno e conta quantas cada um tem
+            .collect(Collectors.groupingBy(Enrollment::getStudent, Collectors.counting()))
+            .entrySet().stream() // Cria um novo stream com as entradas do mapa (Aluno -&gt; Contagem)
+            // Encontra a entrada com o maior valor (maior contagem)
+            .max(Map.Entry.comparingByValue())
+            // Mapeia a entrada encontrada para obter apenas a chave (o Aluno)
+            .map(Map.Entry::getKey);
+}
+</code></pre>
+            <p>O retorno é um <code>Optional&lt;User&gt;</code>, pois pode não haver nenhuma matrícula no sistema, e o
+                <code>Optional</code> trata esse caso de forma segura. Sério, até que essa implementação ficou bem
+                legal, né? 🤓</p>
+            <h3><strong>3.3. Exportação Dinâmica de CSV com Reflection e Anotações</strong></h3>
+            <p>Outra funcionalidade interessante de analisar é a exportação de dados para CSV, um caso de uso mais
+                complexo e um ótimo exemplo de como usar <strong>Reflection</strong>, como visto na Aula 01.</p>
+            <p>O objetivo era criar um exportador genérico que funcionasse para qualquer lista de objetos
+                (<code>List&lt;User&gt;</code>, <code>List&lt;Course&gt;</code>, etc.) e permitisse ao usuário escolher
+                quais colunas exportar.</p>
+            <p><strong>Vamos entender. Como funciona o <code>CsvFormatter.java</code>?</strong></p>
+            <ol>
+                <li>
+                    <p><strong>Anotação Personalizada <code>@CsvColumn</code>:</strong> Primeiro, criamos uma anotação
+                        (<code>@CsvColumn</code>) para marcar quais campos dos nossos modelos (<code>User</code>,
+                        <code>Course</code>) são exportáveis. A anotação também permite definir um nome de cabeçalho
+                        customizado.</p>
+                    <pre><code class="language-java">// Em Course.java
+@CsvColumn(header = &quot;Course Title&quot;)
+private String title;
+</code></pre>
+                </li>
+                <li>
+                    <p><strong>Inspeção em Tempo de Execução (Reflection):</strong> O método <code>export</code> no
+                        <code>CsvFormatter</code> usa Reflection para analisar a estrutura dos objetos em tempo de
+                        execução.</p>
+                    <pre><code class="language-java">// Em CsvFormatter.java
+Class&lt;?&gt; clazz = data.get(0).getClass(); // Pega a classe do objeto
+List&lt;Field&gt; exportableFields = List.of(clazz.getDeclaredFields()).stream() // Pega todos os campos
+        .filter(field -&gt; field.isAnnotationPresent(CsvColumn.class) &amp;&amp; desiredFields.contains(field.getName())) // Filtra os campos desejados e anotados
+        .collect(Collectors.toList());
+</code></pre>
+                </li>
+                <li>
+                    <p><strong>Acessando Dados Privados:</strong> Para ler o valor de cada campo (mesmo os privados), o
+                        código usa <code>field.setAccessible(true)</code> para quebrar o encapsulamento temporariamente
+                        e <code>field.get(item)</code> para obter o valor. Sim, podemos fazer isso aqui mas é importante
+                        lembrar que com grandes poderes vem grandes responsabilidades. Forma geral, não vamos
+                        <em>precisar</em> desse tipo de implementação, mas não deixa de ser um bom exemplo ter noção da
+                        extensão que o Java nos permite manipular o código. </p>
+                    <pre><code class="language-java">// Em CsvFormatter.java, dentro do loop de dados
+field.setAccessible(true); // Permite acesso a campos privados
+Object value = field.get(item); // Pega o valor do campo para o objeto &#39;item&#39;
+</code></pre>
+                </li>
+            </ol>
+            <p>Ou seja, o <code>CsvFormatter</code> é incrivelmente poderoso e reutilizável, pois ele não precisa
+                conhecer as classes <code>User</code> ou <code>Course</code> de antemão. Ele se adapta a qualquer tipo
+                de objeto que use a anotação <code>@CsvColumn</code>. Elegante, né? 💅</p>
+            <h2><strong>4. Conclusão: Unindo os Pontos</strong></h2>
+            <p>O desafio AcademiaDev é a materialização dos conceitos que estudamos. Ele demonstra como uma aplicação
+                minimamente bem arquitetada:</p>
+            <ul>
+                <li><strong>Separa responsabilidades</strong> em camadas distintas, tornando o código mais limpo e
+                    organizado.</li>
+                <li>Usa <strong>injeção de dependência</strong> para criar componentes desacoplados e testáveis.</li>
+                <li>Aplica <strong>recursos modernos do Java</strong>, como <code>Optional</code> e
+                    <code>Streams</code>, para escrever um código mais seguro, conciso e declarativo.</li>
+                <li>Utiliza técnicas como <strong>Reflection e anotações customizadas</strong> para criar
+                    funcionalidades genéricas e poderosas.</li>
+            </ul>
+            <p>Se você teve dificuldade na implementação do Desafio, analise o código que o implemente. Este não é
+                apenas um exercício de leitura, mas uma visão geral de como os princípios da Engenharia de Software e as
+                ferramentas do Java se unem para construir soluções para problemas complexos.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+    </div>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container-fluid">
+            <span>
+                <p class="text-center text-light">Instituto Federal de Educação, Ciência e Tecnologia de São Paulo,
+                    Câmpus
+                    Guarulhos. APIs e Microsserviços - Prof. Giovani.</p>
+            </span>
+        </div>
+    </footer>
+    </div>
+
+
+    <script src="js/prism.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
