@@ -1,0 +1,55 @@
+<hr>
+<div class="project-nav">
+  
+  {% assign parentPage = site.html_pages | where: "title", page.parent | first %}
+  {% assign my_children = site.html_pages | where: "parent", page.title | sort: "nav_order" %}
+  
+  {% assign siblings = site.html_pages | where: "parent", page.parent | sort: "nav_order" %}
+
+  {% assign prevPage = nil %}
+  {% assign nextPage = nil %}
+
+  {% if my_children.size > 0 %}
+    {% assign nextPage = my_children[0] %}
+  {% else %}
+    {% for sibling in siblings %}
+      {% if sibling.url == page.url %}
+        {% assign currIdx = forloop.index0 %}
+        {% assign nextIdx = currIdx | plus: 1 %}
+        {% if nextIdx < siblings.size %}
+            {% assign nextPage = siblings[nextIdx] %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if page.parent %}
+    {% for sibling in siblings %}
+      {% if sibling.url == page.url %}
+        {% assign currIdx = forloop.index0 %}
+        {% if currIdx > 0 %}
+          {% assign prevIdx = currIdx | minus: 1 %}
+          {% assign prevPage = siblings[prevIdx] %}
+        {% else %}
+          {% assign prevPage = parentPage %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if prevPage %}
+    <a href="{{ prevPage.url | relative_url }}" class="btn btn-primary">
+      &#8592; {{ prevPage.title }}
+    </a>
+  {% else %}
+    <span></span> {% endif %}
+
+  {% if nextPage %}
+    <a href="{{ nextPage.url | relative_url }}" class="btn btn-primary">
+      {{ nextPage.title }} &#8594;
+    </a>
+  {% else %}
+    <span></span>
+  {% endif %}
+  
+</div>
