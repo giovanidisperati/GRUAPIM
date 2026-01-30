@@ -1,3 +1,11 @@
+---
+layout: aula
+title: Aula 07 - Construindo o To-do List
+nav_order: 9
+has_children: true
+permalink: /aula07
+---
+
 # Aula 07 – Construção da API de Gerenciamento de Tarefas (To-Do List)
 
 Na Aula 06, evoluímos a nossa API aplicando boas práticas como o uso de `ResponseEntity`, a organização da documentação com Swagger/OpenAPI, a injeção de dependência via construtor e a introdução dos primeiros testes automatizados. Agora, nesta aula, desenvolveremos a nossa **API de Gerenciamento de Tarefas** (To-Do List) seguindo os princípios RESTful e aplicando todos os conceitos que vimos até aqui. Vamos, a partir dessa aula, dar continuidade nos conceitos vistos anteriormente por meio da resolução do exercício do To-Do List.

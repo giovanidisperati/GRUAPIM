@@ -4,6 +4,7 @@ title: 5. Como está nossa aplicação?
 parent: Aula 05 - Aprimorando nossas APIs Rest
 nav_order: 5
 ---
+
 ## 5. Estado atual do sistema
 
 Ao longo dessa aula estruturamos a aplicação seguindo boas práticas de organização de código e responsabilidades bem definidas entre os pacotes. Adotamos conceitos importantes como uso de DTOs para entrada e saída de dados, integração com o banco de dados relacional (MySQL) via Spring Data JPA, paginação e ordenação com `Pageable`, e mapeamento automático entre entidades e DTOs com ModelMapper. Também discutimos aspectos teóricos como a diferença entre entidades e DTOs, uso de Lombok para redução de boilerplate, princípios de Inversão de Controle e Injeção de Dependência, além da documentação interativa com Swagger/OpenAPI.
