@@ -1,33 +1,9 @@
 ---
 layout: aula
-title: Aula 07 - Construindo o To-do List
-nav_order: 9
-has_children: true
-permalink: /aula07
+title: 8. Conclusão e Desafios
+parent: Aula 07 - Construindo o To-do List
+nav_order: 7
 ---
-
-# Aula 07 – Construção da API de Gerenciamento de Tarefas (To-Do List)
-
-Na Aula 06, evoluímos a nossa API aplicando boas práticas como o uso de `ResponseEntity`, a organização da documentação com Swagger/OpenAPI, a injeção de dependência via construtor e a introdução dos primeiros testes automatizados. Agora, nesta aula, desenvolveremos a nossa **API de Gerenciamento de Tarefas** (To-Do List) seguindo os princípios RESTful e aplicando todos os conceitos que vimos até aqui. Vamos, a partir dessa aula, dar continuidade nos conceitos vistos anteriormente por meio da resolução do exercício do To-Do List.
-
-Daremos ênfase na correta separação de responsabilidades em camadas, na implementação de boas práticas de validação, na construção de DTOs e no tratamento adequado de exceções.
-
-A proposta é desenvolver uma API REST que permita que usuários criem, consultem, atualizem e excluam tarefas pessoais. Cada tarefa possuirá atributos como título, descrição, prioridade, categoria, data limite, entre outros.
-
-As funcionalidades obrigatórias incluem:
-- CRUD completo para tarefas.
-- Pesquisa de tarefas por categoria.
-- Marcação de tarefas como concluídas.
-- Paginação e ordenação dos resultados.
-- Validação de campos obrigatórios e regras de negócio.
-- Tratamento global de exceções.
-- Testes unitários e funcionais dos endpoints.
-
-Neste exercício, poderíamos ter seguido a mesma abordagem adotada na Aula 06, onde organizamos nosso código apenas com Controller → Repository → Model → DTO. No entanto, para tornar nossa arquitetura ainda mais robusta e alinhada às boas práticas, incluiremos também uma camada de serviço (@Service). Essa nova camada será responsável por isolar a lógica de negócio, promovendo melhor organização, reutilização de código e maior facilidade na manutenção e nos testes.
-
-
-
-
 
 ## 4. Conclusão
 
@@ -84,5 +60,3 @@ Esse exercício reforçará a prática de regras de negócio e de segurança de 
 - **Crie roles de usuário**: `USER` e `ADMIN`.
 - **Permita que apenas ADMINs possam consultar todas as tarefas** (endpoint `/api/tasks`).
 - **Usuários comuns (`USER`) só devem poder gerenciar suas próprias tarefas**.
-  
-Esse controle de papéis é essencial para implementar autorização baseada em responsabilidades — uma prática indispensável em aplicações reais.
