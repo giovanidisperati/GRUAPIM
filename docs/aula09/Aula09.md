@@ -1,3 +1,11 @@
+---
+layout: aula
+title: Aula 09 - Introdução aos Microsserviços
+nav_order: 11
+has_children: true
+permalink: /aula09
+---
+
 # **Aula 09 – Introdução aos Microsserviços**
 
 Na aula anterior, concluímos nossa primeira jornada pela construção de APIs REST, culminando na implementação de segurança com JWT. Ainda há muito a falar para esgotarmos o tema, mas sem dúvidas já sabemos o suficiente para conseguir avançar nossos conhecimento para a próxima etapa: iniciar a exploração do universo da **arquitetura de microsserviços**. Este estilo arquitetural ganhou imensa popularidade e é fundamental para construir sistemas complexos, escaláveis e flexíveis no cenário tecnológico atual.

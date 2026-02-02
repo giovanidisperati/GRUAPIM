@@ -1,3 +1,11 @@
+---
+layout: aula
+title: Aula 08 - Segurança com JWT
+nav_order: 10
+has_children: true
+permalink: /aula08
+---
+
 # Aula 08 – Segurança em APIs REST com JWT e Spring Security
 
 Na Aula 08, construímos uma API REST de gerenciamento de tarefas (To-Do List) com uma arquitetura em camadas, separação de responsabilidades, validação, tratamento de exceções e testes automatizados. Agora, vamos dar mais um passo importante rumo a uma aplicação robusta e pronta para produção: **a implementação de segurança**!

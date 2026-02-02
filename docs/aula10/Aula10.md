@@ -1,3 +1,11 @@
+---
+layout: aula
+title: Aula 10 - Introdução ao Domain Driven Design
+nav_order: 12
+has_children: true
+permalink: /aula10
+---
+
 # Aula 10 – Domínio, Subdomínio e Bounded Contexts com DDD
 
 Na Aula anterior vimos os conceitos introdutório de microsserviços.

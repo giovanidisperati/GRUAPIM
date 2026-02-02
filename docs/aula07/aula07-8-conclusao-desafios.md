@@ -18,20 +18,16 @@ Nesta aula, você viu na prática:
 - A implementação de um **tratamento global de exceções** robusto e padronizado;
 - E a criação de **testes automatizados** (unitários e funcionais) para garantir a qualidade e a confiabilidade da aplicação.
 
-Mais do que apenas codar, exercitamos um olhar **crítico e consciente** sobre a arquitetura da aplicação — refletindo sobre *por que* certas escolhas são feitas (como a inclusão da camada de serviço) e *quando* elas de fato agregam valor.
+Mais do que apenas codificar, exercitamos um olhar **crítico e consciente** sobre a arquitetura da aplicação — refletindo sobre *por que* certas escolhas são feitas (como a inclusão da camada de serviço) e *quando* elas de fato agregam valor. Fica cada vez mais evidente que dominar desenvolvimento de APIs não se resume a conhecer frameworks ou decorar anotações: é sobre **saber estruturar soluções que sejam limpas, compreensíveis e evolutivas**.
 
-Fica cada vez mais evidente que dominar desenvolvimento de APIs não se resume a conhecer frameworks ou decorar anotações — é sobre **saber estruturar soluções que sejam limpas, compreensíveis, escaláveis e evolutivas**.
+É isso que queremos deixar claro! Essa disciplina não se trata de aprender a fazer APIs com uso do Spring Boot, mas sim de entender os fundamentos. O Java e o Spring são meios, não fim. Todos os conceitos e discussões que temos trazido são transferíveis para outras linguagens e frameworks. 
 
-É isso que queremos deixar claro: não se trata de aprender a fazer APIs com uso do Spring Boot, se trata de entender os fundamentos. O Java e o Spring são meios, não fim. Todos os conceitos e discussões que temos trazido são transferíveis para outras linguagens e frameworks. 
-
-E tenha sempre em mente: **o melhor código é aquele que é fácil de entender, de testar e de melhorar**. E todos os princípios aplicados nesta aula caminham nesse sentido.
-
-Vamos explorar, na próxima aula, os conceitos autenticação, autorização e segurança de APIs — levando nossas aplicações para um nível mais próximo do mundo real. 🚀
+E tenha sempre em mente: **o melhor código é aquele que é fácil de entender, de testar e de melhorar**. Os princípios aplicados nesta aula caminham nesse sentido. Vamos explorar, na próxima aula, os conceitos autenticação, autorização e segurança de APIs, levando nossas aplicações para um nível mais próximo do mundo real. 🚀
 
 E claro... já sabem o que vamos ter, né? 
 
 ---
-
+  
 ## Desafios 🏋️‍♂️
 
 Para consolidar ainda mais os conceitos vistos e introduzir **novas práticas**, você deverá implementar as seguintes melhorias no projeto atual como exercício:

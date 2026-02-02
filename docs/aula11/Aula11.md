@@ -1,3 +1,11 @@
+---
+layout: aula
+title: Aula 11 - Duas soluções para o nosso projeto!
+nav_order: 13
+has_children: true
+permalink: /aula11
+---
+
 # **Aula 11 – Duas soluções possíveis para o nosso Projeto**
 
 Na aula anterior, propusemos o projeto de extração de um Microsserviço. Agora, vamos propor duas soluções distintas, com base no todo que fizemos em aula: uma considerando a extração do nosso *core subdomain* e outra considerando a extração de um *support subdomain* (autenticação e autorização).
