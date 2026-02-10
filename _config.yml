@@ -24,10 +24,13 @@ description: Material didático para apoio à disciplina de APIS e Microsserviç
 # url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Build settings
-theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
 color_scheme: light # Opcional (light, dark)
 search_enabled: true
 heading_anchors: true # Cria links automáticos nos títulos h1, h2...
+
+url: "https://giovanidisperati.github.io"
+baseurl: "/GRUAPIM"
 
 # # Auxiliares
 # kramdown:
