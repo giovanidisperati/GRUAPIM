@@ -39,7 +39,7 @@ Crie uma classe `Produto` com os atributos: `nome` (String), `preco` (double) e 
 
 A startup de tecnologia educacional **AcademiaDev** está lançando sua nova plataforma de cursos online. Seu modelo de negócio é baseado em um sistema de assinaturas que dá aos alunos acesso a um catálogo de cursos de alta qualidade, focados no desenvolvimento de software.
 
-Para validar sua proposta de negócio, a AcademiaDev contratou sua equipe para desenvolver um protótipo inicial da aplicação. Por um infortúnio do destino, parte de sua equipe foi hospitalizada após a ingestão de dezenas de torresmos no Bar do Bigode ao comemorar mais uma vitória do Corinthians sobre o Palmeiras.
+Para validar sua proposta de negócio, a AcademiaDev contratou sua equipe para desenvolver um protótipo inicial da aplicação. Por um infortúnio do destino, parte de sua equipe foi hospitalizada após uma comemoração no Bar do Bigode ao celebrar mais uma vitória do Corinthians sobre o Palmeiras.
 
 Dessa forma, cabe a você, o(a) único(a) desenvolvedor(a) _geração saúde_ da equipe, trabalhar na implementação desse protótipo inicial utilizando todos os conceitos que foram relembrados na Aula 01 e vistos na Aula 02. Nesse protótipo os requisitos são focados na implementação da lógica de negócio principal, utilizando um conjunto de dados já existente.
 
