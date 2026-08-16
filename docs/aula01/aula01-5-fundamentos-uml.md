@@ -5,7 +5,7 @@ parent: Aula 01 - Revisão sobre Java e POO
 nav_order: 5
 ---
 
-## **PARTE V - Modelagem com UML**
+## **Modelagem com UML**
 
 ### **5.1 O que é e por que usar a UML?**
 

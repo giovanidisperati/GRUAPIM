@@ -5,7 +5,7 @@ parent: Aula 01 - Revisão sobre Java e POO
 nav_order: 1
 ---
 
-## **PARTE I - Fundamentos da Linguagem Java**  
+## **Fundamentos da Linguagem Java**  
 
 ### **1. Sintaxe Básica do Java**
 

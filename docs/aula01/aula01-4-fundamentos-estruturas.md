@@ -5,7 +5,7 @@ parent: Aula 01 - Revisão sobre Java e POO
 nav_order: 4
 ---
 
-## **PARTE IV - Explorando a API de Collections do Java**
+## **Explorando a API de Collections do Java**
 
 Enquanto arrays são úteis para armazenar sequências de tamanho fixo, a maioria das aplicações precisa gerenciar grupos de objetos de forma dinâmica. O **Java Collections Framework (JCF)** resolve esse problema, oferecendo um conjunto robusto e eficiente de estruturas de dados prontas para uso. A escolha da `Collection` correta é uma decisão de design crucial que impacta diretamente a performance e a clareza do seu código.
 

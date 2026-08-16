@@ -5,7 +5,7 @@ parent: Aula 01 - Revisão sobre Java e POO
 nav_order: 3
 ---
 
-## **PARTE III - Tópicos Essenciais do Ecossistema Java**
+## **Tópicos Essenciais do Ecossistema Java**
 
 Com os fundamentos da POO estabelecidos, vamos agora explorar recursos cruciais da plataforma Java que nos permitem escrever código mais seguro, robusto e flexível.
 

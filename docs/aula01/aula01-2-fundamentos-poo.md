@@ -5,7 +5,7 @@ parent: Aula 01 - Revisão sobre Java e POO
 nav_order: 2
 ---
 
-## **PARTE II - O Paradigma da Programação Orientada a Objetos (POO)**
+## **O Paradigma da Programação Orientada a Objetos (POO)**
 
 A Programação Orientada a Objetos (POO) é um paradigma que estrutura o software em torno de "objetos" em vez de funções e lógica. Vamos explorar seus pilares fundamentais.
 

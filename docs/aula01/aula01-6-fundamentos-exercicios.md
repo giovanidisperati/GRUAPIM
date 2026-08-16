@@ -5,7 +5,7 @@ parent: Aula 01 - Revisão sobre Java e POO
 nav_order: 6
 ---
 
-## **Exercícios ⚒️**
+## **Exercícios**
 
 Os exercícios abaixo ajudarão a fixar os conceitos abordados. Elabore-os individualmente. 
 
